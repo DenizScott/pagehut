@@ -1,0 +1,49 @@
+{
+  "app": {
+    "tagline": "GDD-Arbeitsbereich",
+    "description": "Ein kostenloser Open-Source-Arbeitsbereich für Game-Design-Dokumente."
+  },
+  "a11y": {
+    "skipToContent": "Zum Inhalt springen",
+    "mainNav": "Navigation im Arbeitsbereich",
+    "openSidebar": "Seitenleiste öffnen",
+    "closeSidebar": "Seitenleiste schließen",
+    "dismiss": "Schließen"
+  },
+  "shell": {
+    "pages": "Seiten",
+    "newPage": "Neue Seite",
+    "untitled": "Ohne Titel",
+    "localMode": "Lokaler Modus",
+    "localModeHint": "Nur in diesem Browser gespeichert. Verbinde später GitHub, um es mit deinem Team zu teilen.",
+    "deletePage": "Seite löschen",
+    "pageActions": "Seitenaktionen",
+    "loading": "Arbeitsbereich wird geladen …",
+    "notFound": "Diese Seite gibt es in diesem Arbeitsbereich nicht.",
+    "backHome": "Zur ersten Seite",
+    "workspaceName": "Mein GDD"
+  },
+  "settings": {
+    "language": "Sprache",
+    "theme": "Design",
+    "themeLight": "Hell",
+    "themeDark": "Dunkel",
+    "themeSystem": "System"
+  },
+  "status": {
+    "savedLocally": "Lokal gespeichert",
+    "saving": "Wird gespeichert …",
+    "offline": "Offline: lokal gespeichert",
+    "error": "Speichern fehlgeschlagen. Dein Text ist noch im Editor.",
+    "label": "Speicherstatus"
+  },
+  "page": {
+    "titlePlaceholder": "Ohne Titel",
+    "titleLabel": "Seitentitel",
+    "lastEdited": "Bearbeitet {time}"
+  },
+  "welcome": {
+    "title": "Willkommen bei {appName}",
+    "body": "{appName} ist ein kostenloser Arbeitsbereich für **Game-Design-Dokumente**.\n\n:::callout idea\nTippe irgendwo `/`, um Überschriften, To-dos, Aufklapper, Hinweisboxen, Tabellen und mehr einzufügen.\n:::\n\n## Probier es aus\n\n- [ ] Schreib den Ein-Satz-Pitch deines Spiels\n- [ ] Lege drei Design-Pillars fest\n- [ ] Beschreibe den Core Loop\n\n:::toggle Wo wird meine Arbeit gespeichert?\nIm lokalen Modus bleibt alles in diesem Browser (IndexedDB). Später kannst du ein GitHub-Repository verbinden, damit dein Team am selben GDD arbeitet.\n:::\n"
+  }
+}

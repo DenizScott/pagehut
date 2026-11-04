@@ -1,0 +1,21 @@
+{
+  "placeholder": "Bir şeyler yaz ya da komutlar için “/” yaz…",
+  "headingPlaceholder": "Başlık {level}",
+  "toolbar": {
+    "label": "Metin biçimlendirme",
+    "bold": "Kalın",
+    "italic": "İtalik",
+    "underline": "Altı çizili",
+    "strike": "Üstü çizili",
+    "code": "Satır içi kod",
+    "link": "Bağlantı",
+    "linkPrompt": "Bağlantı adresi (kaldırmak için boş bırak)"
+  },
+  "dragHandle": "Bu bloğu taşımak için sürükle",
+  "image": {
+    "large": "Bu görsel {size} MB. Yaklaşık 1 MB üzerindeki görseller deponun eşitlenmesini yavaşlatır.",
+    "tooLarge": "Bu dosya {size} MB. Sınır 25 MB.",
+    "failed": "Görsel eklenemedi.",
+    "alt": "Görsel"
+  }
+}

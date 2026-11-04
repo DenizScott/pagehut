@@ -1,0 +1,49 @@
+{
+  "app": {
+    "tagline": "GDD Çalışma Alanı",
+    "description": "Oyun tasarım dokümanları için ücretsiz ve açık kaynak çalışma alanı."
+  },
+  "a11y": {
+    "skipToContent": "İçeriğe geç",
+    "mainNav": "Çalışma alanı gezinmesi",
+    "openSidebar": "Kenar çubuğunu aç",
+    "closeSidebar": "Kenar çubuğunu kapat",
+    "dismiss": "Kapat"
+  },
+  "shell": {
+    "pages": "Sayfalar",
+    "newPage": "Yeni sayfa",
+    "untitled": "Adsız",
+    "localMode": "Yerel mod",
+    "localModeHint": "Yalnızca bu tarayıcıda saklanır. Ekibinle paylaşmak için daha sonra GitHub'a bağlayabilirsin.",
+    "deletePage": "Sayfayı sil",
+    "pageActions": "Sayfa işlemleri",
+    "loading": "Çalışma alanı yükleniyor…",
+    "notFound": "Bu sayfa bu çalışma alanında yok.",
+    "backHome": "İlk sayfaya git",
+    "workspaceName": "GDD Çalışma Alanım"
+  },
+  "settings": {
+    "language": "Dil",
+    "theme": "Tema",
+    "themeLight": "Açık",
+    "themeDark": "Koyu",
+    "themeSystem": "Sistem"
+  },
+  "status": {
+    "savedLocally": "Yerel olarak kaydedildi",
+    "saving": "Kaydediliyor…",
+    "offline": "Çevrimdışı: yerel olarak kaydedildi",
+    "error": "Kaydedilemedi. Metnin hâlâ düzenleyicide.",
+    "label": "Kayıt durumu"
+  },
+  "page": {
+    "titlePlaceholder": "Adsız",
+    "titleLabel": "Sayfa başlığı",
+    "lastEdited": "{time} düzenlendi"
+  },
+  "welcome": {
+    "title": "{appName} uygulamasına hoş geldin",
+    "body": "{appName}, **oyun tasarım dokümanları** (GDD) için ücretsiz bir çalışma alanı.\n\n:::callout idea\nBaşlık, yapılacaklar, açılır blok, bilgi kutusu, tablo ve daha fazlasını eklemek için herhangi bir yere `/` yaz.\n:::\n\n## Dene\n\n- [ ] Oyununun tek cümlelik tanıtımını (pitch) yaz\n- [ ] Üç tasarım ilkesi (design pillar) belirle\n- [ ] Çekirdek döngüyü (core loop) anlat\n\n:::toggle Çalışmalarım nerede saklanıyor?\nYerel modda her şey bu tarayıcıda (IndexedDB) kalır. Daha sonra bir GitHub deposu bağlayarak ekibinle aynı GDD üzerinde çalışabilirsin.\n:::\n"
+  }
+}

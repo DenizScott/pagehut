@@ -1,0 +1,27 @@
+{
+  "label": "Insert block",
+  "noResults": "No matching blocks",
+  "groups": {
+    "basic": "Basic blocks",
+    "structure": "Structure",
+    "media": "Media"
+  },
+  "items": {
+    "text": { "title": "Text", "description": "Plain paragraph", "keywords": "paragraph plain" },
+    "h1": { "title": "Heading 1", "description": "Large section heading", "keywords": "title big" },
+    "h2": { "title": "Heading 2", "description": "Medium section heading", "keywords": "subtitle" },
+    "h3": { "title": "Heading 3", "description": "Small section heading", "keywords": "subheading" },
+    "bullet": { "title": "Bulleted list", "description": "Simple list", "keywords": "unordered ul" },
+    "numbered": { "title": "Numbered list", "description": "Ordered steps", "keywords": "ordered ol steps" },
+    "todo": { "title": "To-do list", "description": "Checklist with checkboxes", "keywords": "task checkbox check" },
+    "toggle": { "title": "Toggle", "description": "Collapsible section", "keywords": "collapse details fold" },
+    "quote": { "title": "Quote", "description": "Quotation or player feedback", "keywords": "blockquote citation" },
+    "callout": { "title": "Callout", "description": "Highlighted note", "keywords": "note info box" },
+    "warning": { "title": "Warning callout", "description": "Risk or open question", "keywords": "risk caution alert" },
+    "idea": { "title": "Idea callout", "description": "Design idea to explore", "keywords": "idea suggestion lightbulb" },
+    "divider": { "title": "Divider", "description": "Horizontal line", "keywords": "hr line separator" },
+    "code": { "title": "Code block", "description": "Code or pseudo-code", "keywords": "snippet pre" },
+    "table": { "title": "Table", "description": "Stats, controls, comparisons", "keywords": "grid stats" },
+    "image": { "title": "Image", "description": "Upload concept art or a screenshot", "keywords": "picture photo upload art" }
+  }
+}

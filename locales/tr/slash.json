@@ -1,0 +1,27 @@
+{
+  "label": "Blok ekle",
+  "noResults": "Eşleşen blok yok",
+  "groups": {
+    "basic": "Temel bloklar",
+    "structure": "Yapı",
+    "media": "Medya"
+  },
+  "items": {
+    "text": { "title": "Metin", "description": "Düz paragraf", "keywords": "paragraf düz yazı" },
+    "h1": { "title": "Başlık 1", "description": "Büyük bölüm başlığı", "keywords": "başlık büyük" },
+    "h2": { "title": "Başlık 2", "description": "Orta bölüm başlığı", "keywords": "başlık alt" },
+    "h3": { "title": "Başlık 3", "description": "Küçük bölüm başlığı", "keywords": "başlık küçük" },
+    "bullet": { "title": "Madde işaretli liste", "description": "Basit liste", "keywords": "liste madde" },
+    "numbered": { "title": "Numaralı liste", "description": "Sıralı adımlar", "keywords": "liste sıralı adım numara" },
+    "todo": { "title": "Yapılacaklar listesi", "description": "Onay kutulu kontrol listesi", "keywords": "görev yapılacak kutu kontrol" },
+    "toggle": { "title": "Açılır blok", "description": "Katlanabilir bölüm", "keywords": "aç kapa katla gizle" },
+    "quote": { "title": "Alıntı", "description": "Alıntı ya da oyuncu geri bildirimi", "keywords": "alıntı söz geri bildirim" },
+    "callout": { "title": "Bilgi kutusu", "description": "Vurgulanmış not", "keywords": "not bilgi kutu" },
+    "warning": { "title": "Uyarı kutusu", "description": "Risk ya da açık soru", "keywords": "uyarı risk dikkat soru" },
+    "idea": { "title": "Fikir kutusu", "description": "Denenecek tasarım fikri", "keywords": "fikir öneri ampul" },
+    "divider": { "title": "Ayırıcı", "description": "Yatay çizgi", "keywords": "çizgi ayraç" },
+    "code": { "title": "Kod bloğu", "description": "Kod ya da sözde kod", "keywords": "kod betik script" },
+    "table": { "title": "Tablo", "description": "Statlar, kontroller, karşılaştırmalar", "keywords": "tablo stat değer" },
+    "image": { "title": "Görsel", "description": "Konsept çizimi ya da ekran görüntüsü yükle", "keywords": "resim görsel fotoğraf yükle çizim" }
+  }
+}

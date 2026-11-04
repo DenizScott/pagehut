@@ -1,0 +1,49 @@
+{
+  "app": {
+    "tagline": "GDD Workspace",
+    "description": "A free, open-source workspace for game design documents."
+  },
+  "a11y": {
+    "skipToContent": "Skip to content",
+    "mainNav": "Workspace navigation",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar",
+    "dismiss": "Dismiss"
+  },
+  "shell": {
+    "pages": "Pages",
+    "newPage": "New page",
+    "untitled": "Untitled",
+    "localMode": "Local mode",
+    "localModeHint": "Stored in this browser only. Connect GitHub later to share it with your team.",
+    "deletePage": "Delete page",
+    "pageActions": "Page actions",
+    "loading": "Loading workspace…",
+    "notFound": "This page doesn't exist in this workspace.",
+    "backHome": "Go to first page",
+    "workspaceName": "My GDD"
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System"
+  },
+  "status": {
+    "savedLocally": "Saved locally",
+    "saving": "Saving…",
+    "offline": "Offline: saved locally",
+    "error": "Couldn't save. Your text is still in the editor.",
+    "label": "Save status"
+  },
+  "page": {
+    "titlePlaceholder": "Untitled",
+    "titleLabel": "Page title",
+    "lastEdited": "Edited {time}"
+  },
+  "welcome": {
+    "title": "Welcome to {appName}",
+    "body": "{appName} is a free workspace for **game design documents**.\n\n:::callout idea\nType `/` anywhere to insert headings, to-dos, toggles, callouts, tables and more.\n:::\n\n## Try it\n\n- [ ] Write your game's one-sentence pitch\n- [ ] List three design pillars\n- [ ] Describe the core loop\n\n:::toggle Where is my work stored?\nIn local mode everything stays in this browser (IndexedDB). Later you can connect a GitHub repository so your team can work on the same GDD.\n:::\n"
+  }
+}

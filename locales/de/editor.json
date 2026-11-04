@@ -1,0 +1,21 @@
+{
+  "placeholder": "Schreib etwas oder tippe „/“ für Befehle …",
+  "headingPlaceholder": "Überschrift {level}",
+  "toolbar": {
+    "label": "Textformatierung",
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "underline": "Unterstrichen",
+    "strike": "Durchgestrichen",
+    "code": "Inline-Code",
+    "link": "Link",
+    "linkPrompt": "Link-Adresse (leer lassen zum Entfernen)"
+  },
+  "dragHandle": "Ziehen, um diesen Block zu verschieben",
+  "image": {
+    "large": "Dieses Bild ist {size} MB groß. Bilder über ca. 1 MB verlangsamen die Synchronisierung des Repositorys.",
+    "tooLarge": "Diese Datei ist {size} MB groß. Das Limit liegt bei 25 MB.",
+    "failed": "Das Bild konnte nicht hinzugefügt werden.",
+    "alt": "Bild"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "placeholder": "Write something, or type “/” for commands…",
+  "headingPlaceholder": "Heading {level}",
+  "toolbar": {
+    "label": "Text formatting",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strike": "Strikethrough",
+    "code": "Inline code",
+    "link": "Link",
+    "linkPrompt": "Link address (leave empty to remove)"
+  },
+  "dragHandle": "Drag to move this block",
+  "image": {
+    "large": "This image is {size} MB. Images above ~1 MB make the repository slow to sync.",
+    "tooLarge": "This file is {size} MB. The limit is 25 MB.",
+    "failed": "The image couldn't be added.",
+    "alt": "Image"
+  }
+}
