@@ -77,7 +77,10 @@ export function Editor({ page, onReady }: EditorProps) {
 
   const extensions = useMemo(
     () => [
-      ...schemaExtensions().map((ext) => (ext.name === "image" ? AssetImage : ext)),
+      ...schemaExtensions({
+        taskCheckbox: (node) => t("a11y.taskCheckbox", { text: node.textContent || t("a11y.emptyTask") }),
+        toggle: (isOpen) => (isOpen ? t("a11y.collapse") : t("a11y.expand")),
+      }).map((ext) => (ext.name === "image" ? AssetImage : ext)),
       Placeholder.configure({
         placeholder: ({ node }) =>
           node.type.name === "heading" ? t("headingPlaceholder", { level: node.attrs.level as number }) : t("placeholder"),
@@ -106,7 +109,7 @@ export function Editor({ page, onReady }: EditorProps) {
         class: "lk-editor-content",
         role: "textbox",
         "aria-multiline": "true",
-        "aria-label": page.title || "Document",
+        "aria-label": t("contentLabel"),
         spellcheck: "true",
         lang: locale,
       },
@@ -129,7 +132,12 @@ export function Editor({ page, onReady }: EditorProps) {
 
   useEffect(() => {
     editorRef.current = editor;
-    if (editor) onReady?.(() => editor.commands.focus("start"));
+    // view.focus() is synchronous; commands.focus() alone waits for an animation frame.
+    if (editor)
+      onReady?.(() => {
+        editor.commands.setTextSelection(1);
+        editor.view.focus();
+      });
   }, [editor, onReady]);
 
   return (

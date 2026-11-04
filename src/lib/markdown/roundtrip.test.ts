@@ -14,7 +14,7 @@ const cases: Record<string, string> = {
   marks: "**bold** *italic* ~~strike~~ ++under++ `code`\n",
   // Tiptap's code mark excludes all other marks, so bold never wraps code.
   "nested marks": "***bold italic*** and **bold** `code`\n",
-  link: '[Project GDD](https://example.com "Title") and <https://example.org>\n',
+  link: '[PageHut](https://example.com "Title") and <https://example.org>\n',
   "hard break": "line one\\\nline two\n",
   "bullet list": "- one\n- two\n  - nested\n- three\n",
   "ordered list": "1. first\n2. second\n3. third\n",

@@ -1,5 +1,6 @@
 import { ulid } from "ulid";
 import { getDB } from "./db";
+import { migrateLegacyDatabases } from "./migrate";
 import { docToMarkdown } from "@/lib/markdown/serialize";
 import { markdownToDoc } from "@/lib/markdown/parse";
 import {
@@ -25,6 +26,8 @@ export interface WelcomeContent {
 /** Returns the active workspace, creating a local one with a welcome page on first run. */
 export async function ensureWorkspace(welcome: WelcomeContent): Promise<WorkspaceRecord> {
   const db = getDB();
+  // Bring over data saved under an earlier product name before deciding this is a first run.
+  await migrateLegacyDatabases(db);
   return db.transaction("rw", db.workspaces, db.pages, db.kv, async () => {
     const activeId = (await db.kv.get(ACTIVE_WS_KEY))?.value as string | undefined;
     const existing = activeId ? await db.workspaces.get(activeId) : await db.workspaces.orderBy("updatedAt").last();

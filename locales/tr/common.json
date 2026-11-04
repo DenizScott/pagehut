@@ -1,6 +1,7 @@
 {
   "app": {
-    "tagline": "GDD Çalışma Alanı",
+    "name": "PageHut",
+    "tagline": "Oyun tasarım çalışma alanı",
     "description": "Oyun tasarım dokümanları için ücretsiz ve açık kaynak çalışma alanı."
   },
   "a11y": {
@@ -21,7 +22,7 @@
     "loading": "Çalışma alanı yükleniyor…",
     "notFound": "Bu sayfa bu çalışma alanında yok.",
     "backHome": "İlk sayfaya git",
-    "workspaceName": "GDD Çalışma Alanım"
+    "workspaceName": "Oyunum"
   },
   "settings": {
     "language": "Dil",

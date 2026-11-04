@@ -17,5 +17,12 @@
     "tooLarge": "This file is {size} MB. The limit is 25 MB.",
     "failed": "The image couldn't be added.",
     "alt": "Image"
-  }
+  },
+  "a11y": {
+    "taskCheckbox": "Mark “{text}” as done",
+    "emptyTask": "empty task",
+    "expand": "Expand section",
+    "collapse": "Collapse section"
+  },
+  "contentLabel": "Page content"
 }

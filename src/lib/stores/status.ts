@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 /**
  * Save/sync status shown in the top bar. P3 adds "syncing" | "synced" | "conflict".
+ * Several savers run at once (title, content…); the status is "saved" only when none is pending.
  */
 export type SaveState = "idle" | "saving" | "saved" | "error";
 
@@ -16,7 +17,12 @@ interface StatusStore {
   lastSavedAt: number | null;
   online: boolean;
   toasts: Toast[];
-  setSave: (s: SaveState) => void;
+  /** Savers with unsaved changes, by saver id. */
+  pending: ReadonlySet<string>;
+  failed: ReadonlySet<string>;
+  markPending: (saverId: string) => void;
+  markSaved: (saverId: string) => void;
+  markFailed: (saverId: string) => void;
   setOnline: (online: boolean) => void;
   toast: (message: string, tone?: Toast["tone"]) => void;
   dismiss: (id: number) => void;
@@ -24,12 +30,43 @@ interface StatusStore {
 
 let toastId = 0;
 
+function derive(pending: ReadonlySet<string>, failed: ReadonlySet<string>): SaveState {
+  if (failed.size) return "error";
+  if (pending.size) return "saving";
+  return "saved";
+}
+
+const without = (set: ReadonlySet<string>, id: string) => {
+  const next = new Set(set);
+  next.delete(id);
+  return next;
+};
+
 export const useStatus = create<StatusStore>((set) => ({
   save: "idle",
   lastSavedAt: null,
   online: true,
   toasts: [],
-  setSave: (save) => set(save === "saved" ? { save, lastSavedAt: Date.now() } : { save }),
+  pending: new Set(),
+  failed: new Set(),
+  markPending: (id) =>
+    set((s) => {
+      const pending = new Set(s.pending).add(id);
+      return { pending, save: derive(pending, s.failed) };
+    }),
+  markSaved: (id) =>
+    set((s) => {
+      const pending = without(s.pending, id);
+      const failed = without(s.failed, id);
+      const save = derive(pending, failed);
+      return { pending, failed, save, ...(save === "saved" ? { lastSavedAt: Date.now() } : {}) };
+    }),
+  markFailed: (id) =>
+    set((s) => {
+      const pending = without(s.pending, id);
+      const failed = new Set(s.failed).add(id);
+      return { pending, failed, save: derive(pending, failed) };
+    }),
   setOnline: (online) => set({ online }),
   toast: (message, tone = "info") => {
     const id = ++toastId;

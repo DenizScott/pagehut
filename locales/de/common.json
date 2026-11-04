@@ -1,6 +1,7 @@
 {
   "app": {
-    "tagline": "GDD-Arbeitsbereich",
+    "name": "PageHut",
+    "tagline": "Game-Design-Arbeitsbereich",
     "description": "Ein kostenloser Open-Source-Arbeitsbereich für Game-Design-Dokumente."
   },
   "a11y": {
@@ -21,7 +22,7 @@
     "loading": "Arbeitsbereich wird geladen …",
     "notFound": "Diese Seite gibt es in diesem Arbeitsbereich nicht.",
     "backHome": "Zur ersten Seite",
-    "workspaceName": "Mein GDD"
+    "workspaceName": "Mein Spiel"
   },
   "settings": {
     "language": "Sprache",

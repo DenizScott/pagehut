@@ -1,14 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useId, useRef } from "react";
 import { useStatus } from "@/lib/stores/status";
 
 /**
  * Debounced save that always flushes: on unmount (page switch), tab hide and page unload.
- * The latest value wins; a failed save keeps the status at "error" and retries on the next change.
+ * The latest value wins. Each saver reports to the shared status by its own id, so the top bar
+ * only says "saved" once every saver has finished.
  */
 export function useDebouncedSaver<T>(save: (value: T) => Promise<unknown>, delay = 300) {
-  const setSave = useStatus((s) => s.setSave);
+  const saverId = useId();
+  const markPending = useStatus((s) => s.markPending);
+  const markSaved = useStatus((s) => s.markSaved);
+  const markFailed = useStatus((s) => s.markFailed);
   const pending = useRef<{ value: T } | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const saveRef = useRef(save);
@@ -25,21 +29,22 @@ export function useDebouncedSaver<T>(save: (value: T) => Promise<unknown>, delay
     pending.current = null;
     try {
       await saveRef.current(item.value);
-      if (!pending.current) setSave("saved");
+      // A newer value may have been scheduled while this one was being written.
+      if (!pending.current) markSaved(saverId);
     } catch (err) {
       console.error("[autosave] failed", err);
-      setSave("error");
+      markFailed(saverId);
     }
-  }, [setSave]);
+  }, [markFailed, markSaved, saverId]);
 
   const schedule = useCallback(
     (value: T) => {
       pending.current = { value };
-      setSave("saving");
+      markPending(saverId);
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(() => void flush(), delay);
     },
-    [delay, flush, setSave],
+    [delay, flush, markPending, saverId],
   );
 
   useEffect(() => {

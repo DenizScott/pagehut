@@ -4,7 +4,6 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { FileText, HardDrive, Plus, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { BRAND } from "@/config/brand";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createPage, listPages } from "@/lib/storage/local-repo";
 import { useWorkspace } from "@/lib/stores/workspace";
@@ -40,7 +39,7 @@ export function Sidebar() {
       <div className="flex items-center gap-2 px-3 pt-3 pb-2">
         <Logo className="size-7" />
         <div className="min-w-0 flex-1 leading-tight">
-          <p className="truncate text-sm font-semibold">{BRAND.name}</p>
+          <p className="truncate text-sm font-semibold">{t("app.name")}</p>
           <p className="truncate text-xs text-fg-muted">{workspace?.name ?? t("app.tagline")}</p>
         </div>
         <Button size="icon-sm" className="md:hidden" onClick={() => setOpen(false)} aria-label={t("a11y.closeSidebar")}>

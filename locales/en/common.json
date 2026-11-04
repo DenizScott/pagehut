@@ -1,6 +1,7 @@
 {
   "app": {
-    "tagline": "GDD Workspace",
+    "name": "PageHut",
+    "tagline": "Game design workspace",
     "description": "A free, open-source workspace for game design documents."
   },
   "a11y": {
@@ -21,7 +22,7 @@
     "loading": "Loading workspace…",
     "notFound": "This page doesn't exist in this workspace.",
     "backHome": "Go to first page",
-    "workspaceName": "My GDD"
+    "workspaceName": "My game"
   },
   "settings": {
     "language": "Language",

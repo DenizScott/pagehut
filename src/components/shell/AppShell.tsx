@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { BRAND } from "@/config/brand";
 import { ensureWorkspace } from "@/lib/storage/local-repo";
 import { useStatus } from "@/lib/stores/status";
 import { useWorkspace } from "@/lib/stores/workspace";
@@ -21,8 +20,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (workspace) return;
     ensureWorkspace({
-      title: t("welcome.title", { appName: BRAND.name }),
-      markdown: t("welcome.body", { appName: BRAND.name }),
+      title: t("welcome.title", { appName: t("app.name") }),
+      markdown: t("welcome.body", { appName: t("app.name") }),
       workspaceName: t("shell.workspaceName"),
     })
       .then(setWorkspace)
@@ -66,12 +65,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p role="alert" className="m-auto max-w-md p-6 text-center text-danger">
             {error}
           </p>
-        ) : workspace ? (
-          <Suspense fallback={null}>{children}</Suspense>
         ) : (
-          <p className="m-auto text-fg-muted" role="status">
-            {t("shell.loading")}
-          </p>
+          // Always rendered so the route segment can prerender; pages wait for data themselves.
+          <Suspense fallback={null}>{children}</Suspense>
         )}
       </main>
       <Toasts />

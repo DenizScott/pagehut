@@ -178,9 +178,9 @@ body {
 .lk-editor [data-type="details"] { display: flex; gap: 0.25rem; }
 .lk-editor [data-type="details"] > button { width: 1.5rem; height: 1.5rem; flex-shrink: 0; display: grid; place-items: center; border-radius: 4px; margin-top: 0.2rem; }
 .lk-editor [data-type="details"] > button:hover { background: var(--surface-hover); }
-.lk-editor [data-type="details"] > button::before { content: "▸"; font-size: 0.8rem; transition: transform 0.15s; }
-.lk-editor [data-type="details"].is-open > button::before { transform: rotate(90deg); }
-.lk-editor [dir="rtl"] [data-type="details"] > button::before { content: "◂"; }
+.lk-editor [data-type="details"] > button::before { content: ""; width: 0.45rem; height: 0.45rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform 0.15s; color: var(--fg-muted); }
+.lk-editor [data-type="details"].is-open > button::before { transform: rotate(45deg); }
+[dir="rtl"] .lk-editor [data-type="details"]:not(.is-open) > button::before { transform: scaleX(-1) rotate(-45deg); }
 .lk-editor [data-type="details"] > div { flex: 1; min-width: 0; }
 .lk-editor [data-type="detailsSummary"] { font-weight: 500; }
 .lk-editor [data-type="details"]:not(.is-open) [data-type="detailsContent"] { display: none; }

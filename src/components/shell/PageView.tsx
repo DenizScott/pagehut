@@ -61,6 +61,11 @@ function PageEditor({ page }: { page: PageRecord }) {
   const focusEditor = useRef<(() => void) | null>(null);
   const titleSaver = useDebouncedSaver((value: string) => savePageTitle(page.id, value));
 
+  // A brand-new page starts with the cursor in the title.
+  useEffect(() => {
+    if (!page.title && !page.markdown.trim()) titleRef.current?.focus();
+  }, [page.title, page.markdown]);
+
   // Auto-grow the title textarea.
   useEffect(() => {
     const el = titleRef.current;

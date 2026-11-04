@@ -17,5 +17,12 @@
     "tooLarge": "Bu dosya {size} MB. Sınır 25 MB.",
     "failed": "Görsel eklenemedi.",
     "alt": "Görsel"
-  }
+  },
+  "a11y": {
+    "taskCheckbox": "“{text}” görevini tamamlandı olarak işaretle",
+    "emptyTask": "boş görev",
+    "expand": "Bölümü aç",
+    "collapse": "Bölümü kapat"
+  },
+  "contentLabel": "Sayfa içeriği"
 }
