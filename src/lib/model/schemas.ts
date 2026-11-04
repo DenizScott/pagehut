@@ -35,6 +35,7 @@ export const pillarSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
 });
+export type Pillar = z.infer<typeof pillarSchema>;
 
 /** workspace.json at the repo root */
 export const workspaceFileSchema = z.object({
@@ -57,6 +58,8 @@ export interface WorkspaceRecord {
   mode: StorageMode;
   createdAt: number;
   updatedAt: number;
+  /** Design pillars shown above every page. */
+  pillars?: Pillar[];
   /** github mode only (P2) */
   repo?: { owner: string; name: string; branch: string };
 }

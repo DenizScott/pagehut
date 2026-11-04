@@ -4,6 +4,7 @@ import {
   defaultMarkdownSerializer,
   type MarkdownSerializerState,
 } from "prosemirror-markdown";
+import { pageLinkTitle } from "@/lib/editor/page-link";
 import { getDocSchema } from "./schema";
 
 /**
@@ -162,6 +163,10 @@ export const markdownSerializer = new MarkdownSerializer(
       const summary = node.firstChild?.textContent.replace(/\s+/g, " ").trim() ?? "";
       const content = node.lastChild?.type.name === "detailsContent" ? node.lastChild : node;
       renderContainer(state, node, `toggle${summary ? ` ${summary}` : ""}`, content);
+    },
+    pageLink(state, node) {
+      const title = pageLinkTitle(String(node.attrs.title ?? ""));
+      state.write(`[[page:${node.attrs.id as string}${title ? `|${title}` : ""}]]`);
     },
     detailsSummary: () => {},
     detailsContent: (state, node) => state.renderContent(node),

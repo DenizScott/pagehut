@@ -1,6 +1,7 @@
 import { ulid } from "ulid";
 import { getDB } from "./db";
 import { migrateLegacyDatabases } from "./migrate";
+import { descendantIds } from "@/lib/tree";
 import { docToMarkdown } from "@/lib/markdown/serialize";
 import { markdownToDoc } from "@/lib/markdown/parse";
 import {
@@ -116,9 +117,60 @@ export async function savePageTitle(id: string, title: string): Promise<void> {
   await getDB().pages.update(id, { title, updatedAt: now, dirty: true });
 }
 
-/** Soft delete: the page moves to trash (restorable in P1). */
+/** Moves a page in the tree (one record changes; see lib/tree.ts). */
+export async function movePage(id: string, to: { parentId: string | null; order: number }): Promise<void> {
+  await getDB().pages.update(id, { parentId: to.parentId, order: to.order, updatedAt: Date.now(), dirty: true });
+}
+
+/**
+ * Soft delete: the page and its whole subtree move to trash with the same timestamp,
+ * so restoring brings the subtree back together.
+ */
 export async function trashPage(id: string): Promise<void> {
-  await getDB().pages.update(id, { deletedAt: Date.now(), dirty: true });
+  const db = getDB();
+  const page = await db.pages.get(id);
+  if (!page) return;
+  const live = (await db.pages.where("workspaceId").equals(page.workspaceId).toArray()).filter((p) => !p.deletedAt);
+  const ids = [id, ...descendantIds(live, id)];
+  const now = Date.now();
+  await db.transaction("rw", db.pages, async () => {
+    for (const pid of ids) await db.pages.update(pid, { deletedAt: now, dirty: true });
+  });
+}
+
+/** Trashed pages whose parent is not also in trash (the roots of trashed subtrees). */
+export async function listTrash(workspaceId: string): Promise<PageRecord[]> {
+  const all = await getDB().pages.where("workspaceId").equals(workspaceId).toArray();
+  const trashed = all.filter((p) => p.deletedAt);
+  const trashedIds = new Set(trashed.map((p) => p.id));
+  return trashed
+    .filter((p) => !p.parentId || !trashedIds.has(p.parentId))
+    .sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0));
+}
+
+/** Restores a trashed page with the subtree trashed together with it. */
+export async function restorePage(id: string): Promise<void> {
+  const db = getDB();
+  const page = await db.pages.get(id);
+  if (!page?.deletedAt) return;
+  const all = await db.pages.where("workspaceId").equals(page.workspaceId).toArray();
+  const sameBatch = all.filter((p) => p.deletedAt === page.deletedAt);
+  const ids = [id, ...[...descendantIds(sameBatch, id)]];
+  const parent = page.parentId ? all.find((p) => p.id === page.parentId) : undefined;
+  const parentAlive = !!parent && !parent.deletedAt;
+  await db.transaction("rw", db.pages, async () => {
+    for (const pid of ids) await db.pages.update(pid, { deletedAt: undefined, dirty: true });
+    // If the old parent is gone, the page comes back at the top level.
+    if (!parentAlive) await db.pages.update(id, { parentId: null });
+  });
+}
+
+export async function updateWorkspace(id: string, patch: Partial<Omit<WorkspaceRecord, "id">>): Promise<void> {
+  await getDB().workspaces.update(id, { ...patch, updatedAt: Date.now() });
+}
+
+export async function getWorkspace(id: string): Promise<WorkspaceRecord | undefined> {
+  return getDB().workspaces.get(id);
 }
 
 async function touchWorkspace(id: string, at: number) {

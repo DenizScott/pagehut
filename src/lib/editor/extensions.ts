@@ -6,6 +6,7 @@ import { TableKit } from "@tiptap/extension-table";
 import { Details, DetailsContent, DetailsSummary } from "@tiptap/extension-details";
 import Image from "@tiptap/extension-image";
 import { Callout } from "./callout";
+import { PageLink } from "./page-link";
 
 /** Localized accessibility labels; they change rendering only, never the schema. */
 export interface EditorA11yLabels {
@@ -46,5 +47,6 @@ export function schemaExtensions(labels?: EditorA11yLabels): AnyExtension[] {
     DetailsContent,
     Image.configure({ inline: false, allowBase64: false }),
     Callout,
+    PageLink,
   ];
 }

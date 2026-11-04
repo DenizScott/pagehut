@@ -39,6 +39,8 @@ const cases: Record<string, string> = {
   "nested containers": "::::callout idea\nOuter\n\n:::toggle Inner\nDeep\n:::\n::::\n",
   "callout in list": "- item\n\n  :::callout info\n  inside\n  :::\n",
   "escaped specials": "1\\. not a list and \\*not italic\\* and a\\++b\n",
+  "page link": "See [[page:01ARZ3NDEKTSV4RRFFQ69G5FAV|Combat System]] and [[page:01ARZ3NDEKTSV4RRFFQ69G5FAW]].\n",
+  "not a page link": "\\[\\[page:nope\\]\\]\n",
   "turkish text": "Çekirdek döngü: keşfet → topla → geliştir. İğdır, ğüşıöç.\n",
   empty: "",
 };

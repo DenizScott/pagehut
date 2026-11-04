@@ -1,6 +1,7 @@
 import MarkdownIt from "markdown-it";
 import type Token from "markdown-it/lib/token.mjs";
 import type StateCore from "markdown-it/lib/rules_core/state_core.mjs";
+import type StateInline from "markdown-it/lib/rules_inline/state_inline.mjs";
 import container from "markdown-it-container";
 import ins from "markdown-it-ins";
 import { MarkdownParser } from "prosemirror-markdown";
@@ -15,6 +16,7 @@ function createTokenizer(): MarkdownIt {
   const md = new MarkdownIt("commonmark", { html: false, linkify: false });
   md.enable(["table", "strikethrough"]);
   md.use(ins);
+  md.inline.ruler.before("link", "page_link", pageLinkRule);
   md.use(container, "callout", { validate: (p: string) => /^callout(\s|$)/.test(p.trim()) });
   md.use(container, "toggle", { validate: (p: string) => /^toggle(\s|$)/.test(p.trim()) });
   md.core.ruler.push("lk_toggles", toggleRule);
@@ -22,6 +24,22 @@ function createTokenizer(): MarkdownIt {
   md.core.ruler.push("lk_cells", cellParagraphRule);
   md.core.ruler.push("lk_images", imageBlockRule);
   return md;
+}
+
+const PAGE_LINK_AT = /^\[\[page:([0-9A-HJKMNP-TV-Z]{26})(?:\|([^\]\n]*))?\]\]/;
+
+/** `[[page:<ULID>|Title]]` → page_link token (inline atom). */
+function pageLinkRule(state: StateInline, silent: boolean): boolean {
+  if (state.src.charCodeAt(state.pos) !== 0x5b /* [ */) return false;
+  const m = PAGE_LINK_AT.exec(state.src.slice(state.pos));
+  if (!m) return false;
+  if (!silent) {
+    const tok = state.push("page_link", "", 0);
+    tok.attrSet("id", m[1]);
+    tok.attrSet("title", m[2] ?? "");
+  }
+  state.pos += m[0].length;
+  return true;
 }
 
 /** `:::toggle Summary` → details > detailsSummary(text) + detailsContent(blocks) */
@@ -179,6 +197,7 @@ export function getMarkdownParser(): MarkdownParser {
       }),
     },
     hardbreak: { node: "hardBreak" },
+    page_link: { node: "pageLink", getAttrs: (tok) => ({ id: tok.attrGet("id"), title: tok.attrGet("title") ?? "" }) },
     table: { block: "table" },
     thead: { ignore: true },
     tbody: { ignore: true },

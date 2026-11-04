@@ -1,4 +1,7 @@
 import type { Editor, Range } from "@tiptap/core";
+import { searchKey } from "@/lib/text";
+
+export { searchKey };
 import {
   AlertTriangle,
   ChevronRight,
@@ -8,6 +11,7 @@ import {
   Heading3,
   Image as ImageIcon,
   Info,
+  Link2,
   Lightbulb,
   List,
   ListChecks,
@@ -26,7 +30,7 @@ export interface SlashContext {
 }
 
 export interface SlashItemDef {
-  id: "text" | "h1" | "h2" | "h3" | "bullet" | "numbered" | "todo" | "toggle" | "quote" | "callout" | "warning" | "idea" | "divider" | "code" | "table" | "image";
+  id: "text" | "h1" | "h2" | "h3" | "bullet" | "numbered" | "todo" | "toggle" | "quote" | "callout" | "warning" | "idea" | "divider" | "code" | "table" | "image" | "pageLink";
   group: SlashGroup;
   icon: LucideIcon;
   /** English aliases that work in every UI language (people paste habits across tools). */
@@ -44,6 +48,14 @@ export const slashItems: SlashItemDef[] = [
   { id: "bullet", group: "basic", icon: List, aliases: ["bullet", "list", "ul"], run: (e, r) => chain(e, r).toggleBulletList().run() },
   { id: "numbered", group: "basic", icon: ListOrdered, aliases: ["numbered", "list", "ol"], run: (e, r) => chain(e, r).toggleOrderedList().run() },
   { id: "todo", group: "basic", icon: ListChecks, aliases: ["todo", "task", "checkbox"], run: (e, r) => chain(e, r).toggleTaskList().run() },
+  {
+    id: "pageLink",
+    group: "basic",
+    icon: Link2,
+    aliases: ["link", "page", "mention"],
+    // Typing [[ opens the page picker (see page-link-command.ts).
+    run: (e, r) => chain(e, r).insertContent("[[").run(),
+  },
   { id: "toggle", group: "structure", icon: ChevronRight, aliases: ["toggle", "details"], run: (e, r) => chain(e, r).setDetails().run() },
   { id: "quote", group: "structure", icon: Quote, aliases: ["quote", "blockquote"], run: (e, r) => chain(e, r).toggleBlockquote().run() },
   { id: "callout", group: "structure", icon: Info, aliases: ["callout", "note", "info"], run: (e, r) => chain(e, r).setCallout("info").run() },
@@ -64,14 +76,6 @@ export const slashItems: SlashItemDef[] = [
   },
 ];
 
-/** Case- and accent-insensitive key, with Turkish dotless ı folded to i. */
-export function searchKey(s: string, locale: string): string {
-  return s
-    .toLocaleLowerCase(locale)
-    .replace(/ı/g, "i")
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "");
-}
 
 export interface SlashEntry extends SlashItemDef {
   title: string;

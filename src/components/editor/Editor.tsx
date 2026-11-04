@@ -10,10 +10,14 @@ import { useEffect, useMemo, useRef } from "react";
 import { schemaExtensions } from "@/lib/editor/extensions";
 import { useDebouncedSaver } from "@/lib/hooks/useDebouncedSaver";
 import { ASSET_WARN_BYTES, type PageRecord } from "@/lib/model/schemas";
-import { AssetTooLargeError, putAsset, savePageContent } from "@/lib/storage/local-repo";
+import { AssetTooLargeError, createPage, listPages, putAsset, savePageContent } from "@/lib/storage/local-repo";
+import { ancestorsOf } from "@/lib/tree";
 import { useStatus } from "@/lib/stores/status";
 import { BubbleToolbar } from "./BubbleToolbar";
 import { AssetImage } from "./ImageView";
+import { PageLinkCommand } from "./page-link-command";
+import type { PageLinkItem } from "./PageLinkMenu";
+import { PageLinkWithView } from "./PageLinkView";
 import { SlashCommand } from "./slash-command";
 import { filterSlash, searchKey, slashItems, type SlashEntry } from "./slash-items";
 
@@ -21,12 +25,33 @@ interface EditorProps {
   page: PageRecord;
   /** Receives a function that focuses the start of the document. */
   onReady?: (focus: () => void) => void;
+  /** Called with true/false whenever the document becomes empty or non-empty. */
+  onEmptyChange?: (empty: boolean) => void;
 }
 
 const PICK_IMAGE_EVENT = "lk:pick-image";
+
+/** Pages matching the text after [[, best matches first, plus a "create" entry for new titles. */
+async function pageLinkItems(workspaceId: string, currentId: string, query: string, locale: string): Promise<PageLinkItem[]> {
+  const pages = await listPages(workspaceId);
+  const q = searchKey(query.trim(), locale);
+  const matches = pages
+    .filter((p) => p.id !== currentId && (!q || searchKey(p.title, locale).includes(q)))
+    .sort((a, b) => Number(!searchKey(a.title, locale).startsWith(q)) - Number(!searchKey(b.title, locale).startsWith(q)))
+    .slice(0, 8)
+    .map<PageLinkItem>((p) => ({
+      kind: "page",
+      id: p.id,
+      title: p.title,
+      icon: p.icon,
+      path: ancestorsOf(pages, p.id).map((a) => a.title).join(" / ") || undefined,
+    }));
+  const exact = pages.some((p) => searchKey(p.title, locale) === q);
+  return query.trim() && !exact ? [...matches, { kind: "create", title: query.trim() }] : matches;
+}
 const mb = (bytes: number) => (bytes / 1024 / 1024).toFixed(1);
 
-export function Editor({ page, onReady }: EditorProps) {
+export function Editor({ page, onReady, onEmptyChange }: EditorProps) {
   const t = useTranslations("editor");
   const ts = useTranslations("slash");
   const locale = useLocale();
@@ -71,8 +96,10 @@ export function Editor({ page, onReady }: EditorProps) {
     }
   }
   const uploadRef = useRef(uploadImage);
+  const onEmptyRef = useRef(onEmptyChange);
   useEffect(() => {
     uploadRef.current = uploadImage;
+    onEmptyRef.current = onEmptyChange;
   });
 
   const extensions = useMemo(
@@ -80,7 +107,7 @@ export function Editor({ page, onReady }: EditorProps) {
       ...schemaExtensions({
         taskCheckbox: (node) => t("a11y.taskCheckbox", { text: node.textContent || t("a11y.emptyTask") }),
         toggle: (isOpen) => (isOpen ? t("a11y.collapse") : t("a11y.expand")),
-      }).map((ext) => (ext.name === "image" ? AssetImage : ext)),
+      }).map((ext) => (ext.name === "image" ? AssetImage : ext.name === "pageLink" ? PageLinkWithView : ext)),
       Placeholder.configure({
         placeholder: ({ node }) =>
           node.type.name === "heading" ? t("headingPlaceholder", { level: node.attrs.level as number }) : t("placeholder"),
@@ -93,6 +120,15 @@ export function Editor({ page, onReady }: EditorProps) {
           groups: { basic: ts("groups.basic"), structure: ts("groups.structure"), media: ts("groups.media") },
         },
         context: { pickImage: (e) => e.view.dom.dispatchEvent(new CustomEvent(PICK_IMAGE_EVENT, { bubbles: true })) },
+      }),
+      PageLinkCommand.configure({
+        getItems: (query) => pageLinkItems(page.workspaceId, page.id, query, locale),
+        createPage: async (title) => (await createPage(page.workspaceId, { title })).id,
+        labels: {
+          menu: t("pageLink.menu"),
+          noResults: t("pageLink.noResults"),
+          create: (title) => t("pageLink.create", { title }),
+        },
       }),
     ],
     // Extensions are created once per mounted page; labels follow the locale via remount on navigation.
@@ -111,7 +147,6 @@ export function Editor({ page, onReady }: EditorProps) {
         "aria-multiline": "true",
         "aria-label": t("contentLabel"),
         spellcheck: "true",
-        lang: locale,
       },
       handlePaste: (_view, event) => {
         const files = Array.from(event.clipboardData?.files ?? []).filter((f) => f.type.startsWith("image/"));
@@ -127,7 +162,11 @@ export function Editor({ page, onReady }: EditorProps) {
         return true;
       },
     },
-    onUpdate: ({ editor: e }) => saver.schedule(e.getJSON()),
+    onCreate: ({ editor: e }) => onEmptyRef.current?.(e.isEmpty),
+    onUpdate: ({ editor: e }) => {
+      saver.schedule(e.getJSON());
+      onEmptyRef.current?.(e.isEmpty);
+    },
   });
 
   useEffect(() => {

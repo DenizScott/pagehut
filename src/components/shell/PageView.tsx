@@ -1,16 +1,23 @@
 "use client";
 
-import { Menu, Trash2 } from "lucide-react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { ChevronRight, FileDown, LayoutTemplate, Menu as MenuIcon, MoreHorizontal, Printer, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Editor } from "@/components/editor/Editor";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "@/i18n/navigation";
+import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useDebouncedSaver } from "@/lib/hooks/useDebouncedSaver";
 import type { PageRecord } from "@/lib/model/schemas";
-import { getPage, savePageTitle, trashPage } from "@/lib/storage/local-repo";
+import { getPage, listPages, savePageTitle, trashPage } from "@/lib/storage/local-repo";
+import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
+import { exportPageMarkdown } from "@/lib/transfer/export";
+import { ancestorsOf } from "@/lib/tree";
+import { Backlinks } from "./Backlinks";
+import { PillarsStrip } from "./PillarsStrip";
 import { SaveStatus } from "./SaveStatus";
 
 type Load = { state: "loading" } | { state: "missing" } | { state: "ready"; page: PageRecord };
@@ -18,7 +25,10 @@ type Load = { state: "loading" } | { state: "missing" } | { state: "ready"; page
 export function PageView() {
   const { pageId } = useParams<{ pageId: string }>();
   const t = useTranslations("common");
+  const contentVersion = useUI((s) => s.contentVersion);
   const [load, setLoad] = useState<Load>({ state: "loading" });
+  // Live view of the record, only to notice that the page was moved to trash elsewhere.
+  const live = useLiveQuery(() => getPage(pageId), [pageId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -29,18 +39,18 @@ export function PageView() {
     return () => {
       cancelled = true;
     };
-  }, [pageId]);
+  }, [pageId, contentVersion]);
 
   if (load.state === "loading") return null;
-  if (load.state === "missing")
+  if (load.state === "missing" || live?.deletedAt)
     return (
       <div className="m-auto max-w-sm p-6 text-center">
         <p className="mb-3 text-fg-muted">{t("shell.notFound")}</p>
         <HomeLink label={t("shell.backHome")} />
       </div>
     );
-  // key: remount editor state per page so nothing leaks between pages.
-  return <PageEditor key={load.page.id} page={load.page} />;
+  // key: remount editor state per page (and after a template replaced the content).
+  return <PageEditor key={`${load.page.id}:${contentVersion}`} page={load.page} />;
 }
 
 function HomeLink({ label }: { label: string }) {
@@ -56,10 +66,14 @@ function PageEditor({ page }: { page: PageRecord }) {
   const t = useTranslations("common");
   const router = useRouter();
   const setSidebarOpen = useWorkspace((s) => s.setSidebarOpen);
+  const openDialog = useUI((s) => s.open);
   const [title, setTitle] = useState(page.title);
+  const [isEmpty, setIsEmpty] = useState(!page.markdown.trim());
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const focusEditor = useRef<(() => void) | null>(null);
   const titleSaver = useDebouncedSaver((value: string) => savePageTitle(page.id, value));
+  const pages = useLiveQuery(() => listPages(page.workspaceId), [page.workspaceId]);
+  const ancestors = pages ? ancestorsOf(pages, page.id) : [];
 
   // A brand-new page starts with the cursor in the title.
   useEffect(() => {
@@ -79,21 +93,64 @@ function PageEditor({ page }: { page: PageRecord }) {
     router.replace("/");
   }
 
+  async function onExportMarkdown() {
+    await titleSaver.flush();
+    const fresh = await getPage(page.id);
+    if (fresh) exportPageMarkdown(fresh);
+  }
+
   return (
     <>
       <header className="lk-no-print flex h-11 shrink-0 items-center gap-2 border-b border-hairline px-2 md:px-3">
         <Button size="icon-sm" className="md:hidden" onClick={() => setSidebarOpen(true)} aria-label={t("a11y.openSidebar")}>
-          <Menu />
+          <MenuIcon />
         </Button>
-        <p className="min-w-0 flex-1 truncate text-sm text-fg-muted">{title || t("shell.untitled")}</p>
+        <nav aria-label={t("page.breadcrumbs")} className="min-w-0 flex-1">
+          <ol className="flex min-w-0 items-center gap-1 text-sm text-fg-muted">
+            {ancestors.map((a) => (
+              <Fragment key={a.id}>
+                <li className="hidden min-w-0 shrink sm:block">
+                  <Link href={`/p/${a.id}`} className="block truncate rounded px-1 hover:bg-surface-hover hover:text-fg">
+                    {a.title || t("shell.untitled")}
+                  </Link>
+                </li>
+                <li aria-hidden="true" className="hidden shrink-0 sm:block">
+                  <ChevronRight className="size-3.5 text-fg-subtle rtl:rotate-180" />
+                </li>
+              </Fragment>
+            ))}
+            <li className="min-w-0 truncate px-1" aria-current="page">
+              {title || t("shell.untitled")}
+            </li>
+          </ol>
+        </nav>
         <SaveStatus />
-        <Button size="icon-sm" onClick={onDelete} aria-label={t("shell.deletePage")} title={t("shell.deletePage")}>
-          <Trash2 />
-        </Button>
+        <Menu>
+          <MenuTrigger className="grid size-7 place-items-center rounded-md text-fg-muted hover:bg-surface-hover hover:text-fg" aria-label={t("shell.pageActions")}>
+            <MoreHorizontal className="size-4" />
+          </MenuTrigger>
+          <MenuContent align="end">
+            <MenuItem onSelect={() => openDialog("templates", { targetPageId: page.id })}>
+              <LayoutTemplate /> {t("templates.applyHere")}
+            </MenuItem>
+            <MenuSeparator />
+            <MenuItem onSelect={() => void onExportMarkdown()}>
+              <FileDown /> {t("transfer.exportMarkdown")}
+            </MenuItem>
+            <MenuItem onSelect={() => setTimeout(() => window.print(), 50)}>
+              <Printer /> {t("transfer.exportPdf")}
+            </MenuItem>
+            <MenuSeparator />
+            <MenuItem onSelect={() => void onDelete()} className="text-danger">
+              <Trash2 className="!text-danger" /> {t("shell.deletePage")}
+            </MenuItem>
+          </MenuContent>
+        </Menu>
       </header>
+      <PillarsStrip />
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <article className="mx-auto w-full max-w-3xl px-6 pt-10 md:px-16 md:pt-16">
+        <article className="mx-auto w-full max-w-3xl px-6 pt-10 md:px-16 md:pt-14">
           <textarea
             ref={titleRef}
             value={title}
@@ -113,7 +170,22 @@ function PageEditor({ page }: { page: PageRecord }) {
             }}
             className="mb-4 w-full resize-none overflow-hidden bg-transparent text-4xl leading-tight font-bold tracking-tight text-fg outline-none placeholder:text-fg-subtle focus-visible:outline-none"
           />
-          <Editor page={page} onReady={(focus) => (focusEditor.current = focus)} />
+          {isEmpty && (
+            <button
+              type="button"
+              onClick={() => openDialog("templates", { targetPageId: page.id })}
+              className="lk-no-print mb-3 inline-flex items-center gap-2 rounded-md px-2 py-1 text-sm text-fg-subtle hover:bg-surface-hover hover:text-fg"
+            >
+              <LayoutTemplate className="size-4" aria-hidden="true" />
+              {t("templates.startWith")}
+            </button>
+          )}
+          <Editor
+            page={page}
+            onReady={(focus) => (focusEditor.current = focus)}
+            onEmptyChange={setIsEmpty}
+          />
+          <Backlinks pageId={page.id} workspaceId={page.workspaceId} />
         </article>
       </div>
     </>
