@@ -89,7 +89,7 @@ function MoveForm({ onDone }: { onDone: () => void }) {
           value={folder}
           onChange={(e) => setFolder(e.target.value)}
           placeholder={tg("repoRoot")}
-          className="w-40 rounded-md border border-hairline bg-canvas px-2 py-1 font-mono text-xs"
+          className="w-40 rounded-md border border-border-control bg-canvas px-2 py-1 font-mono text-xs"
         />
       </label>
       <p className="text-xs text-fg-subtle">{t("hint")}</p>

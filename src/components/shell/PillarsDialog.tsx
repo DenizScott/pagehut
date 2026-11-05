@@ -64,7 +64,7 @@ function PillarsForm({ onDone }: { onDone: () => void }) {
                 aria-label={t("titleLabel", { n: i + 1 })}
                 placeholder={t("titlePlaceholder")}
                 maxLength={60}
-                className="min-w-0 flex-1 rounded-md border border-hairline bg-canvas px-2 py-1 text-sm"
+                className="min-w-0 flex-1 rounded-md border border-border-control bg-canvas px-2 py-1 text-sm"
               />
               <Button size="icon-sm" onClick={() => move(i, -1)} disabled={i === 0} aria-label={t("moveUp")}>
                 <ArrowUp />
@@ -82,7 +82,7 @@ function PillarsForm({ onDone }: { onDone: () => void }) {
               aria-label={t("descriptionLabel", { n: i + 1 })}
               placeholder={t("descriptionPlaceholder")}
               rows={2}
-              className="mt-2 w-full resize-none rounded-md border border-hairline bg-canvas px-2 py-1 text-sm"
+              className="mt-2 w-full resize-none rounded-md border border-border-control bg-canvas px-2 py-1 text-sm"
             />
           </li>
         ))}

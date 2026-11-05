@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -8,7 +8,8 @@ import { dirFor, routing } from "@/i18n/routing";
 import { Providers } from "@/components/shell/Providers";
 import "../globals.css";
 
-const sans = Bricolage_Grotesque({ variable: "--font-sans-face", subsets: ["latin", "latin-ext"] });
+const sans = Bricolage_Grotesque({ variable: "--font-sans-face", subsets: ["latin", "latin-ext"], axes: ["opsz", "wdth"] });
+const doc = Hanken_Grotesk({ variable: "--font-doc-face", subsets: ["latin", "latin-ext"] });
 const mono = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin", "latin-ext"] });
 
 export function generateStaticParams() {
@@ -28,8 +29,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f4f3f0" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e0f13" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f4ee" },
+    { media: "(prefers-color-scheme: dark)", color: "#151b18" },
   ],
 };
 
@@ -39,7 +40,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} dir={dirFor(locale)} className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang={locale} dir={dirFor(locale)} className={`${sans.variable} ${doc.variable} ${mono.variable}`} suppressHydrationWarning>
       <body>
         <NextIntlClientProvider>
           <Providers>{children}</Providers>

@@ -35,7 +35,7 @@ function page(title: string, body: string, status = 200) {
   return new NextResponse(
     `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
 <style>body{font-family:system-ui,sans-serif;max-width:40rem;margin:10vh auto;padding:0 1rem;line-height:1.6;color:#1f2229;background:#fbfaf8}
-button,a.btn{display:inline-block;background:#e8793a;color:#1a1c22;border:0;border-radius:8px;padding:.6rem 1rem;font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
+button,a.btn{display:inline-block;background:#466d50;color:#ffffff;border:0;border-radius:8px;padding:.6rem 1rem;font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
 code{background:#eee;padding:.1rem .3rem;border-radius:4px}.muted{color:#5b6170;font-size:.9rem}</style></head><body>${body}</body></html>`,
     { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } },
   );

@@ -68,7 +68,9 @@ export function SyncButton() {
       data-sync-state={effective}
       className={cn(
         "flex items-center gap-1.5 rounded-md px-2 py-1 text-xs whitespace-nowrap text-fg-muted hover:bg-surface-hover hover:text-fg",
-        effective === "pending" && "text-accent-text",
+        effective === "synced" && "text-success",
+        effective === "syncing" && "text-info",
+        effective === "pending" && "text-warning",
         warn && "text-danger",
       )}
     >

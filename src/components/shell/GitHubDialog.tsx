@@ -162,7 +162,7 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
         <GitHubMark className="size-3.5" />
         {t("signedInAs", { login: user?.login ?? "" })}
       </div>
-      <label className="mx-4 mt-3 flex items-center gap-2 rounded-md border border-hairline bg-canvas px-2">
+      <label className="mx-4 mt-3 flex items-center gap-2 rounded-md border border-border-control bg-canvas px-2">
         <Search className="size-4 text-fg-subtle" aria-hidden="true" />
         <input
           value={filter}
@@ -215,7 +215,7 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
             value={folder}
             onChange={(e) => setFolder(e.target.value)}
             placeholder={t("repoRoot")}
-            className="w-32 rounded-md border border-hairline bg-canvas px-2 py-1 font-mono text-xs"
+            className="w-32 rounded-md border border-border-control bg-canvas px-2 py-1 font-mono text-xs"
           />
           <span className="w-full text-xs text-fg-subtle">{t("folderHint")}</span>
         </label>

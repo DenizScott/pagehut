@@ -22,7 +22,7 @@ export function DialogContent({
   const t = useTranslations("common.a11y");
   return (
     <D.Portal>
-      <D.Overlay className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px]" />
+      <D.Overlay className="fixed inset-0 z-50 bg-(--backdrop)" />
       <D.Content
         {...props}
         // Without a description, opt out of aria-describedby explicitly (Radix convention).

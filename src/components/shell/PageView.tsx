@@ -204,7 +204,7 @@ function PageEditor({ page }: { page: PageRecord }) {
                 focusEditor.current?.();
               }
             }}
-            className="mb-4 w-full resize-none overflow-hidden bg-transparent text-4xl leading-tight font-bold tracking-tight text-fg outline-none placeholder:text-fg-subtle focus-visible:outline-none"
+            className="lk-page-title mb-4 w-full resize-none overflow-hidden bg-transparent text-fg outline-none placeholder:text-fg-subtle focus-visible:outline-none"
           />
           {isEmpty && (
             <button

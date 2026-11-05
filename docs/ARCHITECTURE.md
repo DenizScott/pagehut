@@ -125,16 +125,25 @@ the old database.
 ## Design tokens
 
 Colors are CSS variables in `src/app/globals.css`, defined for light and `.dark` and mapped into
-Tailwind with `@theme inline`. Checked contrast pairs (WCAG AA):
+Tailwind with `@theme inline`. They follow the design handoff in
+[design/HANDOFF.md](design/HANDOFF.md) ("The Quiet Workshop"):
+
+- **Accent.** Moss on cream.
+- **Fonts.** Bricolage Grotesque for the UI and headings, Hanken Grotesk for document text, and
+  JetBrains Mono for code.
+
+Checked contrast pairs (WCAG AA):
 
 | Pair | Light | Dark |
 |---|---|---|
-| Body text on canvas | 15.3:1 | 15.1:1 |
-| Muted text on canvas | 5.9:1 | 7.1:1 |
-| Accent as text | 5.1:1 (`#b4521a`) | 7.8:1 (`#f0915a`) |
-| Text on accent fill | 5.9:1 | — |
+| Body text on canvas | 14.3:1 | 14.2:1 |
+| Muted text on canvas | 6.9:1 | 10.2:1 |
+| Accent as text on canvas | 7.6:1 (`#365b41`) | 10.4:1 (`#b9d9b7`) |
+| Text on accent fill | 5.9:1 | 10.0:1 |
+| Control borders on surface (3:1 needed) | 4.0:1 | 4.8:1 |
 
-Glass (blur plus translucent surface) is used only on chrome: the sidebar drawer, menus and toasts.
+Glass (blur plus translucent surface) is used only on chrome: the sidebar drawer, menus, dialogs
+and toasts. The document canvas is always opaque.
 
 ## Security
 

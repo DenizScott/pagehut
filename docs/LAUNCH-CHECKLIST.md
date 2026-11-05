@@ -20,6 +20,7 @@ account and decision. Tick items off here as they are done.
   - Türk Patent ve Marka Kurumu: <https://www.turkpatent.gov.tr> (marka araştırma)
   - EUIPO: <https://euipo.europa.eu/eSearch/>
   - Optionally WIPO Global Brand Database: <https://branddb.wipo.int>
+- [ ] **Logo similarity check** for the "Folded Shelter" mark (`src/app/icon.svg`): reverse image search and a figurative-mark search (TÜRKPATENT / EUIPO image search) before launch.
 - [ ] **Possible confusion with an existing project.** A small, unrelated project named *PageHut*
       already exists on GitHub (a self-hosted static-site hosting tool). Before launch, look at it,
       decide whether the overlap matters, and consider a distinguishing tagline

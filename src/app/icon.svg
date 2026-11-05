@@ -1,6 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="8" fill="#e8793a"/>
-  <path d="M7 10.5c3-.9 6-.6 9 1.2 3-1.8 6-2.1 9-1.2v12c-3-.9-6-.6-9 1.2-3-1.8-6-2.1-9-1.2z" fill="none" stroke="#1a1c22" stroke-width="1.8" stroke-linejoin="round"/>
-  <circle cx="16" cy="16.2" r="1.6" fill="#1a1c22"/>
-  <path d="M15.3 17.2h1.4l.5 3h-2.4z" fill="#1a1c22"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="PageHut icon"><title>PageHut</title><style>:root{--ph-ink:#466D50;--ph-detail:#93662B}@media (prefers-color-scheme:dark){:root{--ph-ink:#B9D9B7;--ph-detail:#E7BD7D}}</style><g fill="none" stroke-linejoin="round" stroke-linecap="round"><path d="M4.5 20.5 14.25 5.5 24.75 11.25" stroke="var(--ph-ink)" stroke-width="3.25"/><rect x="12.75" y="12" width="15.25" height="16.25" rx="2.7" stroke="var(--ph-ink)" stroke-width="2.75"/><path d="M17 18.25h6.75M17 22.75h4.75" stroke="var(--ph-detail)" stroke-width="2.25"/></g></svg>
