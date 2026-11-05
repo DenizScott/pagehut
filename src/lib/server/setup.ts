@@ -64,7 +64,9 @@ export function manifestFor(origin: string) {
     setup_url: `${origin}/?github=connect`,
     setup_on_update: true,
     request_oauth_on_install: false,
-    hook_attributes: { url: `${origin}/api/github/webhook-unused`, active: false },
+    // PageHut uses no webhooks. GitHub still requires a URL here and rejects localhost even when the
+    // hook is inactive, so a public placeholder is used; with active: false nothing is ever sent.
+    hook_attributes: { url: "https://example.com/pagehut-webhooks-disabled", active: false },
     default_permissions: { contents: "write", metadata: "read" },
     default_events: [],
   };

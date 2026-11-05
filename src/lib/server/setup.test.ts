@@ -30,6 +30,9 @@ describe("one-click GitHub App setup", () => {
     expect(m.callback_urls).toEqual(["http://localhost:3000/api/auth/callback"]);
     expect(m.redirect_url).toBe("http://localhost:3000/api/setup/github/callback");
     expect(m.hook_attributes.active).toBe(false);
+    // GitHub rejects non-public hook URLs, even for an inactive hook.
+    expect(new URL(m.hook_attributes.url).hostname).not.toMatch(/localhost|127\.0\.0\.1/);
+    expect(JSON.stringify(m)).not.toContain("webhook-unused");
   });
 
   it("exchanges the code and writes the keys; rejects a wrong state", async () => {
