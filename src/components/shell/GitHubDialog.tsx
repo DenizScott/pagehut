@@ -91,6 +91,9 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Offered when the other action fits the chosen repo (open <-> save). */
+  const [suggest, setSuggest] = useState<"connect" | "open" | null>(null);
+  const openDialog = useUI((s) => s.open);
 
   useEffect(() => {
     let cancelled = false;
@@ -123,6 +126,7 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
     if (!chosen || !workspace) return;
     setBusy(true);
     setError(null);
+    setSuggest(null);
     const ref = { owner: chosen.owner, name: chosen.name, branch: chosen.defaultBranch };
     try {
       if (mode === "connect") {
@@ -142,6 +146,8 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
       close();
     } catch (err) {
       setError(describe(err));
+      if (err instanceof NotAWorkspaceError && mode === "open" && workspace?.mode !== "github") setSuggest("connect");
+      if (err instanceof RepoHasWorkspaceError && mode === "connect") setSuggest("open");
     } finally {
       setBusy(false);
     }
@@ -200,9 +206,23 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
         </a>
       )}
       {error && (
-        <p role="alert" className="mx-4 mb-2 rounded-md bg-danger-soft px-3 py-2 text-sm text-danger">
-          {error}
-        </p>
+        <div role="alert" className="mx-4 mb-2 rounded-md bg-danger-soft px-3 py-2 text-sm text-danger">
+          <p>{error}</p>
+          {suggest && (
+            <Button
+              size="sm"
+              variant="subtle"
+              className="mt-2"
+              onClick={() => {
+                setError(null);
+                setSuggest(null);
+                openDialog("github", { githubMode: suggest });
+              }}
+            >
+              {suggest === "connect" ? t("saveHereInstead") : t("openHereInstead")}
+            </Button>
+          )}
+        </div>
       )}
       <div className="flex items-center justify-end gap-2 border-t border-hairline p-3">
         {chosen && mode === "connect" && <p className="me-auto text-xs text-fg-muted">{t("connectWarning", { repo: chosen.fullName })}</p>}

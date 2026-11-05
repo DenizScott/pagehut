@@ -33,6 +33,7 @@ async function newPage(page: Page, title: string, body: string) {
 }
 
 test("without server configuration, GitHub explains setup and local mode keeps working", async ({ page }) => {
+  await page.route("**/api/auth/status", (r) => r.fulfill({ json: { configured: false } }));
   await page.goto("/en");
   await page.waitForURL(/\/p\//);
   await page.getByRole("button", { name: /Local mode/ }).click();
@@ -118,4 +119,29 @@ test("connect, push, conflict guard, and open on a second device", async ({ brow
 
   await ctx1.close();
   await ctx2.close();
+});
+
+test("opening a repo without a workspace offers to save into it instead", async ({ browser }) => {
+  const gh = new FakeGitHub();
+  gh.addRepo("team", "game-code", { files: { "README.md": "# Code" } });
+  const ctx = await browser.newContext();
+  await fakeSignedIn(ctx, gh);
+  const page = await ctx.newPage();
+  await page.goto("/en");
+  await page.waitForURL(/\/p\//);
+
+  await page.getByRole("button", { name: /Switch workspace/ }).click();
+  await page.getByRole("menuitem", { name: "Open from GitHub…" }).click();
+  const openDialog = page.getByRole("dialog", { name: "Open a workspace from GitHub" });
+  await openDialog.getByRole("radio", { name: "team/game-code" }).click();
+  await openDialog.getByRole("button", { name: "Open workspace" }).click();
+  await openDialog.getByRole("button", { name: "Save this workspace to this repository instead" }).click();
+
+  const saveDialog = page.getByRole("dialog", { name: "Save this workspace to GitHub" });
+  await expect(saveDialog.getByRole("radio", { name: "team/game-code" })).toHaveAttribute("aria-checked", "true");
+  await expect(saveDialog).toContainText("a repository just for your GDD");
+  await saveDialog.getByRole("button", { name: "Save to repository" }).click();
+  await expect(page.getByText("Workspace saved to team/game-code")).toBeVisible();
+  expect(gh.files("team/game-code")["README.md"]).toBe("# Code");
+  await ctx.close();
 });

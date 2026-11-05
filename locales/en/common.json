@@ -152,7 +152,7 @@
     "noRepos": "No repositories found. Install the app on a repository first.",
     "private": "Private repository",
     "missingRepo": "Don't see your repository? Install the app on it",
-    "connectWarning": "All pages will be committed to {repo}.",
+    "connectWarning": "All pages will be committed to {repo}. Tip: a repository just for your GDD keeps your code repositories clean.",
     "working": "Working…",
     "connectAction": "Save to repository",
     "openAction": "Open workspace",
@@ -171,7 +171,9 @@
     },
     "setupAction": "Set up GitHub sign-in",
     "chooseReposHint": "Choose which repositories PageHut may use. GitHub will bring you back here afterwards.",
-    "chooseRepos": "Choose repositories on GitHub"
+    "chooseRepos": "Choose repositories on GitHub",
+    "saveHereInstead": "Save this workspace to this repository instead",
+    "openHereInstead": "Open the workspace from this repository instead"
   },
   "share": {
     "title": "Share with your team",

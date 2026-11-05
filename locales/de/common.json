@@ -152,7 +152,7 @@
     "noRepos": "Keine Repositories gefunden. Installiere die App zuerst auf einem Repository.",
     "private": "Privates Repository",
     "missingRepo": "Dein Repository fehlt? Installiere die App darauf",
-    "connectWarning": "Alle Seiten werden in {repo} committet.",
+    "connectWarning": "Alle Seiten werden in {repo} committet. Tipp: Ein eigenes Repository nur für das GDD hält deine Code-Repositories sauber.",
     "working": "Wird ausgeführt …",
     "connectAction": "Im Repository speichern",
     "openAction": "Arbeitsbereich öffnen",
@@ -171,7 +171,9 @@
     },
     "setupAction": "GitHub-Anmeldung einrichten",
     "chooseReposHint": "Wähle, welche Repositories PageHut nutzen darf. GitHub bringt dich danach hierher zurück.",
-    "chooseRepos": "Repositories auf GitHub auswählen"
+    "chooseRepos": "Repositories auf GitHub auswählen",
+    "saveHereInstead": "Stattdessen diesen Arbeitsbereich in diesem Repository speichern",
+    "openHereInstead": "Stattdessen den Arbeitsbereich aus diesem Repository öffnen"
   },
   "share": {
     "title": "Mit dem Team teilen",

@@ -152,7 +152,7 @@
     "noRepos": "Depo bulunamadı. Önce uygulamayı bir depoya yükle.",
     "private": "Özel depo",
     "missingRepo": "Deponu göremiyor musun? Uygulamayı o depoya yükle",
-    "connectWarning": "Tüm sayfalar {repo} deposuna commit'lenecek.",
+    "connectWarning": "Tüm sayfalar {repo} deposuna commit’lenecek. İpucu: GDD için ayrı bir depo, kod depolarını temiz tutar.",
     "working": "Çalışıyor…",
     "connectAction": "Depoya kaydet",
     "openAction": "Çalışma alanını aç",
@@ -171,7 +171,9 @@
     },
     "setupAction": "GitHub ile girişi kur",
     "chooseReposHint": "PageHut’ın hangi depoları kullanabileceğini seç. Ardından GitHub seni buraya geri getirir.",
-    "chooseRepos": "GitHub’da depo seç"
+    "chooseRepos": "GitHub’da depo seç",
+    "saveHereInstead": "Bunun yerine bu çalışma alanını bu depoya kaydet",
+    "openHereInstead": "Bunun yerine bu depodaki çalışma alanını aç"
   },
   "share": {
     "title": "Ekibinle paylaş",
