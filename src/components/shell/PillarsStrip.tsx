@@ -2,13 +2,17 @@
 
 import { Landmark, Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
+import type { Pillar } from "@/lib/model/schemas";
 import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
+
+// Stable empty value: a new [] in a store selector would re-render forever.
+const NO_PILLARS: Pillar[] = [];
 
 /** The project's design pillars, visible above every page. */
 export function PillarsStrip() {
   const t = useTranslations("common.pillars");
-  const pillars = useWorkspace((s) => s.workspace?.pillars ?? []);
+  const pillars = useWorkspace((s) => s.workspace?.pillars) ?? NO_PILLARS;
   const open = useUI((s) => s.open);
 
   return (

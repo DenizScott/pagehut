@@ -22,7 +22,10 @@
     "loading": "Arbeitsbereich wird geladen …",
     "notFound": "Diese Seite gibt es in diesem Arbeitsbereich nicht.",
     "backHome": "Zur ersten Seite",
-    "workspaceName": "Mein Spiel"
+    "workspaceName": "Mein Spiel",
+    "search": "Suchen",
+    "templates": "Vorlagen",
+    "trash": "Papierkorb"
   },
   "settings": {
     "language": "Sprache",
@@ -41,10 +44,82 @@
   "page": {
     "titlePlaceholder": "Ohne Titel",
     "titleLabel": "Seitentitel",
-    "lastEdited": "Bearbeitet {time}"
+    "lastEdited": "Bearbeitet {time}",
+    "breadcrumbs": "Seitenpfad",
+    "backlinks": "{count, plural, one {# Seite verlinkt hierher} other {# Seiten verlinken hierher}}"
   },
   "welcome": {
     "title": "Willkommen bei {appName}",
     "body": "{appName} ist ein kostenloser Arbeitsbereich für **Game-Design-Dokumente**.\n\n:::callout idea\nTippe irgendwo `/`, um Überschriften, To-dos, Aufklapper, Hinweisboxen, Tabellen und mehr einzufügen.\n:::\n\n## Probier es aus\n\n- [ ] Schreib den Ein-Satz-Pitch deines Spiels\n- [ ] Lege drei Design-Pillars fest\n- [ ] Beschreibe den Core Loop\n\n:::toggle Wo wird meine Arbeit gespeichert?\nIm lokalen Modus bleibt alles in diesem Browser (IndexedDB). Später kannst du ein GitHub-Repository verbinden, damit dein Team am selben GDD arbeitet.\n:::\n"
+  },
+  "tree": {
+    "expand": "Aufklappen",
+    "collapse": "Zuklappen",
+    "actionsFor": "Aktionen für „{title}“",
+    "addSubpage": "Unterseite hinzufügen",
+    "addSubpageTo": "Unterseite zu „{title}“ hinzufügen",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "indent": "In die Seite darüber verschieben",
+    "outdent": "Eine Ebene nach außen"
+  },
+  "transfer": {
+    "menu": "Import und Export",
+    "import": "Importieren",
+    "importFiles": "Markdown, ZIP oder JSON importieren …",
+    "exportWorkspace": "Arbeitsbereich exportieren",
+    "exportZip": "Als ZIP exportieren (Markdown-Dateien)",
+    "exportJson": "Als JSON exportieren (vollständige Sicherung)",
+    "exportMarkdown": "Seite als Markdown exportieren",
+    "exportPdf": "Drucken oder als PDF speichern",
+    "imported": "{count, plural, one {# Seite importiert} other {# Seiten importiert}}",
+    "skipped": "Übersprungen: {files}",
+    "failed": "Import fehlgeschlagen. Die Datei ist evtl. beschädigt oder hat ein nicht unterstütztes Format."
+  },
+  "search": {
+    "title": "Seiten durchsuchen",
+    "placeholder": "Titel und Text durchsuchen …",
+    "noResults": "Keine Seiten gefunden",
+    "results": "Ergebnisse",
+    "recent": "Zuletzt bearbeitet",
+    "count": "{count, plural, =0 {Keine Ergebnisse} one {# Ergebnis} other {# Ergebnisse}}"
+  },
+  "trash": {
+    "title": "Papierkorb",
+    "description": "Gelöschte Seiten mit ihren Unterseiten. Wiederherstellen legt sie zurück in den Seitenbaum.",
+    "empty": "Der Papierkorb ist leer",
+    "restore": "Wiederherstellen",
+    "deletedAt": "Gelöscht {time}"
+  },
+  "pillars": {
+    "title": "Design-Pillars",
+    "description": "Bis zu sechs Prinzipien, an denen jedes Feature gemessen wird. Sie stehen über jeder Seite.",
+    "empty": "Design-Pillars hinzufügen",
+    "edit": "Design-Pillars bearbeiten",
+    "add": "Pillar hinzufügen",
+    "remove": "Pillar entfernen",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "titleLabel": "Name von Pillar {n}",
+    "titlePlaceholder": "z. B. Jeder Kampf ist ein Rätsel",
+    "descriptionLabel": "Beschreibung von Pillar {n}",
+    "descriptionPlaceholder": "Was es bedeutet und was es ausschließt",
+    "save": "Speichern",
+    "cancel": "Abbrechen"
+  },
+  "templates": {
+    "title": "GDD-Vorlagen",
+    "description": "Starte eine Seite mit einer bewährten Struktur. Alles lässt sich danach ändern.",
+    "use": "Vorlage verwenden",
+    "preview": "Vorlagenvorschau",
+    "sections": "Abschnitte",
+    "startWith": "Mit einer Vorlage beginnen",
+    "applyHere": "Neue Seite aus Vorlage",
+    "categories": {
+      "plan": "Planung und Pitch",
+      "design": "Game Design",
+      "story": "Story und Art",
+      "production": "Produktion"
+    }
   }
 }

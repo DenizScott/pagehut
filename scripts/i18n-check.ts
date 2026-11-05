@@ -20,7 +20,9 @@ function flatten(obj: Json, prefix = "", out = new Map<string, string>()): Map<s
   return out;
 }
 
-const placeholders = (s: string) => [...s.matchAll(/\{(\w+)/g)].map((m) => m[1]).sort().join(",");
+// ICU arguments only ({name} or {name, plural, …}); text inside plural branches is ignored.
+const placeholders = (s: string) =>
+  [...new Set([...s.matchAll(/\{(\w+)(?=[,}])/g)].map((m) => m[1]))].sort().join(",");
 
 const namespaces = readdirSync(join(ROOT, REFERENCE)).filter((f) => f.endsWith(".json"));
 const locales = readdirSync(ROOT).filter((l) => l !== REFERENCE);

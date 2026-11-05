@@ -24,5 +24,12 @@
     "expand": "Bölümü aç",
     "collapse": "Bölümü kapat"
   },
-  "contentLabel": "Sayfa içeriği"
+  "contentLabel": "Sayfa içeriği",
+  "pageLink": {
+    "menu": "Sayfaya bağlantı",
+    "noResults": "Eşleşen sayfa yok",
+    "create": "“{title}” sayfasını oluştur",
+    "missing": "Silinmiş sayfa",
+    "untitled": "Adsız"
+  }
 }

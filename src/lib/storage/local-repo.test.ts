@@ -4,6 +4,7 @@ import { AppDB, setDBForTests } from "./db";
 import {
   createPage,
   ensureWorkspace,
+  fillEmptyPage,
   getPage,
   listPages,
   listTrash,
@@ -66,6 +67,17 @@ describe("local repository", () => {
     await trashPage(parent.id);
     await restorePage(child.id);
     expect((await getPage(child.id))?.parentId).toBeNull();
+  });
+
+  it("fills an empty page from a template but never overwrites text", async () => {
+    const ws = await ensureWorkspace(welcome);
+    const empty = await createPage(ws.id);
+    expect(await fillEmptyPage(empty.id, { title: "GDD", markdown: "## Vision\n", icon: "📚" })).toBe(true);
+    expect(await getPage(empty.id)).toMatchObject({ title: "GDD", markdown: "## Vision\n", icon: "📚" });
+
+    const written = await createPage(ws.id, { title: "Mine", markdown: "My notes\n" });
+    expect(await fillEmptyPage(written.id, { title: "GDD", markdown: "## Vision\n" })).toBe(false);
+    expect(await getPage(written.id)).toMatchObject({ title: "Mine", markdown: "My notes\n" });
   });
 
   it("moves a page under another one", async () => {

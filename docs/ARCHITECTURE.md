@@ -1,6 +1,6 @@
 # Architecture
 
-Status: P0. Sections marked *(planned)* describe the approved design for later phases.
+Status: P1. Sections marked *(planned)* describe the approved design for later phases.
 
 ## Overview
 
@@ -27,6 +27,8 @@ Next.js 16 notes for contributors:
   IndexedDB.
 - Visited pages stay mounted but hidden (React `<Activity>`). In tests, select visible elements
   (`getByRole`), not `getByLabel`.
+- The page route component is reused when only the id changes. `PageView` renders nothing until
+  the requested page has loaded, so typing can never land in the previous page.
 
 ## Source layout
 
@@ -40,7 +42,11 @@ Next.js 16 notes for contributors:
 | `src/lib/editor/` | Editor schema (extensions) shared by the UI and the Markdown converters |
 | `src/lib/markdown/` | Canonical Markdown serializer and parser |
 | `src/components/editor/` | Tiptap UI: slash menu, bubble toolbar, drag handle, image view |
-| `src/components/shell/` | App shell, sidebar, page view, preferences, toasts |
+| `src/components/shell/` | App shell, sidebar, page tree, page view, dialogs (search, templates, trash, pillars) |
+| `src/lib/tree.ts` | Pure page-tree helpers: build, move, keyboard moves, ancestors |
+| `src/lib/search.ts` | MiniSearch index over titles and plain text (Turkish-aware) |
+| `src/lib/transfer/` | Front matter, ZIP/JSON bundles, import with id remapping, downloads |
+| `src/templates/` | GDD templates, one file per language (`en.ts`, `tr.ts`, `de.ts`) |
 
 ## Data model
 
@@ -74,6 +80,7 @@ CommonMark plus GFM tables and strikethrough, with these additions:
 | Callout | `:::callout warning` ... `:::` (variants: info, warning, danger, success, idea) |
 | Toggle | `:::toggle Summary text` ... `:::` |
 | Nested containers | outer fence gets one more colon per level (`::::callout`) |
+| Page link | `[[page:<ULID>|Title]]` (the id is the link; the title is a readable hint) |
 
 Known limits, by design (text is never dropped):
 
@@ -83,6 +90,20 @@ Known limits, by design (text is never dropped):
 
 Every block type has a round-trip test in `src/lib/markdown/roundtrip.test.ts`. Add one whenever
 you add a node or mark.
+
+## Page tree
+
+Pages are a flat list with `parentId` and a fractional `order`. A move changes one record: the new
+order is the midpoint between the neighbors. This keeps diffs small once the tree is synced as
+`workspace.json`. Trashing a page trashes its subtree with the same timestamp, so a restore brings
+the subtree back together. A page whose parent is still in trash is restored to the top level.
+
+## Import and export
+
+The ZIP export uses the planned repository layout (`workspace.json`, `pages/<id>.md` with front
+matter, `assets/`), so it can be committed as is. On import, every page gets a fresh id and
+`[[page:…]]` links are rewritten. Importing the same file twice never overwrites anything.
+Templates fill a page only when it is empty; otherwise they create a new page.
 
 ## Saving
 

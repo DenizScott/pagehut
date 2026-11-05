@@ -1,12 +1,18 @@
 "use client";
 
+import { useLiveQuery } from "dexie-react-hooks";
 import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { ensureWorkspace } from "@/lib/storage/local-repo";
+import { ensureWorkspace, getWorkspace } from "@/lib/storage/local-repo";
 import { useStatus } from "@/lib/stores/status";
+import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
+import { PillarsDialog } from "./PillarsDialog";
+import { SearchDialog } from "./SearchDialog";
 import { Sidebar } from "./Sidebar";
+import { TemplatesDialog } from "./TemplatesDialog";
 import { Toasts } from "./Toasts";
+import { TrashDialog } from "./TrashDialog";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const t = useTranslations("common");
@@ -16,6 +22,27 @@ export function AppShell({ children }: { children: ReactNode }) {
   const setSidebarOpen = useWorkspace((s) => s.setSidebarOpen);
   const setOnline = useStatus((s) => s.setOnline);
   const [error, setError] = useState<string | null>(null);
+  const openDialog = useUI((s) => s.open);
+
+  // Keep the workspace in the store in sync with IndexedDB (pillars, name, imports).
+  const live = useLiveQuery(() => (workspace ? getWorkspace(workspace.id) : undefined), [workspace?.id]);
+  useEffect(() => {
+    if (!live || !workspace) return;
+    const key = (w: typeof live) => JSON.stringify([w.name, w.pillars ?? []]);
+    if (key(live) !== key(workspace)) setWorkspace(live);
+  }, [live, workspace, setWorkspace]);
+
+  // Ctrl/Cmd+K opens search from anywhere, including inside the editor.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        openDialog("search");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openDialog]);
 
   useEffect(() => {
     if (workspace) return;
@@ -71,6 +98,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
       </main>
       <Toasts />
+      <Suspense fallback={null}>
+        <SearchDialog />
+        <TemplatesDialog />
+        <TrashDialog />
+        <PillarsDialog />
+      </Suspense>
     </div>
   );
 }

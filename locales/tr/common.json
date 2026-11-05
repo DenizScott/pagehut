@@ -22,7 +22,10 @@
     "loading": "Çalışma alanı yükleniyor…",
     "notFound": "Bu sayfa bu çalışma alanında yok.",
     "backHome": "İlk sayfaya git",
-    "workspaceName": "Oyunum"
+    "workspaceName": "Oyunum",
+    "search": "Ara",
+    "templates": "Şablonlar",
+    "trash": "Çöp kutusu"
   },
   "settings": {
     "language": "Dil",
@@ -41,10 +44,82 @@
   "page": {
     "titlePlaceholder": "Adsız",
     "titleLabel": "Sayfa başlığı",
-    "lastEdited": "{time} düzenlendi"
+    "lastEdited": "{time} düzenlendi",
+    "breadcrumbs": "Sayfa yolu",
+    "backlinks": "{count, plural, one {# sayfa buraya bağlanıyor} other {# sayfa buraya bağlanıyor}}"
   },
   "welcome": {
     "title": "{appName} uygulamasına hoş geldin",
     "body": "{appName}, **oyun tasarım dokümanları** (GDD) için ücretsiz bir çalışma alanı.\n\n:::callout idea\nBaşlık, yapılacaklar, açılır blok, bilgi kutusu, tablo ve daha fazlasını eklemek için herhangi bir yere `/` yaz.\n:::\n\n## Dene\n\n- [ ] Oyununun tek cümlelik tanıtımını (pitch) yaz\n- [ ] Üç tasarım ilkesi (design pillar) belirle\n- [ ] Çekirdek döngüyü (core loop) anlat\n\n:::toggle Çalışmalarım nerede saklanıyor?\nYerel modda her şey bu tarayıcıda (IndexedDB) kalır. Daha sonra bir GitHub deposu bağlayarak ekibinle aynı GDD üzerinde çalışabilirsin.\n:::\n"
+  },
+  "tree": {
+    "expand": "Genişlet",
+    "collapse": "Daralt",
+    "actionsFor": "“{title}” için işlemler",
+    "addSubpage": "Alt sayfa ekle",
+    "addSubpageTo": "“{title}” sayfasına alt sayfa ekle",
+    "moveUp": "Yukarı taşı",
+    "moveDown": "Aşağı taşı",
+    "indent": "Üstteki sayfanın içine taşı",
+    "outdent": "Bir düzey dışarı taşı"
+  },
+  "transfer": {
+    "menu": "İçe ve dışa aktar",
+    "import": "İçe aktar",
+    "importFiles": "Markdown, ZIP ya da JSON içe aktar…",
+    "exportWorkspace": "Çalışma alanını dışa aktar",
+    "exportZip": "ZIP olarak dışa aktar (Markdown dosyaları)",
+    "exportJson": "JSON olarak dışa aktar (tam yedek)",
+    "exportMarkdown": "Sayfayı Markdown olarak dışa aktar",
+    "exportPdf": "Yazdır ya da PDF olarak kaydet",
+    "imported": "{count, plural, one {# sayfa içe aktarıldı} other {# sayfa içe aktarıldı}}",
+    "skipped": "Atlananlar: {files}",
+    "failed": "İçe aktarılamadı. Dosya bozuk ya da desteklenmeyen bir biçimde olabilir."
+  },
+  "search": {
+    "title": "Sayfalarda ara",
+    "placeholder": "Başlık ve metinlerde ara…",
+    "noResults": "Sayfa bulunamadı",
+    "results": "Sonuçlar",
+    "recent": "Son düzenlenenler",
+    "count": "{count, plural, =0 {Sonuç yok} one {# sonuç} other {# sonuç}}"
+  },
+  "trash": {
+    "title": "Çöp kutusu",
+    "description": "Silinen sayfalar ve alt sayfaları. Geri yükle, onları sayfa ağacına geri koyar.",
+    "empty": "Çöp kutusu boş",
+    "restore": "Geri yükle",
+    "deletedAt": "{time} silindi"
+  },
+  "pillars": {
+    "title": "Tasarım ilkeleri",
+    "description": "Her özelliğin ölçüldüğü en fazla altı ilke. Her sayfanın üstünde görünürler.",
+    "empty": "Tasarım ilkelerini ekle",
+    "edit": "Tasarım ilkelerini düzenle",
+    "add": "İlke ekle",
+    "remove": "İlkeyi kaldır",
+    "moveUp": "Yukarı taşı",
+    "moveDown": "Aşağı taşı",
+    "titleLabel": "{n}. ilkenin adı",
+    "titlePlaceholder": "ör. Her dövüş bir bulmacadır",
+    "descriptionLabel": "{n}. ilkenin açıklaması",
+    "descriptionPlaceholder": "Ne anlama geliyor, neyi dışarıda bırakıyor?",
+    "save": "Kaydet",
+    "cancel": "Vazgeç"
+  },
+  "templates": {
+    "title": "GDD şablonları",
+    "description": "Sayfaya denenmiş bir yapıyla başla. Sonradan her şeyi değiştirebilirsin.",
+    "use": "Şablonu kullan",
+    "preview": "Şablon önizlemesi",
+    "sections": "Bölümler",
+    "startWith": "Bir şablonla başla",
+    "applyHere": "Şablondan yeni sayfa",
+    "categories": {
+      "plan": "Plan ve sunum",
+      "design": "Oyun tasarımı",
+      "story": "Hikâye ve sanat",
+      "production": "Üretim"
+    }
   }
 }

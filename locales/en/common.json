@@ -22,7 +22,10 @@
     "loading": "Loading workspace…",
     "notFound": "This page doesn't exist in this workspace.",
     "backHome": "Go to first page",
-    "workspaceName": "My game"
+    "workspaceName": "My game",
+    "search": "Search",
+    "templates": "Templates",
+    "trash": "Trash"
   },
   "settings": {
     "language": "Language",
@@ -41,10 +44,82 @@
   "page": {
     "titlePlaceholder": "Untitled",
     "titleLabel": "Page title",
-    "lastEdited": "Edited {time}"
+    "lastEdited": "Edited {time}",
+    "breadcrumbs": "Page path",
+    "backlinks": "{count, plural, one {# page links here} other {# pages link here}}"
   },
   "welcome": {
     "title": "Welcome to {appName}",
     "body": "{appName} is a free workspace for **game design documents**.\n\n:::callout idea\nType `/` anywhere to insert headings, to-dos, toggles, callouts, tables and more.\n:::\n\n## Try it\n\n- [ ] Write your game's one-sentence pitch\n- [ ] List three design pillars\n- [ ] Describe the core loop\n\n:::toggle Where is my work stored?\nIn local mode everything stays in this browser (IndexedDB). Later you can connect a GitHub repository so your team can work on the same GDD.\n:::\n"
+  },
+  "tree": {
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "actionsFor": "Actions for “{title}”",
+    "addSubpage": "Add subpage",
+    "addSubpageTo": "Add a subpage to “{title}”",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "indent": "Move into page above",
+    "outdent": "Move out one level"
+  },
+  "transfer": {
+    "menu": "Import and export",
+    "import": "Import",
+    "importFiles": "Import Markdown, ZIP or JSON…",
+    "exportWorkspace": "Export workspace",
+    "exportZip": "Export as ZIP (Markdown files)",
+    "exportJson": "Export as JSON (full backup)",
+    "exportMarkdown": "Export page as Markdown",
+    "exportPdf": "Print or save as PDF",
+    "imported": "{count, plural, one {# page imported} other {# pages imported}}",
+    "skipped": "Skipped: {files}",
+    "failed": "Import failed. The file may be damaged or in an unsupported format."
+  },
+  "search": {
+    "title": "Search pages",
+    "placeholder": "Search titles and text…",
+    "noResults": "No pages found",
+    "results": "Results",
+    "recent": "Recently edited",
+    "count": "{count, plural, =0 {No results} one {# result} other {# results}}"
+  },
+  "trash": {
+    "title": "Trash",
+    "description": "Deleted pages and their subpages. Restore puts them back in the page tree.",
+    "empty": "Trash is empty",
+    "restore": "Restore",
+    "deletedAt": "Deleted {time}"
+  },
+  "pillars": {
+    "title": "Design pillars",
+    "description": "Up to six principles every feature is measured against. They're shown above every page.",
+    "empty": "Add your design pillars",
+    "edit": "Edit design pillars",
+    "add": "Add pillar",
+    "remove": "Remove pillar",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "titleLabel": "Pillar {n} name",
+    "titlePlaceholder": "e.g. Every fight is a puzzle",
+    "descriptionLabel": "Pillar {n} description",
+    "descriptionPlaceholder": "What it means, and what it rules out",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "templates": {
+    "title": "GDD templates",
+    "description": "Start a page from a proven structure. You can change everything afterwards.",
+    "use": "Use template",
+    "preview": "Template preview",
+    "sections": "Sections",
+    "startWith": "Start with a template",
+    "applyHere": "New page from template",
+    "categories": {
+      "plan": "Plan and pitch",
+      "design": "Game design",
+      "story": "Story and art",
+      "production": "Production"
+    }
   }
 }

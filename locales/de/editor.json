@@ -24,5 +24,12 @@
     "expand": "Abschnitt aufklappen",
     "collapse": "Abschnitt einklappen"
   },
-  "contentLabel": "Seiteninhalt"
+  "contentLabel": "Seiteninhalt",
+  "pageLink": {
+    "menu": "Auf Seite verlinken",
+    "noResults": "Keine passenden Seiten",
+    "create": "Seite „{title}“ erstellen",
+    "missing": "Gelöschte Seite",
+    "untitled": "Ohne Titel"
+  }
 }

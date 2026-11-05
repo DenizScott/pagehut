@@ -11,7 +11,17 @@ students, indie teams, small studios and university classes.
   roadmap ([docs/FEATURES.md](docs/FEATURES.md)).
 - **Localized.** Turkish, English and German at launch, with RTL support ready.
 
-> Status: **P0 (local editor)**. GitHub sign-in and sync are not built yet.
+> Status: **P1 (local workspace)**. GitHub sign-in and sync are not built yet.
+
+## What works today
+
+- Block editor with a `/` menu, Markdown shortcuts, a formatting toolbar and drag handles. Blocks include callouts, toggles, tables, to-dos, code and images.
+- Nested page tree with drag and drop, plus keyboard move commands and a trash you can restore from.
+- `[[page links]]` with backlinks, and **Ctrl/Cmd+K** search across every page.
+- Design pillars strip shown above every page.
+- 14 GDD templates in Turkish, English and German: one-page GDD, full GDD, vertical slice, pitch deck, level design, mechanic spec, economy, UI/UX flow, story bible, character sheet, art bible, technical design, playtest report and post-mortem.
+- Export a page as Markdown or PDF (through the browser print dialog), or the whole workspace as ZIP (repo layout) or JSON.
+- Import Markdown files, ZIPs (folders become parent pages) or JSON backups.
 
 ## Run locally
 

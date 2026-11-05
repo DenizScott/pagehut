@@ -26,22 +26,25 @@ export function PageView() {
   const { pageId } = useParams<{ pageId: string }>();
   const t = useTranslations("common");
   const contentVersion = useUI((s) => s.contentVersion);
-  const [load, setLoad] = useState<Load>({ state: "loading" });
+  // `for` records which page id and content version this result belongs to.
+  const [load, setLoad] = useState<Load & { for?: string }>({ state: "loading" });
   // Live view of the record, only to notice that the page was moved to trash elsewhere.
   const live = useLiveQuery(() => getPage(pageId), [pageId]);
+  const want = `${pageId}:${contentVersion}`;
 
   useEffect(() => {
     let cancelled = false;
     getPage(pageId).then((page) => {
       if (cancelled) return;
-      setLoad(page && !page.deletedAt ? { state: "ready", page } : { state: "missing" });
+      setLoad({ ...(page && !page.deletedAt ? { state: "ready", page } : { state: "missing" }), for: `${pageId}:${contentVersion}` });
     });
     return () => {
       cancelled = true;
     };
   }, [pageId, contentVersion]);
 
-  if (load.state === "loading") return null;
+  // Never show the previous page while the next one loads: typing there would edit the wrong page.
+  if (load.state === "loading" || load.for !== want) return null;
   if (load.state === "missing" || live?.deletedAt)
     return (
       <div className="m-auto max-w-sm p-6 text-center">
@@ -50,7 +53,7 @@ export function PageView() {
       </div>
     );
   // key: remount editor state per page (and after a template replaced the content).
-  return <PageEditor key={`${load.page.id}:${contentVersion}`} page={load.page} />;
+  return <PageEditor key={want} page={load.page} />;
 }
 
 function HomeLink({ label }: { label: string }) {

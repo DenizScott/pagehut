@@ -7,21 +7,90 @@
     "media": "Medien"
   },
   "items": {
-    "text": { "title": "Text", "description": "Einfacher Absatz", "keywords": "absatz text" },
-    "h1": { "title": "Überschrift 1", "description": "Große Abschnittsüberschrift", "keywords": "überschrift titel groß" },
-    "h2": { "title": "Überschrift 2", "description": "Mittlere Abschnittsüberschrift", "keywords": "überschrift untertitel" },
-    "h3": { "title": "Überschrift 3", "description": "Kleine Abschnittsüberschrift", "keywords": "überschrift klein" },
-    "bullet": { "title": "Aufzählung", "description": "Einfache Liste", "keywords": "liste punkte" },
-    "numbered": { "title": "Nummerierte Liste", "description": "Schritte in Reihenfolge", "keywords": "liste nummer schritte" },
-    "todo": { "title": "To-do-Liste", "description": "Checkliste mit Kästchen", "keywords": "aufgabe checkliste kästchen" },
-    "toggle": { "title": "Aufklapper", "description": "Ein- und ausklappbarer Abschnitt", "keywords": "aufklappen einklappen details" },
-    "quote": { "title": "Zitat", "description": "Zitat oder Spieler-Feedback", "keywords": "zitat feedback" },
-    "callout": { "title": "Hinweisbox", "description": "Hervorgehobene Notiz", "keywords": "hinweis notiz info" },
-    "warning": { "title": "Warnbox", "description": "Risiko oder offene Frage", "keywords": "warnung risiko achtung frage" },
-    "idea": { "title": "Ideenbox", "description": "Design-Idee zum Ausprobieren", "keywords": "idee vorschlag glühbirne" },
-    "divider": { "title": "Trennlinie", "description": "Horizontale Linie", "keywords": "linie trenner" },
-    "code": { "title": "Codeblock", "description": "Code oder Pseudocode", "keywords": "code skript" },
-    "table": { "title": "Tabelle", "description": "Werte, Steuerung, Vergleiche", "keywords": "tabelle werte stats" },
-    "image": { "title": "Bild", "description": "Konzeptzeichnung oder Screenshot hochladen", "keywords": "bild foto hochladen grafik" }
+    "text": {
+      "title": "Text",
+      "description": "Einfacher Absatz",
+      "keywords": "absatz text"
+    },
+    "h1": {
+      "title": "Überschrift 1",
+      "description": "Große Abschnittsüberschrift",
+      "keywords": "überschrift titel groß"
+    },
+    "h2": {
+      "title": "Überschrift 2",
+      "description": "Mittlere Abschnittsüberschrift",
+      "keywords": "überschrift untertitel"
+    },
+    "h3": {
+      "title": "Überschrift 3",
+      "description": "Kleine Abschnittsüberschrift",
+      "keywords": "überschrift klein"
+    },
+    "bullet": {
+      "title": "Aufzählung",
+      "description": "Einfache Liste",
+      "keywords": "liste punkte"
+    },
+    "numbered": {
+      "title": "Nummerierte Liste",
+      "description": "Schritte in Reihenfolge",
+      "keywords": "liste nummer schritte"
+    },
+    "todo": {
+      "title": "To-do-Liste",
+      "description": "Checkliste mit Kästchen",
+      "keywords": "aufgabe checkliste kästchen"
+    },
+    "toggle": {
+      "title": "Aufklapper",
+      "description": "Ein- und ausklappbarer Abschnitt",
+      "keywords": "aufklappen einklappen details"
+    },
+    "quote": {
+      "title": "Zitat",
+      "description": "Zitat oder Spieler-Feedback",
+      "keywords": "zitat feedback"
+    },
+    "callout": {
+      "title": "Hinweisbox",
+      "description": "Hervorgehobene Notiz",
+      "keywords": "hinweis notiz info"
+    },
+    "warning": {
+      "title": "Warnbox",
+      "description": "Risiko oder offene Frage",
+      "keywords": "warnung risiko achtung frage"
+    },
+    "idea": {
+      "title": "Ideenbox",
+      "description": "Design-Idee zum Ausprobieren",
+      "keywords": "idee vorschlag glühbirne"
+    },
+    "divider": {
+      "title": "Trennlinie",
+      "description": "Horizontale Linie",
+      "keywords": "linie trenner"
+    },
+    "code": {
+      "title": "Codeblock",
+      "description": "Code oder Pseudocode",
+      "keywords": "code skript"
+    },
+    "table": {
+      "title": "Tabelle",
+      "description": "Werte, Steuerung, Vergleiche",
+      "keywords": "tabelle werte stats"
+    },
+    "image": {
+      "title": "Bild",
+      "description": "Konzeptzeichnung oder Screenshot hochladen",
+      "keywords": "bild foto hochladen grafik"
+    },
+    "pageLink": {
+      "title": "Seitenlink",
+      "description": "Andere Seite verlinken (oder [[ tippen)",
+      "keywords": "link seite verweis"
+    }
   }
 }

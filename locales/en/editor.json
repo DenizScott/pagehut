@@ -24,5 +24,12 @@
     "expand": "Expand section",
     "collapse": "Collapse section"
   },
-  "contentLabel": "Page content"
+  "contentLabel": "Page content",
+  "pageLink": {
+    "menu": "Link to page",
+    "noResults": "No matching pages",
+    "create": "Create page “{title}”",
+    "missing": "Deleted page",
+    "untitled": "Untitled"
+  }
 }

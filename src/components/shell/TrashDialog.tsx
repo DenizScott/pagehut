@@ -29,7 +29,7 @@ export function TrashDialog() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm">{p.title || t("shell.untitled")}</p>
                   <p className="text-xs text-fg-subtle">
-                    {t("trash.deletedAt", { time: format.relativeTime(p.deletedAt ?? Date.now()) })}
+                    {t("trash.deletedAt", { time: format.relativeTime(p.deletedAt ?? 0) })}
                   </p>
                 </div>
                 <Button size="sm" variant="subtle" onClick={() => void restorePage(p.id)}>

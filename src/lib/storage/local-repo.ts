@@ -67,7 +67,7 @@ export async function getPage(id: string): Promise<PageRecord | undefined> {
 
 export async function createPage(
   workspaceId: string,
-  opts: { title?: string; parentId?: string | null; markdown?: string } = {},
+  opts: { title?: string; parentId?: string | null; markdown?: string; icon?: string } = {},
 ): Promise<PageRecord> {
   const db = getDB();
   const siblings = await listPages(workspaceId);
@@ -81,6 +81,7 @@ export async function createPage(
     parentId,
     order: maxOrder + 1,
     title: opts.title ?? "",
+    ...(opts.icon ? { icon: opts.icon } : {}),
     doc,
     markdown: docToMarkdown(doc),
     createdAt: now,
@@ -110,6 +111,28 @@ export async function savePageContent(id: string, doc: unknown): Promise<PageRec
   if (!page) throw new Error(`Page ${id} not found`);
   await touchWorkspace(page.workspaceId, now);
   return page;
+}
+
+/**
+ * Fills an EMPTY page (e.g. from a template). Refuses to overwrite existing text: returns false
+ * and changes nothing, so callers can create a new page instead.
+ */
+export async function fillEmptyPage(id: string, content: { title: string; markdown: string; icon?: string }): Promise<boolean> {
+  const db = getDB();
+  return db.transaction("rw", db.pages, async () => {
+    const page = await db.pages.get(id);
+    if (!page || page.markdown.trim()) return false;
+    const doc = markdownToDoc(content.markdown);
+    await db.pages.update(id, {
+      title: page.title.trim() ? page.title : content.title,
+      ...(content.icon && !page.icon ? { icon: content.icon } : {}),
+      doc,
+      markdown: docToMarkdown(doc),
+      updatedAt: Date.now(),
+      dirty: true,
+    });
+    return true;
+  });
 }
 
 export async function savePageTitle(id: string, title: string): Promise<void> {
