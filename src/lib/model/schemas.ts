@@ -60,12 +60,18 @@ export interface WorkspaceRecord {
   updatedAt: number;
   /** Design pillars shown above every page. */
   pillars?: Pillar[];
-  /** github mode only (P2) */
+  /** github mode only: the repository this workspace lives in. */
   repo?: { owner: string; name: string; branch: string };
+  /** github mode: commit the local copy was last synced with (null = repo was empty). */
+  headSha?: string | null;
+  /** github mode: workspace.json text as last synced, to detect tree/pillar changes. */
+  workspaceFileBase?: string;
+  lastSyncedAt?: number;
 }
 
 /** Last synced remote state of a page; the base of a three-way merge (P3). */
 export interface SyncBase {
+  /** Full file text of pages/<id>.md (front matter + body) as last synced. */
   markdown: string;
   sha: string;
   syncedAt: number;
@@ -98,6 +104,8 @@ export interface AssetRecord {
   mime: string;
   size: number;
   createdAt: number;
+  /** Blob sha once uploaded to the workspace repo. */
+  sha?: string;
 }
 
 export const ASSET_WARN_BYTES = 1024 * 1024;

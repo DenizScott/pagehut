@@ -9,7 +9,8 @@
     "mainNav": "Workspace navigation",
     "openSidebar": "Open sidebar",
     "closeSidebar": "Close sidebar",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "newTab": "opens in a new tab"
   },
   "shell": {
     "pages": "Pages",
@@ -121,5 +122,75 @@
       "story": "Story and art",
       "production": "Production"
     }
+  },
+  "workspace": {
+    "title": "Workspaces",
+    "switch": "Switch workspace (current: {name})",
+    "current": "Current workspace"
+  },
+  "github": {
+    "connect": "Save to GitHub…",
+    "connectShort": "Connect",
+    "open": "Open from GitHub…",
+    "signOut": "Sign out of GitHub ({login})",
+    "repoHint": "Stored in this GitHub repository. Opens on github.com.",
+    "connectTitle": "Save this workspace to GitHub",
+    "connectDescription": "Your pages become Markdown files in a repository you own. Everyone you add to the repo can open the workspace.",
+    "openTitle": "Open a workspace from GitHub",
+    "openDescription": "Pick a repository that already contains a workspace.",
+    "checking": "Checking GitHub sign-in…",
+    "unconfigured": "GitHub sign-in is not set up on this server.",
+    "unconfiguredHint": "Whoever runs this server needs to create a GitHub App and set its keys (see docs/GITHUB-SETUP.md). Local mode keeps working meanwhile.",
+    "signInWhy": "Sign in with GitHub to store this workspace in a repository and share it with your team.",
+    "privacy1": "Documents go straight from your browser to GitHub; this server never stores them.",
+    "privacy2": "The app can only reach repositories you explicitly install it on.",
+    "signIn": "Sign in with GitHub",
+    "signedInAs": "Signed in as {login}",
+    "filterRepos": "Filter repositories",
+    "repositories": "Repositories",
+    "loadingRepos": "Loading repositories…",
+    "noRepos": "No repositories found. Install the app on a repository first.",
+    "private": "Private repository",
+    "missingRepo": "Don't see your repository? Install the app on it",
+    "connectWarning": "All pages will be committed to {repo}.",
+    "working": "Working…",
+    "connectAction": "Save to repository",
+    "openAction": "Open workspace",
+    "connected": "Workspace saved to {repo}",
+    "opened": "Opened workspace from {repo}",
+    "errors": {
+      "hasWorkspace": "This repository already contains a workspace. Use “Open from GitHub” instead.",
+      "notWorkspace": "This repository has no workspace yet. Use “Save to GitHub” from a local workspace instead.",
+      "offline": "You're offline. Your work is saved in this browser; try again when you're back online.",
+      "rateLimited": "GitHub's rate limit was reached. Try again after {time}.",
+      "signedOut": "Your GitHub session expired. Sign in again; nothing local is lost.",
+      "noAccess": "The app can't access this repository. Check that it's installed on it and that you can push.",
+      "generic": "Something went wrong talking to GitHub. Your local work is safe.",
+      "denied": "GitHub sign-in was cancelled.",
+      "signInFailed": "GitHub sign-in failed. Please try again."
+    }
+  },
+  "share": {
+    "title": "Share with your team",
+    "description": "Team access is GitHub access: whoever can push to the repository can edit the workspace.",
+    "step1": "Add teammates as collaborators on the repository:",
+    "collaborators": "collaborator settings",
+    "step2": "They accept the invitation on GitHub.",
+    "step3": "They open {app} and choose “Open from GitHub”, then {repo}.",
+    "permissions": "Read access lets people view; write access lets them edit. Per-page permissions aren't possible on a Git repository.",
+    "viewRepo": "View repository on GitHub",
+    "manageInstall": "Manage which repositories the app can access",
+    "localOnly": "This workspace is only in this browser. Save it to GitHub first to share it."
+  },
+  "sync": {
+    "synced": "Synced",
+    "pending": "{count, plural, one {# change to push} other {# changes to push}}",
+    "syncing": "Pushing…",
+    "remoteChanged": "GitHub has newer changes",
+    "offline": "Offline",
+    "rateLimited": "Paused until {time}",
+    "signedOut": "Sign in to sync",
+    "error": "Sync failed",
+    "pushHint": "click to push now"
   }
 }

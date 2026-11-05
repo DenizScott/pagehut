@@ -1,7 +1,22 @@
-# GitHub sync and conflicts (draft)
+# GitHub sync and conflicts
 
-Status: **draft design**, to be finalized and implemented in phase P3. P0 already stores the
-fields this design needs (`dirty`, `base` on every page).
+Status: **P2 implemented** (sign-in, connect, open, manual push with fast-forward only).
+**P3 pending** (automatic sync, pull, three-way merge, conflict UI, history).
+
+## What P2 does today
+
+- **Connect:** commits every page, `workspace.json` and (if missing) a `README.md` to an empty or
+  non-workspace repo. An empty repo is initialized through the Contents API first.
+- **Push** (sync button): content-based. Only files whose text differs from `base` are sent, in
+  one commit through the Git Data API (blobs, tree, commit, then a ref update with `force: false`).
+- **Branch moved** (a teammate pushed): the push fails with `RemoteChangedError` and local text
+  stays. This also happens when nothing is pending locally, so the UI never shows "synced" while
+  GitHub is ahead.
+- **Open:** reads `workspace.json`, pages and assets into a new local workspace with `base` set. A
+  second open of the same repo switches to the existing copy.
+
+Tested against an in-memory GitHub (`src/lib/github/fake-github.ts`) in unit tests and through the
+real UI in `e2e/p2-github.spec.ts`.
 
 ## Goals
 

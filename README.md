@@ -11,7 +11,7 @@ students, indie teams, small studios and university classes.
   roadmap ([docs/FEATURES.md](docs/FEATURES.md)).
 - **Localized.** Turkish, English and German at launch, with RTL support ready.
 
-> Status: **P1 (local workspace)**. GitHub sign-in and sync are not built yet.
+> Status: **P2 (GitHub storage)**. Automatic sync and merging of teammates' changes come in P3.
 
 ## What works today
 
@@ -22,6 +22,11 @@ students, indie teams, small studios and university classes.
 - 14 GDD templates in Turkish, English and German: one-page GDD, full GDD, vertical slice, pitch deck, level design, mechanic spec, economy, UI/UX flow, story bible, character sheet, art bible, technical design, playtest report and post-mortem.
 - Export a page as Markdown or PDF (through the browser print dialog), or the whole workspace as ZIP (repo layout) or JSON.
 - Import Markdown files, ZIPs (folders become parent pages) or JSON backups.
+- **GitHub:** sign in, save a workspace to a repository (one readable Markdown file per page), push changes as one commit, open a workspace from a repository on another device, and share by adding collaborators. A push never overwrites a teammate's newer commit.
+
+## GitHub sign-in (optional)
+
+Local mode needs no setup. To store workspaces on GitHub, create a free GitHub App and set four environment variables. See [docs/GITHUB-SETUP.md](docs/GITHUB-SETUP.md) and copy [.env.example](.env.example) to `.env.local`.
 
 ## Run locally
 

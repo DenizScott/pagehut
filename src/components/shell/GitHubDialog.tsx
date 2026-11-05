@@ -1,0 +1,203 @@
+"use client";
+
+import { ExternalLink, Lock, Search } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { GitHubMark } from "@/components/ui/github-mark";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { GitHubError, OfflineError, RateLimitError, SignedOutError } from "@/lib/github/api";
+import { installUrl, listRepos, type RepoSummary } from "@/lib/github/repo";
+import { githubApi, useGitHub } from "@/lib/github/session";
+import { connectWorkspace, NotAWorkspaceError, openRepoWorkspace, RepoHasWorkspaceError } from "@/lib/github/sync";
+import { getWorkspace, setActiveWorkspace } from "@/lib/storage/local-repo";
+import { useStatus } from "@/lib/stores/status";
+import { useSync } from "@/lib/stores/sync";
+import { useUI } from "@/lib/stores/ui";
+import { useWorkspace } from "@/lib/stores/workspace";
+import { cn } from "@/lib/utils";
+
+/** Connect the current workspace to a repo, or open a workspace stored in a repo. */
+export function GitHubDialog() {
+  const t = useTranslations("common.github");
+  const open = useUI((s) => s.dialog === "github");
+  const mode = useUI((s) => s.githubMode);
+  const close = useUI((s) => s.close);
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && close()}>
+      {open && (
+        <DialogContent
+          title={mode === "connect" ? t("connectTitle") : t("openTitle")}
+          description={mode === "connect" ? t("connectDescription") : t("openDescription")}
+          className="max-w-xl"
+        >
+          <Body mode={mode} />
+        </DialogContent>
+      )}
+    </Dialog>
+  );
+}
+
+function Body({ mode }: { mode: "connect" | "open" }) {
+  const t = useTranslations("common.github");
+  const github = useGitHub();
+  const pathname = usePathname();
+
+  if (github.status === "unknown") return <p className="p-4 text-sm text-fg-muted">{t("checking")}</p>;
+  if (github.status === "unconfigured")
+    return (
+      <div className="space-y-2 p-4 text-sm">
+        <p>{t("unconfigured")}</p>
+        <p className="text-fg-muted">{t("unconfiguredHint")}</p>
+      </div>
+    );
+  if (github.status === "signedOut")
+    return (
+      <div className="space-y-3 p-4 text-sm">
+        <p className="text-fg-muted">{t("signInWhy")}</p>
+        <ul className="list-disc space-y-1 ps-5 text-fg-muted">
+          <li>{t("privacy1")}</li>
+          <li>{t("privacy2")}</li>
+        </ul>
+        <Button variant="primary" onClick={() => github.signIn(`${window.location.pathname}?github=${mode}`)}>
+          <GitHubMark /> {t("signIn")}
+        </Button>
+      </div>
+    );
+  return <RepoPicker mode={mode} key={pathname} />;
+}
+
+function RepoPicker({ mode }: { mode: "connect" | "open" }) {
+  const t = useTranslations("common.github");
+  const router = useRouter();
+  const { appSlug, user } = useGitHub();
+  const workspace = useWorkspace((s) => s.workspace);
+  const setWorkspace = useWorkspace((s) => s.setWorkspace);
+  const close = useUI((s) => s.close);
+  const toast = useStatus((s) => s.toast);
+  const resetSync = useSync((s) => s.reset);
+  const [repos, setRepos] = useState<RepoSummary[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [filter, setFilter] = useState("");
+  const [selected, setSelected] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    listRepos(githubApi())
+      .then((r) => !cancelled && setRepos(r))
+      .catch((err: unknown) => !cancelled && setLoadError(describe(err)));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function describe(err: unknown): string {
+    if (err instanceof RepoHasWorkspaceError) return t("errors.hasWorkspace");
+    if (err instanceof NotAWorkspaceError) return t("errors.notWorkspace");
+    if (err instanceof OfflineError) return t("errors.offline");
+    if (err instanceof RateLimitError) return t("errors.rateLimited", { time: new Date(err.resetAt).toLocaleTimeString() });
+    if (err instanceof SignedOutError) return t("errors.signedOut");
+    if (err instanceof GitHubError && (err.status === 403 || err.status === 404)) return t("errors.noAccess");
+    return t("errors.generic");
+  }
+
+  const shown = useMemo(
+    () => (repos ?? []).filter((r) => r.fullName.toLowerCase().includes(filter.trim().toLowerCase())),
+    [repos, filter],
+  );
+  const chosen = repos?.find((r) => r.fullName === selected);
+
+  async function run() {
+    if (!chosen || !workspace) return;
+    setBusy(true);
+    setError(null);
+    const ref = { owner: chosen.owner, name: chosen.name, branch: chosen.defaultBranch };
+    try {
+      if (mode === "connect") {
+        await connectWorkspace(githubApi(), workspace.id, ref);
+        const updated = await getWorkspace(workspace.id);
+        if (updated) setWorkspace(updated);
+        resetSync();
+        toast(t("connected", { repo: chosen.fullName }));
+      } else {
+        const id = await openRepoWorkspace(githubApi(), ref);
+        const { workspace: ws, firstPageId } = await setActiveWorkspace(id);
+        setWorkspace(ws);
+        resetSync();
+        router.push(firstPageId ? `/p/${firstPageId}` : "/");
+        toast(t("opened", { repo: chosen.fullName }));
+      }
+      close();
+    } catch (err) {
+      setError(describe(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="flex min-h-0 flex-col">
+      <div className="flex items-center gap-2 px-4 pt-3 text-xs text-fg-muted">
+        <GitHubMark className="size-3.5" />
+        {t("signedInAs", { login: user?.login ?? "" })}
+      </div>
+      <label className="mx-4 mt-3 flex items-center gap-2 rounded-md border border-hairline bg-canvas px-2">
+        <Search className="size-4 text-fg-subtle" aria-hidden="true" />
+        <input
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder={t("filterRepos")}
+          aria-label={t("filterRepos")}
+          className="min-w-0 flex-1 bg-transparent py-1.5 text-sm outline-none"
+        />
+      </label>
+      <div role="radiogroup" aria-label={t("repositories")} className="min-h-24 overflow-y-auto p-2">
+        {!repos && !loadError && <p className="p-3 text-sm text-fg-muted">{t("loadingRepos")}</p>}
+        {loadError && <p role="alert" className="p-3 text-sm text-danger">{loadError}</p>}
+        {repos && shown.length === 0 && <p className="p-3 text-sm text-fg-muted">{t("noRepos")}</p>}
+        {shown.map((r) => (
+          <button
+            key={r.fullName}
+            type="button"
+            role="radio"
+            aria-checked={selected === r.fullName}
+            disabled={mode === "connect" && !r.canPush}
+            onClick={() => setSelected(r.fullName)}
+            className={cn(
+              "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-start text-sm hover:bg-surface-hover disabled:opacity-50",
+              selected === r.fullName && "bg-accent-soft",
+            )}
+          >
+            <span className="min-w-0 flex-1 truncate">{r.fullName}</span>
+            {r.private && <Lock className="size-3.5 text-fg-subtle" aria-label={t("private")} />}
+          </button>
+        ))}
+      </div>
+      {appSlug && (
+        <a
+          href={installUrl(appSlug)}
+          target="_blank"
+          rel="noreferrer"
+          className="mx-4 mb-2 inline-flex items-center gap-1 text-xs text-accent-text underline underline-offset-2"
+        >
+          {t("missingRepo")} <ExternalLink className="size-3" aria-hidden="true" />
+        </a>
+      )}
+      {error && (
+        <p role="alert" className="mx-4 mb-2 rounded-md bg-danger-soft px-3 py-2 text-sm text-danger">
+          {error}
+        </p>
+      )}
+      <div className="flex items-center justify-end gap-2 border-t border-hairline p-3">
+        {chosen && mode === "connect" && <p className="me-auto text-xs text-fg-muted">{t("connectWarning", { repo: chosen.fullName })}</p>}
+        <Button variant="primary" disabled={!chosen || busy} onClick={() => void run()}>
+          {busy ? t("working") : mode === "connect" ? t("connectAction") : t("openAction")}
+        </Button>
+      </div>
+    </div>
+  );
+}

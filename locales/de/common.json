@@ -9,7 +9,8 @@
     "mainNav": "Navigation im Arbeitsbereich",
     "openSidebar": "Seitenleiste öffnen",
     "closeSidebar": "Seitenleiste schließen",
-    "dismiss": "Schließen"
+    "dismiss": "Schließen",
+    "newTab": "öffnet in neuem Tab"
   },
   "shell": {
     "pages": "Seiten",
@@ -121,5 +122,75 @@
       "story": "Story und Art",
       "production": "Produktion"
     }
+  },
+  "workspace": {
+    "title": "Arbeitsbereiche",
+    "switch": "Arbeitsbereich wechseln (aktuell: {name})",
+    "current": "Aktueller Arbeitsbereich"
+  },
+  "github": {
+    "connect": "Auf GitHub speichern …",
+    "connectShort": "Verbinden",
+    "open": "Von GitHub öffnen …",
+    "signOut": "Von GitHub abmelden ({login})",
+    "repoHint": "In diesem GitHub-Repository gespeichert. Öffnet github.com.",
+    "connectTitle": "Diesen Arbeitsbereich auf GitHub speichern",
+    "connectDescription": "Deine Seiten werden zu Markdown-Dateien in einem Repository, das dir gehört. Alle, die du zum Repo hinzufügst, können den Arbeitsbereich öffnen.",
+    "openTitle": "Arbeitsbereich von GitHub öffnen",
+    "openDescription": "Wähle ein Repository, das bereits einen Arbeitsbereich enthält.",
+    "checking": "GitHub-Anmeldung wird geprüft …",
+    "unconfigured": "Die GitHub-Anmeldung ist auf diesem Server nicht eingerichtet.",
+    "unconfiguredHint": "Wer diesen Server betreibt, muss eine GitHub App anlegen und ihre Schlüssel hinterlegen (siehe docs/GITHUB-SETUP.md). Der lokale Modus funktioniert weiterhin.",
+    "signInWhy": "Melde dich mit GitHub an, um diesen Arbeitsbereich in einem Repository zu speichern und mit deinem Team zu teilen.",
+    "privacy1": "Dokumente gehen direkt von deinem Browser zu GitHub; dieser Server speichert sie nie.",
+    "privacy2": "Die App erreicht nur Repositories, auf denen du sie ausdrücklich installierst.",
+    "signIn": "Mit GitHub anmelden",
+    "signedInAs": "Angemeldet als {login}",
+    "filterRepos": "Repositories filtern",
+    "repositories": "Repositories",
+    "loadingRepos": "Repositories werden geladen …",
+    "noRepos": "Keine Repositories gefunden. Installiere die App zuerst auf einem Repository.",
+    "private": "Privates Repository",
+    "missingRepo": "Dein Repository fehlt? Installiere die App darauf",
+    "connectWarning": "Alle Seiten werden in {repo} committet.",
+    "working": "Wird ausgeführt …",
+    "connectAction": "Im Repository speichern",
+    "openAction": "Arbeitsbereich öffnen",
+    "connected": "Arbeitsbereich in {repo} gespeichert",
+    "opened": "Arbeitsbereich aus {repo} geöffnet",
+    "errors": {
+      "hasWorkspace": "Dieses Repository enthält bereits einen Arbeitsbereich. Nutze stattdessen „Von GitHub öffnen“.",
+      "notWorkspace": "Dieses Repository enthält noch keinen Arbeitsbereich. Nutze stattdessen „Auf GitHub speichern“ in einem lokalen Arbeitsbereich.",
+      "offline": "Du bist offline. Deine Arbeit ist in diesem Browser gespeichert; versuch es wieder, sobald du online bist.",
+      "rateLimited": "Das GitHub-Ratenlimit ist erreicht. Versuch es nach {time} erneut.",
+      "signedOut": "Deine GitHub-Sitzung ist abgelaufen. Melde dich erneut an; lokal geht nichts verloren.",
+      "noAccess": "Die App hat keinen Zugriff auf dieses Repository. Prüfe, ob sie dort installiert ist und du Schreibrechte hast.",
+      "generic": "Bei der Verbindung mit GitHub ist etwas schiefgelaufen. Deine lokale Arbeit ist sicher.",
+      "denied": "Die GitHub-Anmeldung wurde abgebrochen.",
+      "signInFailed": "Die GitHub-Anmeldung ist fehlgeschlagen. Bitte versuch es erneut."
+    }
+  },
+  "share": {
+    "title": "Mit dem Team teilen",
+    "description": "Teamzugriff ist GitHub-Zugriff: Wer ins Repository pushen kann, kann den Arbeitsbereich bearbeiten.",
+    "step1": "Füge Teammitglieder als Collaborators zum Repository hinzu:",
+    "collaborators": "Collaborator-Einstellungen",
+    "step2": "Sie nehmen die Einladung auf GitHub an.",
+    "step3": "Sie öffnen {app}, wählen „Von GitHub öffnen“ und dann {repo}.",
+    "permissions": "Leserechte erlauben Ansehen, Schreibrechte Bearbeiten. Rechte pro Seite sind in einem Git-Repository nicht möglich.",
+    "viewRepo": "Repository auf GitHub ansehen",
+    "manageInstall": "Verwalten, auf welche Repositories die App zugreift",
+    "localOnly": "Dieser Arbeitsbereich existiert nur in diesem Browser. Speichere ihn zuerst auf GitHub, um ihn zu teilen."
+  },
+  "sync": {
+    "synced": "Synchronisiert",
+    "pending": "{count, plural, one {# Änderung zu pushen} other {# Änderungen zu pushen}}",
+    "syncing": "Wird gepusht …",
+    "remoteChanged": "GitHub hat neuere Änderungen",
+    "offline": "Offline",
+    "rateLimited": "Pausiert bis {time}",
+    "signedOut": "Zum Synchronisieren anmelden",
+    "error": "Synchronisierung fehlgeschlagen",
+    "pushHint": "klicken, um jetzt zu pushen"
   }
 }

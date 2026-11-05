@@ -2,7 +2,7 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import { RotateCcw } from "lucide-react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useNow, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { listTrash, restorePage } from "@/lib/storage/local-repo";
@@ -13,6 +13,7 @@ import { useWorkspace } from "@/lib/stores/workspace";
 export function TrashDialog() {
   const t = useTranslations("common");
   const format = useFormatter();
+  const now = useNow({ updateInterval: 60_000 });
   const open = useUI((s) => s.dialog === "trash");
   const close = useUI((s) => s.close);
   const workspace = useWorkspace((s) => s.workspace);
@@ -29,7 +30,7 @@ export function TrashDialog() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm">{p.title || t("shell.untitled")}</p>
                   <p className="text-xs text-fg-subtle">
-                    {t("trash.deletedAt", { time: format.relativeTime(p.deletedAt ?? 0) })}
+                    {t("trash.deletedAt", { time: format.relativeTime(p.deletedAt ?? 0, now) })}
                   </p>
                 </div>
                 <Button size="sm" variant="subtle" onClick={() => void restorePage(p.id)}>

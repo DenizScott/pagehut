@@ -1,6 +1,6 @@
 # Architecture
 
-Status: P1. Sections marked *(planned)* describe the approved design for later phases.
+Status: P2. Sections marked *(planned)* describe the approved design for later phases.
 
 ## Overview
 
@@ -46,6 +46,9 @@ Next.js 16 notes for contributors:
 | `src/lib/tree.ts` | Pure page-tree helpers: build, move, keyboard moves, ancestors |
 | `src/lib/search.ts` | MiniSearch index over titles and plain text (Turkish-aware) |
 | `src/lib/transfer/` | Front matter, ZIP/JSON bundles, import with id remapping, downloads |
+| `src/lib/server/` | Server-only auth: GitHub App config, sealed cookies, OAuth/PKCE handlers |
+| `src/app/api/auth/*` | Route handlers: `status`, `login`, `callback`, `token`, `logout` |
+| `src/lib/github/` | Browser GitHub client: REST wrapper, repo operations (Git Data API), workspace sync, in-memory fake for tests |
 | `src/templates/` | GDD templates, one file per language (`en.ts`, `tr.ts`, `de.ts`) |
 
 ## Data model
@@ -132,9 +135,17 @@ Tailwind with `@theme inline`. Checked contrast pairs (WCAG AA):
 
 Glass (blur plus translucent surface) is used only on chrome: the sidebar drawer, menus and toasts.
 
-## Security *(planned, P2)*
+## Security
 
-GitHub App with fine-grained `Contents: read/write` + `Metadata: read` on repositories the user
-picks. The refresh token is kept in an encrypted httpOnly cookie. The short-lived access token is
-held in memory only, and the client calls `api.github.com` directly. See the approved plan in
-`docs/SYNC.md`.
+GitHub App with `Contents: read/write` + `Metadata: read`, limited to repositories the app is
+installed on. Sign-in uses the web flow with `state` and PKCE (S256).
+
+- **Refresh token.** Sealed with AES-256-GCM in an `httpOnly`, `SameSite=Lax` cookie scoped to
+  `/api/auth`, and `Secure` on HTTPS.
+- **Access token.** Lives about 8 hours. It is handed to the browser once and kept in module
+  memory only (`src/lib/github/session.ts`).
+- **Token endpoint.** Requires the `x-pagehut-csrf` header and a same-origin `Origin`.
+- **Return paths.** Only relative return paths are accepted (no open redirects).
+- **Documents.** Go straight between the browser and `api.github.com`; the server never sees them.
+
+Setup steps are in `docs/GITHUB-SETUP.md`.

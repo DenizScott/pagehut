@@ -1,7 +1,7 @@
 "use client";
 
 import { useLiveQuery } from "dexie-react-hooks";
-import { Download, HardDrive, LayoutTemplate, MoreHorizontal, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { Download, LayoutTemplate, MoreHorizontal, Plus, Search, Trash2, Upload, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -13,9 +13,9 @@ import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
 import { cn } from "@/lib/utils";
 import { useImporter } from "./Importer";
-import { Logo } from "./Logo";
 import { PageTree } from "./PageTree";
 import { LocaleSwitcher, ThemeSwitcher } from "./Preferences";
+import { StorageBadge, WorkspaceMenu } from "./WorkspaceMenu";
 
 const isMac = () => typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
 
@@ -51,25 +51,14 @@ export function Sidebar() {
         open ? "translate-x-0" : "-translate-x-full rtl:translate-x-full",
       )}
     >
-      <div className="flex items-center gap-2 px-3 pt-3 pb-2">
-        <Logo className="size-7" />
-        <div className="min-w-0 flex-1 leading-tight">
-          <p className="truncate text-sm font-semibold">{t("app.name")}</p>
-          <p className="truncate text-xs text-fg-muted">{workspace?.name ?? t("app.tagline")}</p>
-        </div>
+      <div className="flex items-center gap-1 px-2 pt-2 pb-2">
+        <WorkspaceMenu />
         <Button size="icon-sm" className="md:hidden" onClick={() => setOpen(false)} aria-label={t("a11y.closeSidebar")}>
           <X />
         </Button>
       </div>
 
-      <p
-        className="mx-3 mb-2 flex items-center gap-1.5 rounded-md bg-surface-hover px-2 py-1 text-xs text-fg-muted"
-        title={t("shell.localModeHint")}
-      >
-        <HardDrive className="size-3.5" aria-hidden="true" />
-        {t("shell.localMode")}
-        <span className="sr-only">: {t("shell.localModeHint")}</span>
-      </p>
+      <StorageBadge />
 
       <div className="space-y-px px-2">
         {quick.map(({ key, icon: Icon, label, kbd, run }) => (

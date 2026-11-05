@@ -9,7 +9,8 @@
     "mainNav": "Çalışma alanı gezinmesi",
     "openSidebar": "Kenar çubuğunu aç",
     "closeSidebar": "Kenar çubuğunu kapat",
-    "dismiss": "Kapat"
+    "dismiss": "Kapat",
+    "newTab": "yeni sekmede açılır"
   },
   "shell": {
     "pages": "Sayfalar",
@@ -121,5 +122,75 @@
       "story": "Hikâye ve sanat",
       "production": "Üretim"
     }
+  },
+  "workspace": {
+    "title": "Çalışma alanları",
+    "switch": "Çalışma alanını değiştir (şu an: {name})",
+    "current": "Geçerli çalışma alanı"
+  },
+  "github": {
+    "connect": "GitHub'a kaydet…",
+    "connectShort": "Bağla",
+    "open": "GitHub'dan aç…",
+    "signOut": "GitHub oturumunu kapat ({login})",
+    "repoHint": "Bu GitHub deposunda saklanıyor. github.com'da açılır.",
+    "connectTitle": "Bu çalışma alanını GitHub'a kaydet",
+    "connectDescription": "Sayfaların, sahibi olduğun bir depoda Markdown dosyaları olur. Depoya eklediğin herkes çalışma alanını açabilir.",
+    "openTitle": "GitHub'dan çalışma alanı aç",
+    "openDescription": "İçinde zaten bir çalışma alanı olan bir depo seç.",
+    "checking": "GitHub oturumu kontrol ediliyor…",
+    "unconfigured": "Bu sunucuda GitHub ile giriş ayarlanmamış.",
+    "unconfiguredHint": "Sunucuyu çalıştıran kişinin bir GitHub App oluşturup anahtarlarını girmesi gerekiyor (bkz. docs/GITHUB-SETUP.md). Bu arada yerel mod çalışmaya devam eder.",
+    "signInWhy": "Bu çalışma alanını bir depoda saklamak ve ekibinle paylaşmak için GitHub ile giriş yap.",
+    "privacy1": "Belgeler tarayıcından doğrudan GitHub'a gider; bu sunucu onları hiç saklamaz.",
+    "privacy2": "Uygulama yalnızca açıkça yüklediğin depolara erişebilir.",
+    "signIn": "GitHub ile giriş yap",
+    "signedInAs": "{login} olarak giriş yapıldı",
+    "filterRepos": "Depoları filtrele",
+    "repositories": "Depolar",
+    "loadingRepos": "Depolar yükleniyor…",
+    "noRepos": "Depo bulunamadı. Önce uygulamayı bir depoya yükle.",
+    "private": "Özel depo",
+    "missingRepo": "Deponu göremiyor musun? Uygulamayı o depoya yükle",
+    "connectWarning": "Tüm sayfalar {repo} deposuna commit'lenecek.",
+    "working": "Çalışıyor…",
+    "connectAction": "Depoya kaydet",
+    "openAction": "Çalışma alanını aç",
+    "connected": "Çalışma alanı {repo} deposuna kaydedildi",
+    "opened": "{repo} deposundan çalışma alanı açıldı",
+    "errors": {
+      "hasWorkspace": "Bu depoda zaten bir çalışma alanı var. Bunun yerine “GitHub'dan aç”ı kullan.",
+      "notWorkspace": "Bu depoda henüz çalışma alanı yok. Bunun yerine yerel bir çalışma alanından “GitHub'a kaydet”i kullan.",
+      "offline": "Çevrimdışısın. Çalışman bu tarayıcıda kayıtlı; bağlantı gelince tekrar dene.",
+      "rateLimited": "GitHub istek sınırına ulaşıldı. {time} sonrasında tekrar dene.",
+      "signedOut": "GitHub oturumunun süresi doldu. Yeniden giriş yap; yerel hiçbir şey kaybolmaz.",
+      "noAccess": "Uygulama bu depoya erişemiyor. Uygulamanın depoya yüklü olduğunu ve yazma iznin olduğunu kontrol et.",
+      "generic": "GitHub ile iletişimde bir sorun oldu. Yerel çalışman güvende.",
+      "denied": "GitHub ile giriş iptal edildi.",
+      "signInFailed": "GitHub ile giriş başarısız oldu. Lütfen tekrar dene."
+    }
+  },
+  "share": {
+    "title": "Ekibinle paylaş",
+    "description": "Ekip erişimi GitHub erişimidir: depoya yazabilen herkes çalışma alanını düzenleyebilir.",
+    "step1": "Ekip arkadaşlarını depoya ortak çalışan (collaborator) olarak ekle:",
+    "collaborators": "ortak çalışan ayarları",
+    "step2": "Davetiyeyi GitHub'da kabul ederler.",
+    "step3": "{app} uygulamasını açıp “GitHub'dan aç”ı, ardından {repo} deposunu seçerler.",
+    "permissions": "Okuma izni görüntülemeye, yazma izni düzenlemeye yeter. Git deposunda sayfa bazlı izin mümkün değildir.",
+    "viewRepo": "Depoyu GitHub'da görüntüle",
+    "manageInstall": "Uygulamanın erişebildiği depoları yönet",
+    "localOnly": "Bu çalışma alanı yalnızca bu tarayıcıda. Paylaşmak için önce GitHub'a kaydet."
+  },
+  "sync": {
+    "synced": "Eşitlendi",
+    "pending": "{count, plural, one {Gönderilecek # değişiklik} other {Gönderilecek # değişiklik}}",
+    "syncing": "Gönderiliyor…",
+    "remoteChanged": "GitHub'da daha yeni değişiklikler var",
+    "offline": "Çevrimdışı",
+    "rateLimited": "{time} saatine kadar duraklatıldı",
+    "signedOut": "Eşitlemek için giriş yap",
+    "error": "Eşitleme başarısız",
+    "pushHint": "şimdi göndermek için tıkla"
   }
 }

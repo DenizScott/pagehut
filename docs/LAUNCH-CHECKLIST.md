@@ -27,6 +27,7 @@ account and decision. Tick items off here as they are done.
 
 ## Before the first public deploy
 
-- [ ] GitHub App for sign-in (phase P2): exact steps will be added to `README.md` then.
+- [ ] GitHub App for sign-in: follow `docs/GITHUB-SETUP.md`. Use a separate app for production,
+      with the production callback URL.
 - [ ] Choose the license (MIT proposed) and add `LICENSE`.
 - [ ] Privacy note: documents are stored only in the browser or in the user's GitHub repo.

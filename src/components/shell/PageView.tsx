@@ -19,6 +19,7 @@ import { ancestorsOf } from "@/lib/tree";
 import { Backlinks } from "./Backlinks";
 import { PillarsStrip } from "./PillarsStrip";
 import { SaveStatus } from "./SaveStatus";
+import { SyncButton } from "./SyncButton";
 
 type Load = { state: "loading" } | { state: "missing" } | { state: "ready"; page: PageRecord };
 
@@ -128,6 +129,7 @@ function PageEditor({ page }: { page: PageRecord }) {
           </ol>
         </nav>
         <SaveStatus />
+        <SyncButton />
         <Menu>
           <MenuTrigger className="grid size-7 place-items-center rounded-md text-fg-muted hover:bg-surface-hover hover:text-fg" aria-label={t("shell.pageActions")}>
             <MoreHorizontal className="size-4" />

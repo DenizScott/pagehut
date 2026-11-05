@@ -7,8 +7,11 @@ import { ensureWorkspace, getWorkspace } from "@/lib/storage/local-repo";
 import { useStatus } from "@/lib/stores/status";
 import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
+import { useGitHub } from "@/lib/github/session";
+import { GitHubDialog } from "./GitHubDialog";
 import { PillarsDialog } from "./PillarsDialog";
 import { SearchDialog } from "./SearchDialog";
+import { ShareDialog } from "./ShareDialog";
 import { Sidebar } from "./Sidebar";
 import { TemplatesDialog } from "./TemplatesDialog";
 import { Toasts } from "./Toasts";
@@ -31,6 +34,24 @@ export function AppShell({ children }: { children: ReactNode }) {
     const key = (w: typeof live) => JSON.stringify([w.name, w.pillars ?? []]);
     if (key(live) !== key(workspace)) setWorkspace(live);
   }, [live, workspace, setWorkspace]);
+
+  // GitHub: learn whether sign-in is configured and who is signed in. After the OAuth redirect,
+  // reopen the dialog the user started from (?github=connect|open) or explain an error (?github_error=…).
+  const initGitHub = useGitHub((s) => s.init);
+  const toast = useStatus((s) => s.toast);
+  const tg = useTranslations("common.github");
+  useEffect(() => {
+    void initGitHub();
+    const url = new URL(window.location.href);
+    const reopen = url.searchParams.get("github");
+    const error = url.searchParams.get("github_error");
+    if (!reopen && !error) return;
+    if (reopen === "connect" || reopen === "open") openDialog("github", { githubMode: reopen });
+    if (error) toast(error === "denied" ? tg("errors.denied") : error === "not_configured" ? tg("unconfigured") : tg("errors.signInFailed"), "error");
+    url.searchParams.delete("github");
+    url.searchParams.delete("github_error");
+    window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+  }, [initGitHub, openDialog, toast, tg]);
 
   // Ctrl/Cmd+K opens search from anywhere, including inside the editor.
   useEffect(() => {
@@ -103,6 +124,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <TemplatesDialog />
         <TrashDialog />
         <PillarsDialog />
+        <GitHubDialog />
+        <ShareDialog />
       </Suspense>
     </div>
   );

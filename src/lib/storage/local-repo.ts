@@ -55,6 +55,20 @@ export async function ensureWorkspace(welcome: WelcomeContent): Promise<Workspac
   });
 }
 
+export async function listWorkspaces(): Promise<WorkspaceRecord[]> {
+  return (await getDB().workspaces.toArray()).sort((a, b) => a.createdAt - b.createdAt);
+}
+
+/** Makes a workspace the one that opens next time; returns it with its first page. */
+export async function setActiveWorkspace(id: string): Promise<{ workspace: WorkspaceRecord; firstPageId: string | null }> {
+  const db = getDB();
+  const workspace = await db.workspaces.get(id);
+  if (!workspace) throw new Error("Workspace not found");
+  await db.kv.put({ key: ACTIVE_WS_KEY, value: id });
+  const [first] = await listPages(id);
+  return { workspace, firstPageId: first?.id ?? null };
+}
+
 /** Live pages of a workspace in sidebar order (trash excluded). */
 export async function listPages(workspaceId: string): Promise<PageRecord[]> {
   const pages = await getDB().pages.where("workspaceId").equals(workspaceId).toArray();

@@ -1,19 +1,22 @@
 import { create } from "zustand";
 
 /** Workspace-level dialogs, opened from the sidebar, shortcuts or the editor. */
-type DialogName = "search" | "templates" | "trash" | "pillars" | null;
+type DialogName = "search" | "templates" | "trash" | "pillars" | "github" | "share" | null;
 
 interface OpenOptions {
   /** Templates: parent for a new page (null = top level). */
   templateParentId?: string | null;
   /** Templates: fill this existing page instead of creating one. */
   targetPageId?: string | null;
+  /** GitHub dialog: connect this workspace, or open one from a repo. */
+  githubMode?: "connect" | "open";
 }
 
 interface UIStore {
   dialog: DialogName;
   templateParentId: string | null;
   targetPageId: string | null;
+  githubMode: "connect" | "open";
   /** Bumped when page content is replaced outside the editor, so the open editor reloads. */
   contentVersion: number;
   open: (dialog: Exclude<DialogName, null>, opts?: OpenOptions) => void;
@@ -25,9 +28,15 @@ export const useUI = create<UIStore>((set) => ({
   dialog: null,
   templateParentId: null,
   targetPageId: null,
+  githubMode: "connect",
   contentVersion: 0,
   open: (dialog, opts) =>
-    set({ dialog, templateParentId: opts?.templateParentId ?? null, targetPageId: opts?.targetPageId ?? null }),
+    set({
+      dialog,
+      templateParentId: opts?.templateParentId ?? null,
+      targetPageId: opts?.targetPageId ?? null,
+      githubMode: opts?.githubMode ?? "connect",
+    }),
   close: () => set({ dialog: null }),
   bumpContent: () => set((s) => ({ contentVersion: s.contentVersion + 1 })),
 }));
