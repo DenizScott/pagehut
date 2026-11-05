@@ -408,3 +408,42 @@ export async function openRepoWorkspace(api: GitHubApi, target: RepoRef): Promis
   });
   return workspaceId;
 }
+
+/** Files that mark a repository as a game project (Unity, Unreal, Godot). */
+export function isGameProject(paths: string[]): boolean {
+  return (
+    paths.some((p) => p.startsWith("Assets/")) && paths.some((p) => p.startsWith("ProjectSettings/"))
+  ) || paths.some((p) => /^[^/]+\.uproject$/.test(p)) || paths.includes("project.godot");
+}
+
+/**
+ * Workspaces connected before folder support (repo.dir === undefined) sit at the repository root.
+ * In a game repository they are moved to "GDD/" once, automatically; elsewhere the root is kept
+ * and recorded as an explicit choice. New connections always set repo.dir, so this never touches
+ * a folder someone picked on purpose.
+ */
+const migrating = new Map<string, Promise<"moved" | "kept" | "skipped">>();
+
+export function migrateLegacyRootWorkspace(api: GitHubApi, workspaceId: string): Promise<"moved" | "kept" | "skipped"> {
+  // One run per workspace at a time, even if the UI asks again while it is in flight.
+  const running = migrating.get(workspaceId);
+  if (running) return running.then(() => "skipped" as const);
+  const run = migrateOnce(api, workspaceId).finally(() => migrating.delete(workspaceId));
+  migrating.set(workspaceId, run);
+  return run;
+}
+
+async function migrateOnce(api: GitHubApi, workspaceId: string): Promise<"moved" | "kept" | "skipped"> {
+  const db = getDB();
+  const ws = await db.workspaces.get(workspaceId);
+  if (!ws?.repo || ws.repo.dir !== undefined) return "skipped";
+  const head = await getHead(api, ws.repo);
+  const paths = head ? (await readTree(api, ws.repo, head.tree)).map((e) => e.path) : [];
+  if (!isGameProject(paths)) {
+    await db.workspaces.update(workspaceId, { repo: { ...ws.repo, dir: "" } });
+    return "kept";
+  }
+  if ((await pendingCount(workspaceId)) > 0) await pushWorkspace(api, workspaceId);
+  await moveWorkspaceDir(api, workspaceId, "GDD");
+  return "moved";
+}

@@ -176,7 +176,8 @@
     "openHereInstead": "Stattdessen den Arbeitsbereich aus diesem Repository öffnen",
     "folderLabel": "Ordner im Repository:",
     "folderHint": "Empfohlen für Spiele-Repos: PageHut ändert nur diesen Ordner, nie dein Unity/Unreal-Projekt. Leer lassen für das Repository-Stammverzeichnis.",
-    "repoRoot": "Stammverzeichnis"
+    "repoRoot": "Stammverzeichnis",
+    "autoMoved": "Dein GDD in {repo} liegt jetzt im Ordner GDD/. Sonst hat sich im Repository nichts geändert."
   },
   "share": {
     "title": "Mit dem Team teilen",

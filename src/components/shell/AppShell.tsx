@@ -7,7 +7,8 @@ import { ensureWorkspace, getWorkspace } from "@/lib/storage/local-repo";
 import { useStatus } from "@/lib/stores/status";
 import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
-import { useGitHub } from "@/lib/github/session";
+import { githubApi, useGitHub } from "@/lib/github/session";
+import { migrateLegacyRootWorkspace } from "@/lib/github/sync";
 import { GitHubDialog } from "./GitHubDialog";
 import { MoveFolderDialog } from "./MoveFolderDialog";
 import { PillarsDialog } from "./PillarsDialog";
@@ -53,6 +54,21 @@ export function AppShell({ children }: { children: ReactNode }) {
     url.searchParams.delete("github_error");
     window.history.replaceState(null, "", url.pathname + url.search + url.hash);
   }, [initGitHub, openDialog, toast, tg]);
+
+  // One-time: workspaces connected before folder support move from the repo root to GDD/ in game repos.
+  const githubStatus = useGitHub((s) => s.status);
+  useEffect(() => {
+    if (githubStatus !== "signedIn" || workspace?.mode !== "github" || !workspace.repo || workspace.repo.dir !== undefined) return;
+    const id = workspace.id;
+    const repoName = `${workspace.repo.owner}/${workspace.repo.name}`;
+    migrateLegacyRootWorkspace(githubApi(), id)
+      .then(async (result) => {
+        const updated = await getWorkspace(id);
+        if (updated) setWorkspace(updated);
+        if (result === "moved") toast(tg("autoMoved", { repo: repoName }));
+      })
+      .catch((err: unknown) => console.error("[sync] folder migration failed", err instanceof Error ? err.message : err));
+  }, [githubStatus, workspace, setWorkspace, toast, tg]);
 
   // Ctrl/Cmd+K opens search from anywhere, including inside the editor.
   useEffect(() => {

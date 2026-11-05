@@ -8,6 +8,7 @@ import { FakeGitHub } from "./fake-github";
 import { commitChanges, listRepos } from "./repo";
 import {
   connectWorkspace,
+  migrateLegacyRootWorkspace,
   moveWorkspaceDir,
   NotAWorkspaceError,
   openRepoWorkspace,
@@ -309,5 +310,69 @@ describe("workspaces connected by an older version (no stored workspace.json sha
     const { gitBlobSha } = await import("./api");
     // `printf 'hello\n' | git hash-object --stdin`
     expect(await gitBlobSha(new TextEncoder().encode("hello\n"))).toBe("ce013625030ba8dba906f756967f9e9ca394464a");
+  });
+});
+
+describe("automatic move of older root workspaces in game repos", () => {
+  const unity = { "Assets/Scripts/Player.cs": "class Player {}", "ProjectSettings/ProjectVersion.txt": "6000.0" };
+
+  async function legacyConnected(files: Record<string, string>) {
+    gh.addRepo("team", "gdd", { files });
+    const ws = await ensureWorkspace(welcome);
+    await connectWorkspace(api, ws.id, { ...repo, dir: "" });
+    // Older versions stored no folder and no workspace.json sha.
+    await getDB().workspaces.update(ws.id, { repo: { owner: "team", name: "gdd", branch: "main" }, workspaceFileSha: undefined });
+    return ws;
+  }
+
+  it("moves a root workspace in a Unity repo to GDD/, including unpushed edits", async () => {
+    const ws = await legacyConnected(unity);
+    gh.commit("team/gdd", { "Assets/Scripts/Enemy.cs": "class Enemy {}" }, "Teammate");
+    const [page] = await listPages(ws.id);
+    await savePageTitle(page.id, "TwinCoasters");
+
+    expect(await migrateLegacyRootWorkspace(api, ws.id)).toBe("moved");
+    const files = gh.files("team/gdd");
+    expect(files["workspace.json"]).toBeUndefined();
+    expect(files[`GDD/pages/${page.id}.md`]).toContain('title: "TwinCoasters"');
+    expect(files["Assets/Scripts/Enemy.cs"]).toBe("class Enemy {}");
+    expect((await getWorkspace(ws.id))?.repo?.dir).toBe("GDD");
+    expect(await migrateLegacyRootWorkspace(api, ws.id)).toBe("skipped");
+  });
+
+  it("keeps the root in a repo that is not a game project, and never asks again", async () => {
+    const ws = await legacyConnected({ "README.md": "# Docs" });
+    expect(await migrateLegacyRootWorkspace(api, ws.id)).toBe("kept");
+    expect(gh.files("team/gdd")["workspace.json"]).toBeDefined();
+    expect((await getWorkspace(ws.id))?.repo?.dir).toBe("");
+    expect(await migrateLegacyRootWorkspace(api, ws.id)).toBe("skipped");
+  });
+
+  it("never moves a workspace whose folder was chosen on purpose", async () => {
+    gh.addRepo("team", "gdd", { files: unity });
+    const ws = await ensureWorkspace(welcome);
+    await connectWorkspace(api, ws.id, { ...repo, dir: "" });
+    expect(await migrateLegacyRootWorkspace(api, ws.id)).toBe("skipped");
+    expect(gh.files("team/gdd")["workspace.json"]).toBeDefined();
+  });
+
+  it("recognizes Unity, Unreal and Godot projects", async () => {
+    const { isGameProject } = await import("./sync");
+    expect(isGameProject(["Assets/a.cs", "ProjectSettings/x.asset"])).toBe(true);
+    expect(isGameProject(["MyGame.uproject", "Source/x.cpp"])).toBe(true);
+    expect(isGameProject(["project.godot"])).toBe(true);
+    expect(isGameProject(["README.md", "docs/Assets/x.png"])).toBe(false);
+  });
+});
+
+describe("migration concurrency", () => {
+  it("runs once even when started twice at the same time", async () => {
+    gh.addRepo("team", "gdd", { files: { "Assets/a.cs": "a", "ProjectSettings/p.asset": "p" } });
+    const ws = await ensureWorkspace(welcome);
+    await connectWorkspace(api, ws.id, { ...repo, dir: "" });
+    await getDB().workspaces.update(ws.id, { repo: { owner: "team", name: "gdd", branch: "main" } });
+    const results = await Promise.all([migrateLegacyRootWorkspace(api, ws.id), migrateLegacyRootWorkspace(api, ws.id)]);
+    expect(results.sort()).toEqual(["moved", "skipped"]);
+    expect(gh.files("team/gdd")["GDD/workspace.json"]).toBeDefined();
   });
 });

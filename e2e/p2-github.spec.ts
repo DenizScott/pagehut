@@ -193,3 +193,47 @@ test("an existing root workspace can be moved into GDD/ of a game repo", async (
   await expect(page.locator("[data-sync-state]:visible")).toHaveAttribute("data-sync-state", "synced");
   await ctx.close();
 });
+
+test("an older root connection in a Unity repo moves to GDD/ by itself on reload", async ({ browser }) => {
+  const gh = new FakeGitHub();
+  gh.addRepo("team", "unity-game", { files: { "Assets/Scripts/Player.cs": "class Player {}", "ProjectSettings/ProjectVersion.txt": "6000.0" } });
+  const ctx = await browser.newContext();
+  await fakeSignedIn(ctx, gh);
+  const page = await ctx.newPage();
+  await page.goto("/en");
+  await page.waitForURL(/\/p\//);
+
+  await page.getByRole("button", { name: /Local mode/ }).click();
+  const dialog = page.getByRole("dialog", { name: "Save this workspace to GitHub" });
+  await dialog.getByRole("radio", { name: "team/unity-game" }).click();
+  await dialog.getByRole("textbox", { name: "Folder in the repository:" }).fill("");
+  await dialog.getByRole("button", { name: "Save to repository" }).click();
+  await expect(page.getByText("Workspace saved to team/unity-game")).toBeVisible();
+  expect(Object.keys(gh.files("team/unity-game"))).toContain("workspace.json");
+
+  // Turn it into a connection made by the older version (no folder recorded).
+  await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((res) => {
+      const r = indexedDB.open("pagehut");
+      r.onsuccess = () => res(r.result);
+    });
+    await new Promise<void>((res) => {
+      const store = db.transaction("workspaces", "readwrite").objectStore("workspaces");
+      const all = store.getAll();
+      all.onsuccess = () => {
+        for (const ws of all.result) if (ws.repo) store.put({ ...ws, repo: { owner: ws.repo.owner, name: ws.repo.name, branch: ws.repo.branch }, workspaceFileSha: undefined });
+        res();
+      };
+    });
+    db.close();
+  });
+
+  await page.reload();
+  await expect(page.getByText("now lives in the GDD/ folder")).toBeVisible();
+  const files = Object.keys(gh.files("team/unity-game"));
+  expect(files).toContain("GDD/workspace.json");
+  expect(files).not.toContain("workspace.json");
+  expect(files).toContain("Assets/Scripts/Player.cs");
+  await expect(page.getByRole("link", { name: /team\/unity-game\/GDD/ })).toBeVisible();
+  await ctx.close();
+});

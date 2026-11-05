@@ -176,7 +176,8 @@
     "openHereInstead": "Bunun yerine bu depodaki çalışma alanını aç",
     "folderLabel": "Depodaki klasör:",
     "folderHint": "Oyun depoları için önerilir: PageHut yalnızca bu klasöre dokunur, Unity/Unreal projene asla dokunmaz. Deponun köküne koymak için boş bırak.",
-    "repoRoot": "deponun kökü"
+    "repoRoot": "deponun kökü",
+    "autoMoved": "{repo} deposundaki GDD artık GDD/ klasöründe. Depodaki başka hiçbir şey değişmedi."
   },
   "share": {
     "title": "Ekibinle paylaş",

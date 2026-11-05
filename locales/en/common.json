@@ -176,7 +176,8 @@
     "openHereInstead": "Open the workspace from this repository instead",
     "folderLabel": "Folder in the repository:",
     "folderHint": "Recommended for game repos: PageHut only touches this folder, never your Unity/Unreal project. Leave empty to use the repository root.",
-    "repoRoot": "repository root"
+    "repoRoot": "repository root",
+    "autoMoved": "Your GDD in {repo} now lives in the GDD/ folder. Nothing else in the repository changed."
   },
   "share": {
     "title": "Share with your team",
