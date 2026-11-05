@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { databaseTemplateIds, getDatabaseTemplates } from "./databases";
+import { propertySchema, viewSchema } from "@/lib/database/types";
+import { cellText } from "@/lib/database/query";
 import { docToMarkdown } from "@/lib/markdown/serialize";
 import { markdownToDoc } from "@/lib/markdown/parse";
 import { getTemplates, templateIds, templateLocales } from "./index";
@@ -37,5 +40,35 @@ describe("GDD templates", () => {
 
   it("unknown locales fall back to English", () => {
     expect(getTemplates("fr")[0].title).toBe(getTemplates("en")[0].title);
+  });
+});
+
+describe("database templates", () => {
+  it.each(["en", "tr", "de"])("are valid and consistent in %s", (locale) => {
+    const all = getDatabaseTemplates(locale);
+    expect(all.map((t) => t.id)).toEqual([...databaseTemplateIds]);
+    for (const tpl of all) {
+      const data = tpl.build();
+      const props = new Map(data.properties.map((p) => [p.id, p]));
+      for (const p of data.properties) expect(propertySchema.safeParse(p).success, `${tpl.id}.${p.id}`).toBe(true);
+      for (const v of data.views) {
+        expect(viewSchema.safeParse(v).success).toBe(true);
+        if (v.groupBy) expect(props.get(v.groupBy)?.type).toBe("select");
+        for (const ref of [...v.filters.map((f) => f.propertyId), ...v.sorts.map((s) => s.propertyId), ...v.hidden]) expect(props.has(ref)).toBe(true);
+      }
+      for (const row of data.rows) {
+        for (const [pid, value] of Object.entries(row.cells)) {
+          const p = props.get(pid);
+          expect(p, `${tpl.id} cell ${pid}`).toBeDefined();
+          if (p!.type === "select" || p!.type === "multiSelect") {
+            for (const id of [value].flat()) expect(p!.options!.some((o) => o.id === id)).toBe(true);
+          }
+        }
+        // Every formula computes a number for every sample row.
+        for (const p of data.properties.filter((x) => x.type === "formula")) expect(cellText(data, row, p)).not.toBe("#ERR");
+      }
+      // Fresh ids each time.
+      expect(tpl.build().rows[0]?.id).not.toBe(data.rows[0]?.id);
+    }
   });
 });

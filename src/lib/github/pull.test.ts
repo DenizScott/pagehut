@@ -2,12 +2,16 @@ import "fake-indexeddb/auto";
 import { beforeEach, describe, expect, it } from "vitest";
 import { markdownToDoc } from "@/lib/markdown/parse";
 import { AppDB, getDB, setDBForTests } from "@/lib/storage/db";
-import { createPage, ensureWorkspace, getPage, getWorkspace, listPages, movePage, savePageContent, trashPage } from "@/lib/storage/local-repo";
+import { createDatabase, createPage, ensureWorkspace, saveDatabase, getPage, getWorkspace, listPages, movePage, savePageContent, trashPage } from "@/lib/storage/local-repo";
 import { GitHubApi } from "./api";
 import { FakeGitHub } from "./fake-github";
 import { pullWorkspace, resolveConflict, restorePageVersion, syncWorkspace } from "./pull";
 import { listFileCommits, readFileAt } from "./repo";
-import { connectWorkspace, pageFileText, pendingCount, pushWorkspace } from "./sync";
+import { connectWorkspace, openRepoWorkspace, pageFileText, pendingCount, pushWorkspace } from "./sync";
+import { serializeDatabase } from "@/lib/database/file";
+import type { DatabaseData } from "@/lib/database/types";
+import { pageContentFromFile } from "@/lib/page-file";
+import { pageFile } from "@/lib/transfer/bundle";
 
 const welcome = { title: "Combat", markdown: "## Core loop\n\nExplore.\n\n## Bosses\n\nThree phases.\n", workspaceName: "Twin Coasters" };
 const repo = { owner: "team", name: "game", branch: "main", dir: "GDD" };
@@ -243,5 +247,52 @@ describe("page history", () => {
     expect(remoteText()).toContain("Three phases.");
     expect(await listFileCommits(api, repo, path)).toHaveLength(3);
     expect(pageFileText((await getPage(page.id))!)).toBe(remoteText());
+  });
+});
+
+describe("databases", () => {
+  const playtests = (): DatabaseData => ({
+    properties: [
+      { id: "title", name: "Session", type: "title" },
+      { id: "fun", name: "Fun (1-5)", type: "number" },
+    ],
+    views: [{ id: "table", name: "Table", type: "table", filters: [], sorts: [], hidden: [] }],
+    rows: [{ id: "01J0000000000000000000000A", order: 1, cells: { title: "Build 1", fun: 3 } }],
+  });
+
+  it("syncs a database and merges rows two people added at the same time", async () => {
+    gh.addRepo("team", "game", { files: unity });
+    const ws = await ensureWorkspace(welcome);
+    const dbPage = await createDatabase(ws.id, { title: "Playtests", data: playtests() });
+    await connectWorkspace(api, ws.id, repo);
+    const path = `GDD/pages/${dbPage.id}.md`;
+    expect(gh.files("team/game")[path]).toContain('type: "database"');
+    expect(JSON.parse(gh.files("team/game")["GDD/workspace.json"]).tree.find((n: { id: string }) => n.id === dbPage.id).kind).toBe("database");
+
+    // A teammate adds a row and edits a cell on GitHub...
+    const theirs = playtests();
+    theirs.rows[0].cells.fun = 4;
+    theirs.rows.push({ id: "01J0000000000000000000000T", order: 2, cells: { title: "Build 2 (Ada)" } });
+    gh.commit("team/game", { [path]: pageFile({ id: dbPage.id, parentId: null, order: 1, title: "Playtests", kind: "database", markdown: serializeDatabase(theirs) }) }, "Teammate playtest");
+    // ...while I add another row here.
+    const mine = playtests();
+    mine.rows.push({ id: "01J0000000000000000000000M", order: 2, cells: { title: "Build 2 (me)" } });
+    await saveDatabase(dbPage.id, mine);
+
+    const r = await syncWorkspace(api, ws.id);
+    expect(r.pull.merged).toEqual([dbPage.id]);
+    const local = await getPage(dbPage.id);
+    expect(local?.database?.rows.map((x) => x.cells.title)).toEqual(["Build 1", "Build 2 (me)", "Build 2 (Ada)"]);
+    expect(local?.database?.rows[0].cells.fun).toBe(4);
+    const pushed = pageContentFromFile(gh.files("team/game")[path], "");
+    expect(pushed.database?.rows).toHaveLength(3);
+    expect(await pendingCount(ws.id)).toBe(0);
+
+    // A second device opens it as a database.
+    setDBForTests(new AppDB(`second-${Math.random()}`));
+    const id2 = await openRepoWorkspace(api, repo);
+    const opened = (await listPages(id2)).find((p) => p.id === dbPage.id);
+    expect(opened?.kind).toBe("database");
+    expect(opened?.database?.rows).toHaveLength(3);
   });
 });

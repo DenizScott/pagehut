@@ -4,6 +4,9 @@ import { migrateLegacyDatabases } from "./migrate";
 import { descendantIds } from "@/lib/tree";
 import { docToMarkdown } from "@/lib/markdown/serialize";
 import { markdownToDoc } from "@/lib/markdown/parse";
+import { serializeDatabase } from "@/lib/database/file";
+import type { DatabaseData } from "@/lib/database/types";
+import { EMPTY_DOC } from "@/lib/page-file";
 import {
   ASSET_MAX_BYTES,
   type AssetRecord,
@@ -252,4 +255,45 @@ export async function putAsset(workspaceId: string, file: File): Promise<AssetRe
 
 export async function getAsset(path: string): Promise<AssetRecord | undefined> {
   return getDB().assets.get(path);
+}
+
+/* ---------- Databases (P4) ---------- */
+
+/** Creates a database page. Its file body is regenerated from `data` on every save. */
+export async function createDatabase(
+  workspaceId: string,
+  opts: { title: string; data: DatabaseData; parentId?: string | null; icon?: string },
+): Promise<PageRecord> {
+  const db = getDB();
+  const siblings = await listPages(workspaceId);
+  const parentId = opts.parentId ?? null;
+  const maxOrder = Math.max(0, ...siblings.filter((p) => p.parentId === parentId).map((p) => p.order));
+  const now = Date.now();
+  const page: PageRecord = {
+    id: ulid(),
+    workspaceId,
+    parentId,
+    order: maxOrder + 1,
+    title: opts.title,
+    ...(opts.icon ? { icon: opts.icon } : {}),
+    kind: "database",
+    database: opts.data,
+    doc: EMPTY_DOC,
+    markdown: serializeDatabase(opts.data),
+    createdAt: now,
+    updatedAt: now,
+    dirty: true,
+  };
+  await db.pages.add(page);
+  await touchWorkspace(workspaceId, now);
+  return page;
+}
+
+/** Saves a database's properties, views and rows. */
+export async function saveDatabase(id: string, data: DatabaseData): Promise<void> {
+  const db = getDB();
+  const now = Date.now();
+  await db.pages.update(id, { database: data, markdown: serializeDatabase(data), updatedAt: now, dirty: true });
+  const page = await db.pages.get(id);
+  if (page) await touchWorkspace(page.workspaceId, now);
 }

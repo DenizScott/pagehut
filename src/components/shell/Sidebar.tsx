@@ -1,13 +1,14 @@
 "use client";
 
 import { useLiveQuery } from "dexie-react-hooks";
-import { Download, LayoutTemplate, MoreHorizontal, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { Download, LayoutTemplate, MoreHorizontal, Plus, Search, Table2, Trash2, Upload, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { useRouter } from "@/i18n/navigation";
-import { createPage, listPages } from "@/lib/storage/local-repo";
+import { createDatabase, createPage, listPages } from "@/lib/storage/local-repo";
+import { emptyDatabase } from "@/lib/database/types";
 import { exportWorkspaceJson, exportWorkspaceZip } from "@/lib/transfer/export";
 import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
@@ -21,6 +22,7 @@ const isMac = () => typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(n
 
 export function Sidebar() {
   const t = useTranslations("common");
+  const tdb = useTranslations("database");
   const router = useRouter();
   const params = useParams<{ pageId?: string }>();
   const workspace = useWorkspace((s) => s.workspace);
@@ -33,6 +35,13 @@ export function Sidebar() {
   async function onNewPage(parentId: string | null = null) {
     if (!workspace) return;
     const page = await createPage(workspace.id, { parentId });
+    setOpen(false);
+    router.push(`/p/${page.id}`);
+  }
+
+  async function onNewDatabase() {
+    if (!workspace) return;
+    const page = await createDatabase(workspace.id, { title: "", data: emptyDatabase({ name: tdb("defaults.name"), table: tdb("views.table") }) });
     setOpen(false);
     router.push(`/p/${page.id}`);
   }
@@ -123,6 +132,14 @@ export function Sidebar() {
         >
           <Plus className="size-4" aria-hidden="true" />
           {t("shell.newPage")}
+        </button>
+        <button
+          type="button"
+          onClick={() => void onNewDatabase()}
+          className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-fg-subtle hover:bg-surface-hover hover:text-fg"
+        >
+          <Table2 className="size-4" aria-hidden="true" />
+          {tdb("new")}
         </button>
       </nav>
 

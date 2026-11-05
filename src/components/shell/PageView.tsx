@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Editor } from "@/components/editor/Editor";
+import { DatabaseView } from "@/components/database/DatabaseView";
 import { Button } from "@/components/ui/button";
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -23,6 +24,7 @@ import { SyncButton } from "./SyncButton";
 import { ConflictBanner } from "./ConflictBanner";
 import { LastEditor, PageHistoryDialog } from "./PageHistory";
 import { useStatus } from "@/lib/stores/status";
+import { cn } from "@/lib/utils";
 
 type Load = { state: "loading" } | { state: "missing" } | { state: "ready"; page: PageRecord };
 
@@ -75,7 +77,8 @@ function PageEditor({ page }: { page: PageRecord }) {
   const setSidebarOpen = useWorkspace((s) => s.setSidebarOpen);
   const openDialog = useUI((s) => s.open);
   const [title, setTitle] = useState(page.title);
-  const [isEmpty, setIsEmpty] = useState(!page.markdown.trim());
+  const isDatabase = page.kind === "database";
+  const [isEmpty, setIsEmpty] = useState(!isDatabase && !page.markdown.trim());
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const focusEditor = useRef<(() => void) | null>(null);
   const titleSaver = useDebouncedSaver((value: string) => savePageTitle(page.id, value));
@@ -94,8 +97,8 @@ function PageEditor({ page }: { page: PageRecord }) {
 
   // A brand-new page starts with the cursor in the title.
   useEffect(() => {
-    if (!page.title && !page.markdown.trim()) titleRef.current?.focus();
-  }, [page.title, page.markdown]);
+    if (!page.title && (isDatabase || !page.markdown.trim())) titleRef.current?.focus();
+  }, [page.title, page.markdown, isDatabase]);
 
   // Auto-grow the title textarea.
   useEffect(() => {
@@ -149,9 +152,11 @@ function PageEditor({ page }: { page: PageRecord }) {
             <MoreHorizontal className="size-4" />
           </MenuTrigger>
           <MenuContent align="end">
-            <MenuItem onSelect={() => openDialog("templates", { targetPageId: page.id })}>
-              <LayoutTemplate /> {t("templates.applyHere")}
-            </MenuItem>
+            {!isDatabase && (
+              <MenuItem onSelect={() => openDialog("templates", { targetPageId: page.id })}>
+                <LayoutTemplate /> {t("templates.applyHere")}
+              </MenuItem>
+            )}
             {repo && (
               <MenuItem onSelect={() => setHistoryOpen(true)}>
                 <History /> {t("history.title")}
@@ -185,7 +190,7 @@ function PageEditor({ page }: { page: PageRecord }) {
       )}
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <article className="mx-auto w-full max-w-3xl px-6 pt-10 md:px-16 md:pt-14">
+        <article className={cn("mx-auto w-full px-6 pt-10 md:pt-14", isDatabase ? "max-w-[1040px] pb-16 md:px-10" : "max-w-3xl md:px-16")}>
           <textarea
             ref={titleRef}
             value={title}
@@ -216,11 +221,11 @@ function PageEditor({ page }: { page: PageRecord }) {
               {t("templates.startWith")}
             </button>
           )}
-          <Editor
-            page={page}
-            onReady={(focus) => (focusEditor.current = focus)}
-            onEmptyChange={setIsEmpty}
-          />
+          {isDatabase ? (
+            <DatabaseView page={page} />
+          ) : (
+            <Editor page={page} onReady={(focus) => (focusEditor.current = focus)} onEmptyChange={setIsEmpty} />
+          )}
           <Backlinks pageId={page.id} workspaceId={page.workspaceId} />
         </article>
       </div>

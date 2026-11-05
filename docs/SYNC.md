@@ -27,6 +27,7 @@ automatic two-way sync, three-way merge, conflict resolution, page history.
   |---|---|
   | Changed only on GitHub | Theirs is taken |
   | Changed on both sides, different lines | Three-way merge (line-based, `node-diff3`); the merged text is pushed next |
+  | Database changed on both sides | Merged by row and cell; only the same cell changed differently is a conflict |
   | Changed on both sides, same lines | **Conflict**: local text stays in the editor, theirs is kept in `page.conflict` |
   | Added on GitHub | New local page (and new images under `assets/`) |
   | Deleted on GitHub | Removed locally if untouched; if edited locally, kept and re-added |

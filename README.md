@@ -7,11 +7,11 @@ students, indie teams, small studios and university classes.
 - **Local-first.** Everything works offline in your browser (IndexedDB) with no sign-up.
 - **Your files stay yours.** Team workspaces live in a GitHub repository you own, as readable
   Markdown and JSON.
-- **Made for games.** Templates, design pillars, mechanics databases and playtest logs are on the
-  roadmap ([docs/FEATURES.md](docs/FEATURES.md)).
+- **Made for games.** GDD templates, design pillars, and databases for mechanics, scope, story
+  beats, playtests and balancing ([docs/FEATURES.md](docs/FEATURES.md)).
 - **Localized.** Turkish, English and German at launch, with RTL support ready.
 
-> Status: **P3 (team sync)**. Databases and views come next (P4).
+> Status: **P4 (databases)**. Comments and @mentions come next (P5).
 
 ## What works today
 
@@ -20,6 +20,7 @@ students, indie teams, small studios and university classes.
 - `[[page links]]` with backlinks, and **Ctrl/Cmd+K** search across every page.
 - Design pillars strip shown above every page.
 - 14 GDD templates in Turkish, English and German: one-page GDD, full GDD, vertical slice, pitch deck, level design, mechanic spec, economy, UI/UX flow, story bible, character sheet, art bible, technical design, playtest report and post-mortem.
+- **Databases:** typed properties (text, number, select, multi-select, checkbox, date, link, person, relation, formula), table, board and gallery views, filters and sorts. Six game templates: mechanics, scope tracker (MoSCoW), story beats, playtest log, balance table with formulas and mood board. Teammates' edits merge by row and cell.
 - Export a page as Markdown or PDF (through the browser print dialog), or the whole workspace as ZIP (repo layout) or JSON.
 - Import Markdown files, ZIPs (folders become parent pages) or JSON backups.
 - **GitHub:** sign in, save a workspace to a repository (one readable Markdown file per page), push changes as one commit, open a workspace from a repository on another device, and share by adding collaborators. Automatic two-way sync with three-way merge; overlapping edits show a compare / keep mine / keep theirs choice, and every page has a restorable history. Nothing is ever force-pushed. A workspace can live in a `GDD/` folder inside a Unity or Unreal repository.

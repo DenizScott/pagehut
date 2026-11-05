@@ -1,9 +1,6 @@
-import { docToMarkdown } from "@/lib/markdown/serialize";
-import { markdownToDoc } from "@/lib/markdown/parse";
-import { mergeText } from "@/lib/merge";
+import { mergePageFile, pageContentFromFile } from "@/lib/page-file";
 import { workspaceFileSchema, type AssetRecord, type PageRecord, type WorkspaceFile, type WorkspaceRecord } from "@/lib/model/schemas";
 import { getDB } from "@/lib/storage/db";
-import { parseFrontMatter } from "@/lib/transfer/frontmatter";
 import { RemoteChangedError, utf8, type GitHubApi } from "./api";
 import { getHead, inRepo, readBlob, readTree, type RepoRef } from "./repo";
 import { basePageSha, baseWorkspaceSha, pageFileText, pagePath, pushWorkspace, WORKSPACE_FILE, type PushResult } from "./sync";
@@ -45,16 +42,7 @@ interface Remote {
 
 const emptyResult = (): PullResult => ({ pulled: false, updated: [], added: [], removed: [], merged: [], conflicts: [], deferred: [] });
 
-function pageFromFile(text: string, fallbackTitle: string) {
-  const { meta, body } = parseFrontMatter(text);
-  const doc = markdownToDoc(body);
-  return {
-    title: typeof meta.title === "string" ? meta.title : fallbackTitle,
-    icon: typeof meta.icon === "string" ? meta.icon : undefined,
-    doc,
-    markdown: docToMarkdown(doc),
-  };
-}
+const pageFromFile = (text: string, fallbackTitle: string) => pageContentFromFile(text, fallbackTitle);
 
 function parseWorkspaceFile(text: string | undefined): WorkspaceFile | null {
   if (!text) return null;
@@ -141,7 +129,7 @@ export async function pullWorkspace(api: GitHubApi, workspaceId: string, opts: P
       continue;
     }
 
-    const merged = mergeText(page.base!.markdown, localText, theirs);
+    const merged = mergePageFile(page.id, page.base!.markdown, localText, theirs);
     if (merged.clean) {
       // Base becomes theirs, so the merged text is what the next push sends.
       update(page.id, { ...pageFromFile(merged.text, page.title), base: remoteBase, dirty: merged.text !== theirs, conflict: undefined });

@@ -3,6 +3,8 @@ import { docToMarkdown } from "@/lib/markdown/serialize";
 import { markdownToDoc } from "@/lib/markdown/parse";
 import { ASSET_MAX_BYTES, type PageRecord } from "@/lib/model/schemas";
 import { getDB } from "@/lib/storage/db";
+import { isDatabaseBody, parseDatabase, serializeDatabase } from "@/lib/database/file";
+import { EMPTY_DOC } from "@/lib/page-file";
 import { bundleFromJson, bundleFromZip, remapIds, titleFromMarkdown, type WorkspaceBundle } from "./bundle";
 import { parseFrontMatter } from "./frontmatter";
 
@@ -24,6 +26,24 @@ export async function importBundle(workspaceId: string, source: WorkspaceBundle)
   const now = Date.now();
 
   const records: PageRecord[] = bundle.pages.map((p) => {
+    if (p.kind === "database" || isDatabaseBody(p.markdown)) {
+      const { data } = parseDatabase(p.markdown);
+      return {
+        id: p.id,
+        workspaceId,
+        parentId: p.parentId,
+        order: p.parentId ? p.order : offset + p.order,
+        title: p.title,
+        icon: p.icon,
+        kind: "database" as const,
+        database: data,
+        doc: EMPTY_DOC,
+        markdown: serializeDatabase(data),
+        createdAt: now,
+        updatedAt: now,
+        dirty: true,
+      };
+    }
     // Parse + re-serialize: the stored Markdown is always in canonical form.
     const doc = markdownToDoc(p.markdown);
     return {

@@ -5,13 +5,17 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useRouter } from "@/i18n/navigation";
-import { createPage, fillEmptyPage } from "@/lib/storage/local-repo";
+import { createDatabase, createPage, fillEmptyPage } from "@/lib/storage/local-repo";
 import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
 import { cn } from "@/lib/utils";
 import { getTemplates, type Template, type TemplateCategory } from "@/templates";
+import { getDatabaseTemplates, type DatabaseTemplate } from "@/templates/databases";
 
-const categories: TemplateCategory[] = ["plan", "design", "story", "production"];
+const categories: (TemplateCategory | "databases")[] = ["plan", "design", "story", "production", "databases"];
+
+/** A page template (Markdown) or a database template (properties, views, sample rows). */
+type Item = ({ kind: "page" } & Template) | ({ kind: "database"; category: "databases" } & DatabaseTemplate);
 
 /** Localized GDD template gallery. Fills the current page if it's empty, otherwise creates a new page. */
 export function TemplatesDialog() {
@@ -40,11 +44,24 @@ function Gallery() {
   const router = useRouter();
   const workspace = useWorkspace((s) => s.workspace);
   const { close, targetPageId, templateParentId, bumpContent } = useUI();
-  const templates = useMemo(() => getTemplates(locale), [locale]);
-  const [selected, setSelected] = useState<Template>(templates[0]);
+  const templates = useMemo<Item[]>(
+    () => [
+      ...getTemplates(locale).map((tpl) => ({ kind: "page" as const, ...tpl })),
+      ...getDatabaseTemplates(locale).map((tpl) => ({ kind: "database" as const, category: "databases" as const, ...tpl })),
+    ],
+    [locale],
+  );
+  const [selected, setSelected] = useState<Item>(templates[0]);
 
-  async function use(tpl: Template) {
+  async function use(tpl: Item) {
     if (!workspace) return;
+    if (tpl.kind === "database") {
+      // A database is always a new page; it never replaces a document.
+      const page = await createDatabase(workspace.id, { title: tpl.title, icon: tpl.icon, data: tpl.build(), parentId: templateParentId });
+      close();
+      router.push(`/p/${page.id}`);
+      return;
+    }
     const content = { title: tpl.title, markdown: tpl.markdown, icon: tpl.icon };
     if (targetPageId && (await fillEmptyPage(targetPageId, content))) {
       close();
@@ -100,9 +117,9 @@ function Gallery() {
         </p>
         <h3 className="mt-1 font-semibold">{selected.title}</h3>
         <p className="mt-1 text-sm text-fg-muted">{selected.description}</p>
-        <p className="mt-4 mb-1 text-xs font-medium text-fg-subtle uppercase">{t("sections")}</p>
+        <p className="mt-4 mb-1 text-xs font-medium text-fg-subtle uppercase">{selected.kind === "database" ? t("properties") : t("sections")}</p>
         <ul className="min-h-0 flex-1 space-y-0.5 overflow-y-auto text-sm text-fg-muted">
-          {outline(selected.markdown).map((h) => (
+          {(selected.kind === "database" ? selected.build().properties.map((p) => p.name) : outline(selected.markdown)).map((h) => (
             <li key={h} className="truncate">
               {h}
             </li>

@@ -1,6 +1,6 @@
 import { strFromU8, strToU8, unzipSync, zipSync, type Zippable } from "fflate";
 import { BRAND } from "@/config/brand";
-import { SCHEMA_VERSION, type Pillar, type WorkspaceFile } from "@/lib/model/schemas";
+import { SCHEMA_VERSION, type PageKind, type Pillar, type WorkspaceFile } from "@/lib/model/schemas";
 import { parseFrontMatter, stringifyFrontMatter } from "./frontmatter";
 
 /**
@@ -14,6 +14,7 @@ export interface BundlePage {
   order: number;
   title: string;
   icon?: string;
+  kind?: PageKind;
   markdown: string;
 }
 
@@ -34,14 +35,14 @@ export interface WorkspaceBundle {
 export const PAGE_LINK_RE = /\[\[page:([0-9A-HJKMNP-TV-Z]{26})(?:\|[^\]\n]*)?\]\]/g;
 
 export function pageFile(page: BundlePage): string {
-  return stringifyFrontMatter({ id: page.id, title: page.title, ...(page.icon ? { icon: page.icon } : {}) }) + page.markdown;
+  return stringifyFrontMatter({ id: page.id, title: page.title, ...(page.icon ? { icon: page.icon } : {}), ...(page.kind ? { type: page.kind } : {}) }) + page.markdown;
 }
 
 export function workspaceFile(bundle: WorkspaceBundle): WorkspaceFile {
   return {
     schemaVersion: SCHEMA_VERSION,
     name: bundle.name,
-    tree: bundle.pages.map(({ id, parentId, order, title, icon }) => ({ id, parentId, order, title, ...(icon ? { icon } : {}) })),
+    tree: bundle.pages.map(({ id, parentId, order, title, icon, kind }) => ({ id, parentId, order, title, ...(icon ? { icon } : {}), ...(kind ? { kind } : {}) })),
     pillars: bundle.pillars,
     templates: [],
   };
@@ -128,8 +129,9 @@ export function bundleFromZip(data: Uint8Array, fallbackName: string): Workspace
     const root = wsName.slice(0, -"workspace.json".length);
     const pages: BundlePage[] = ws.tree.map((node) => {
       const file = entries[`${root}pages/${node.id}.md`];
-      const { body } = parseFrontMatter(file ? strFromU8(file) : "");
-      return { id: node.id, parentId: node.parentId, order: node.order, title: node.title, icon: node.icon, markdown: body };
+      const { meta, body } = parseFrontMatter(file ? strFromU8(file) : "");
+      const kind = node.kind ?? (meta.type === "database" ? "database" : undefined);
+      return { id: node.id, parentId: node.parentId, order: node.order, title: node.title, icon: node.icon, ...(kind ? { kind } : {}), markdown: body };
     });
     return { name: ws.name, pillars: ws.pillars ?? [], pages, assets };
   }
@@ -177,7 +179,11 @@ export function bundleFromZip(data: Uint8Array, fallbackName: string): Workspace
  */
 export function remapIds(bundle: WorkspaceBundle, newId: () => string): WorkspaceBundle {
   const map = new Map(bundle.pages.map((p) => [p.id, newId()]));
-  const relink = (md: string) => md.replace(PAGE_LINK_RE, (full, id: string) => (map.has(id) ? full.replace(id, map.get(id)!) : full));
+  const relink = (md: string) =>
+    md
+      .replace(PAGE_LINK_RE, (full, id: string) => (map.has(id) ? full.replace(id, map.get(id)!) : full))
+      // Database relations point at another database page by id.
+      .replace(/"relationTo":"([0-9A-HJKMNP-TV-Z]{26})"/g, (full, id: string) => (map.has(id) ? full.replace(id, map.get(id)!) : full));
   return {
     ...bundle,
     pages: bundle.pages.map((p) => ({

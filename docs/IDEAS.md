@@ -14,6 +14,11 @@ into a phase plan. Add yours at the bottom.
   (Mermaid), which reveals unreachable or circular quests.
 - **"Where is this used?"** for every mechanic: the levels, items and beats that reference it.
 
+- **Character map.** A relation between characters drawn as a graph (Mermaid), straight from a
+  characters database.
+- **Rows as pages.** Open a database row as a full page with its own text. Today a row
+  has properties only.
+
 ## Design discipline
 
 - **Pillar check on every page.** A small strip that asks "Which pillar does this serve?" with

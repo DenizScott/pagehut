@@ -1,11 +1,9 @@
 import { ulid } from "ulid";
 import { BRAND } from "@/config/brand";
-import { docToMarkdown } from "@/lib/markdown/serialize";
-import { markdownToDoc } from "@/lib/markdown/parse";
 import { workspaceFileSchema, type AssetRecord, type PageRecord, type WorkspaceRecord } from "@/lib/model/schemas";
 import { getDB } from "@/lib/storage/db";
 import { pageFile, workspaceFile } from "@/lib/transfer/bundle";
-import { parseFrontMatter } from "@/lib/transfer/frontmatter";
+import { pageContentFromFile } from "@/lib/page-file";
 import { gitBlobSha, GitHubError, RemoteChangedError, utf8, type GitHubApi } from "./api";
 import { commitChanges, getHead, inRepo, normalizeDir, readBlob, readTree, type FileChange, type RepoRef } from "./repo";
 
@@ -41,14 +39,14 @@ export const WORKSPACE_FILE = "workspace.json";
 export const pagePath = (id: string) => `pages/${id}.md`;
 
 export function pageFileText(page: PageRecord): string {
-  return pageFile({ id: page.id, parentId: page.parentId, order: page.order, title: page.title, icon: page.icon, markdown: page.markdown });
+  return pageFile({ id: page.id, parentId: page.parentId, order: page.order, title: page.title, icon: page.icon, kind: page.kind, markdown: page.markdown });
 }
 
 function workspaceJsonText(ws: WorkspaceRecord, pages: PageRecord[]): string {
   const file = workspaceFile({
     name: ws.name,
     pillars: ws.pillars ?? [],
-    pages: pages.map(({ id, parentId, order, title, icon, markdown }) => ({ id, parentId, order, title, icon, markdown })),
+    pages: pages.map(({ id, parentId, order, title, icon, kind, markdown }) => ({ id, parentId, order, title, icon, kind, markdown })),
     assets: [],
   });
   return `${JSON.stringify(file, null, 2)}\n`;
@@ -368,8 +366,7 @@ export async function openRepoWorkspace(api: GitHubApi, target: RepoRef): Promis
   for (const node of file.tree) {
     const entry = byPath.get(inRepo(repo, pagePath(node.id)));
     const text = entry ? utf8.decode(await readBlob(api, repo, entry.sha)) : "";
-    const { body } = parseFrontMatter(text);
-    const doc = markdownToDoc(body);
+    const content = pageContentFromFile(text, node.title);
     pages.push({
       id: node.id,
       workspaceId,
@@ -377,8 +374,9 @@ export async function openRepoWorkspace(api: GitHubApi, target: RepoRef): Promis
       order: node.order,
       title: node.title,
       icon: node.icon,
-      doc,
-      markdown: docToMarkdown(doc),
+      ...(content.kind || node.kind ? { kind: "database" as const, database: content.database ?? { properties: [], views: [], rows: [] } } : {}),
+      doc: content.doc,
+      markdown: content.markdown,
       createdAt: now,
       updatedAt: now,
       dirty: false,

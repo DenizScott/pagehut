@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { DatabaseData } from "@/lib/database/types";
 
 /**
  * On-disk formats (what ends up in the GitHub repo) and local records.
@@ -26,6 +27,8 @@ export const treeNodeSchema = z.object({
   order: z.number(),
   title: z.string(),
   icon: z.string().optional(),
+  /** "database" for database pages (P4); absent for documents. */
+  kind: z.enum(["database"]).optional(),
   deletedAt: z.number().optional(),
 });
 export type TreeNode = z.infer<typeof treeNodeSchema>;
@@ -47,6 +50,8 @@ export const workspaceFileSchema = z.object({
   templates: z.array(z.object({ id: idSchema, title: z.string(), pageId: idSchema })).default([]),
 });
 export type WorkspaceFile = z.infer<typeof workspaceFileSchema>;
+
+export type PageKind = "database";
 
 /* ---------- Local (IndexedDB) records ---------- */
 
@@ -88,6 +93,10 @@ export interface PageRecord {
   order: number;
   title: string;
   icon?: string;
+  /** "database" for database pages (P4); absent for documents. */
+  kind?: PageKind;
+  /** Database pages: working copy of properties, views and rows. `markdown` is its file body. */
+  database?: DatabaseData;
   /** Working copy: ProseMirror JSON. Lossless for anything the editor can express. */
   doc: unknown;
   /** Canonical file body, regenerated from `doc` on every save. This is what gets committed. */

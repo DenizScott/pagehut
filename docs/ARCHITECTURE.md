@@ -1,6 +1,6 @@
 # Architecture
 
-Status: P3. Sections marked *(planned)* describe the approved design for later phases.
+Status: P4. Sections marked *(planned)* describe the approved design for later phases.
 
 ## Overview
 
@@ -50,7 +50,10 @@ Next.js 16 notes for contributors:
 | `src/app/api/auth/*` | Route handlers: `status`, `login`, `callback`, `token`, `logout` |
 | `src/lib/github/` | Browser GitHub client: REST wrapper, repo operations (Git Data API), push (`sync.ts`), pull and merge (`pull.ts`), in-memory fake for tests |
 | `src/lib/merge.ts` | Line-based three-way merge and diff (node-diff3) |
-| `src/templates/` | GDD templates, one file per language (`en.ts`, `tr.ts`, `de.ts`) |
+| `src/lib/database/` | Database types, file format, queries (filter, sort, group), formulas, edits, structural merge |
+| `src/lib/page-file.ts` | Page file text <-> content for both kinds of page; picks the right merge |
+| `src/components/database/` | Database UI: views, cells, property menu, row dialog |
+| `src/templates/` | GDD templates, one file per language (`en.ts`, `tr.ts`, `de.ts`), and database templates (`databases.ts`) |
 
 ## Data model
 
@@ -63,15 +66,41 @@ Each page is stored locally as a `PageRecord`:
 
 If serialization ever fails, the `doc` is still saved, so no text is lost.
 
-Planned repository layout *(P2)*:
+Repository layout:
 
 ```
 workspace.json        page tree, settings, pillars, templates (schemaVersion)
-pages/<id>.md         YAML front matter + Markdown body
-databases/<id>.json   database schema, views and rows (P4)
-comments/<id>.json    comment threads anchored by text quotes (P5)
+pages/<id>.md         YAML front matter + Markdown body (documents and databases)
+comments/<id>.json    comment threads anchored by text quotes (P5, planned)
 assets/<id>-<name>    images and files (warn above 1 MB, refuse above 25 MB)
 ```
+
+## Databases
+
+A database is a page with `kind: "database"`. It has typed properties, views (table, board,
+gallery, each with its own filters, sorts and hidden properties) and rows. Its file is
+`pages/<id>.md` like any page, with `type: "database"` in the front matter, so push, pull,
+conflicts and history work unchanged. The body has two parts:
+
+- **Readable table.** A GitHub Markdown table, regenerated on every save, so the database reads
+  well on github.com.
+- **Data block.** A ```pagehut-database``` fence holding one JSON line per property, view and
+  row. Rows are sorted by id, not display order, so diffs stay small. Only this block is read
+  back.
+
+**Merging** (`src/lib/database/merge.ts`) works by item and field, not by line:
+
+- Two people editing different cells of one row, or adding rows at the same time, never conflict.
+- Multi-select values and relations merge as sets.
+- An edit beats a delete.
+- Only the same cell changed differently on both sides is a conflict. It uses the normal conflict
+  banner.
+
+**Formulas** (`src/lib/database/formula.ts`) are arithmetic over number properties, written as
+`{Name}`. They are parsed by hand and never use `eval`. Renaming a property updates the
+formulas that use it.
+
+Relations store row ids of another database page.
 
 ## Markdown format
 

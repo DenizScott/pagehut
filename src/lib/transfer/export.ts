@@ -36,7 +36,7 @@ export async function collectBundle(ws: WorkspaceRecord): Promise<WorkspaceBundl
   return {
     name: ws.name,
     pillars: ws.pillars ?? [],
-    pages: pages.map(({ id, parentId, order, title, icon, markdown }) => ({ id, parentId, order, title, icon, markdown })),
+    pages: pages.map(({ id, parentId, order, title, icon, kind, markdown }) => ({ id, parentId, order, title, icon, kind, markdown })),
     assets: await Promise.all(
       assets.map(async (a) => ({ path: a.path, mime: a.mime, data: new Uint8Array(await a.blob.arrayBuffer()) })),
     ),

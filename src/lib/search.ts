@@ -23,6 +23,9 @@ export interface SearchHit {
 /** Markdown → plain text for indexing and snippets. */
 export function plainText(markdown: string): string {
   return markdown
+    // Database pages: index the readable table, not the data block.
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/^```pagehut-database\r?\n[\s\S]*?^```$/gm, "")
     .replace(/\[\[page:[0-9A-Z]{26}\|?([^\]]*)\]\]/g, "$1")
     .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")

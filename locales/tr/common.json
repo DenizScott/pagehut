@@ -120,8 +120,10 @@
       "plan": "Plan ve sunum",
       "design": "Oyun tasarımı",
       "story": "Hikâye ve sanat",
-      "production": "Üretim"
-    }
+      "production": "Üretim",
+      "databases": "Veritabanları"
+    },
+    "properties": "Özellikler"
   },
   "workspace": {
     "title": "Çalışma alanları",

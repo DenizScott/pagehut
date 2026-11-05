@@ -120,8 +120,10 @@
       "plan": "Plan and pitch",
       "design": "Game design",
       "story": "Story and art",
-      "production": "Production"
-    }
+      "production": "Production",
+      "databases": "Databases"
+    },
+    "properties": "Properties"
   },
   "workspace": {
     "title": "Workspaces",

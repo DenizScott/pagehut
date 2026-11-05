@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ChevronRight, FileText, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ChevronRight, FileText, MoreHorizontal, Plus, Table2, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState, type DragEvent } from "react";
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
@@ -150,7 +150,7 @@ export function PageTree({ workspaceId, pages, activeId, onCreateChild, onNaviga
                 className={cn("flex min-w-0 flex-1 items-center gap-2 py-1.5 hover:text-fg", active && "font-medium")}
                 draggable={false}
               >
-                {p.icon ? <span aria-hidden="true">{p.icon}</span> : <FileText className="size-4 shrink-0" aria-hidden="true" />}
+                {p.icon ? <span aria-hidden="true">{p.icon}</span> : p.kind === "database" ? <Table2 className="size-4 shrink-0" aria-hidden="true" /> : <FileText className="size-4 shrink-0" aria-hidden="true" />}
                 <span className="truncate">{p.title || t("shell.untitled")}</span>
               </Link>
               <div className="flex opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 has-[[data-state=open]]:opacity-100">
