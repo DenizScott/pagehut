@@ -6,7 +6,23 @@ export interface RepoRef {
   owner: string;
   name: string;
   branch: string;
+  /**
+   * Folder inside the repository that holds the workspace ("" = repository root), e.g. "GDD" so a
+   * game's design documents live next to its Unity/Unreal project.
+   */
+  dir?: string;
 }
+
+/** "GDD/", "/docs/gdd" → "GDD", "docs/gdd"; rejects ".." and odd characters. */
+export function normalizeDir(input: string | undefined): string {
+  const dir = (input ?? "").trim().replace(/\\/g, "/").replace(/^\/+|\/+$/g, "").replace(/\/{2,}/g, "/");
+  if (dir.split("/").some((part) => part === ".." || part === ".")) throw new Error("Invalid folder");
+  if (dir && !/^[\w .\-/]+$/u.test(dir)) throw new Error("Invalid folder");
+  return dir;
+}
+
+/** Path of a workspace file inside the repository. */
+export const inRepo = (repo: Pick<RepoRef, "dir">, path: string) => (repo.dir ? `${repo.dir}/${path}` : path);
 
 export interface RepoSummary {
   owner: string;
@@ -95,7 +111,12 @@ export async function readBlob(api: GitHubApi, repo: RepoRef, sha: string): Prom
   return data.encoding === "base64" ? base64ToBytes(data.content) : utf8.encode(data.content);
 }
 
-export type FileChange = { path: string; content: Uint8Array } | { path: string; delete: true };
+/**
+ * One file to write or delete. `expectedSha` is the blob sha this file had in the repository when
+ * we last synced (null = it should not exist). It lets a commit go on top of teammates' newer
+ * commits safely: only when none of OUR files changed remotely.
+ */
+export type FileChange = ({ path: string; content: Uint8Array } | { path: string; delete: true }) & { expectedSha?: string | null };
 
 /** Git Data writes fail on an empty repository, so the first commit goes through the Contents API. */
 async function initializeEmptyRepo(api: GitHubApi, repo: RepoRef, readme: string): Promise<{ commit: string; tree: string }> {
@@ -110,8 +131,9 @@ async function initializeEmptyRepo(api: GitHubApi, repo: RepoRef, readme: string
 }
 
 /**
- * One commit with all changes. Fails with RemoteChangedError if the branch moved since
- * `expectedHead` (the ref update is never forced, so nobody's work is overwritten).
+ * One commit with all changes. If the branch moved since `expectedHead` (a teammate pushed, e.g.
+ * Unity code), the commit is placed on top of the new head, but only if none of the files we write
+ * changed remotely. Otherwise RemoteChangedError. The ref update is never forced.
  */
 export async function commitChanges(
   api: GitHubApi,
@@ -119,10 +141,13 @@ export async function commitChanges(
   input: { expectedHead: string | null; changes: FileChange[]; message: string; readmeForEmptyRepo: string },
 ): Promise<{ commit: string; blobShas: Map<string, string> }> {
   let head = await getHead(api, repo);
-  if (input.expectedHead !== (head?.commit ?? null)) {
-    // Accept the case where we are the ones initializing an empty repo.
-    if (!(input.expectedHead === null && head === null)) throw new RemoteChangedError();
+  if (head && input.expectedHead !== head.commit) {
+    // The branch moved. Safe to continue only if every file we touch is still as we last saw it.
+    const remote = new Map((await readTree(api, repo, head.tree)).map((e) => [e.path, e.sha]));
+    const touched = input.changes.some((c) => c.expectedSha === undefined || (remote.get(c.path) ?? null) !== c.expectedSha);
+    if (touched) throw new RemoteChangedError();
   }
+  if (!head && input.expectedHead !== null) throw new RemoteChangedError(); // repo was emptied
   head ??= await initializeEmptyRepo(api, repo, input.readmeForEmptyRepo);
 
   const blobShas = new Map<string, string>();

@@ -3,7 +3,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { AlertTriangle, CloudCheck, CloudOff, CloudUpload, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { getDB } from "@/lib/storage/db";
+import { pendingCount } from "@/lib/github/sync";
 import { useSync, type SyncState } from "@/lib/stores/sync";
 import { useWorkspace } from "@/lib/stores/workspace";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,8 @@ export function SyncButton() {
   const workspace = useWorkspace((s) => s.workspace);
   const { state, retryAt, push } = useSync();
   const unsynced = useLiveQuery(
-    async () => (workspace?.mode === "github" ? (await getDB().pages.where("workspaceId").equals(workspace.id).toArray()).filter((p) => p.dirty).length : 0),
+    // Re-runs whenever pages, assets or the workspace change in IndexedDB.
+    async () => (workspace?.mode === "github" ? pendingCount(workspace.id) : 0),
     [workspace?.id, workspace?.mode],
   );
 

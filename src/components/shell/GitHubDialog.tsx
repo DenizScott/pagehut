@@ -90,6 +90,9 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
   const [filter, setFilter] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  /** Folder inside the repository for the workspace (connect only). "GDD" keeps game repos tidy. */
+  const [folder, setFolder] = useState("GDD");
+  const cleanFolder = folder.trim().replace(/^\/+|\/+$/g, "");
   const [error, setError] = useState<string | null>(null);
   /** Offered when the other action fits the chosen repo (open <-> save). */
   const [suggest, setSuggest] = useState<"connect" | "open" | null>(null);
@@ -130,7 +133,7 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
     const ref = { owner: chosen.owner, name: chosen.name, branch: chosen.defaultBranch };
     try {
       if (mode === "connect") {
-        await connectWorkspace(githubApi(), workspace.id, ref);
+        await connectWorkspace(githubApi(), workspace.id, { ...ref, dir: folder });
         const updated = await getWorkspace(workspace.id);
         if (updated) setWorkspace(updated);
         resetSync();
@@ -205,6 +208,18 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
           {t("missingRepo")} <ExternalLink className="size-3" aria-hidden="true" />
         </a>
       )}
+      {mode === "connect" && (
+        <label className="mx-4 mb-2 flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-fg-muted">{t("folderLabel")}</span>
+          <input
+            value={folder}
+            onChange={(e) => setFolder(e.target.value)}
+            placeholder={t("repoRoot")}
+            className="w-32 rounded-md border border-hairline bg-canvas px-2 py-1 font-mono text-xs"
+          />
+          <span className="w-full text-xs text-fg-subtle">{t("folderHint")}</span>
+        </label>
+      )}
       {error && (
         <div role="alert" className="mx-4 mb-2 rounded-md bg-danger-soft px-3 py-2 text-sm text-danger">
           <p>{error}</p>
@@ -225,7 +240,11 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
         </div>
       )}
       <div className="flex items-center justify-end gap-2 border-t border-hairline p-3">
-        {chosen && mode === "connect" && <p className="me-auto text-xs text-fg-muted">{t("connectWarning", { repo: chosen.fullName })}</p>}
+        {chosen && mode === "connect" && (
+          <p className="me-auto text-xs text-fg-muted">
+            {t("connectWarning", { repo: chosen.fullName, folder: cleanFolder ? `${cleanFolder}/` : t("repoRoot") })}
+          </p>
+        )}
         <Button variant="primary" disabled={!chosen || busy} onClick={() => void run()}>
           {busy ? t("working") : mode === "connect" ? t("connectAction") : t("openAction")}
         </Button>

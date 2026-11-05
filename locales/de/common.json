@@ -152,7 +152,7 @@
     "noRepos": "Keine Repositories gefunden. Installiere die App zuerst auf einem Repository.",
     "private": "Privates Repository",
     "missingRepo": "Dein Repository fehlt? Installiere die App darauf",
-    "connectWarning": "Alle Seiten werden in {repo} committet. Tipp: Ein eigenes Repository nur für das GDD hält deine Code-Repositories sauber.",
+    "connectWarning": "Alle Seiten werden in {repo} unter {folder} committet.",
     "working": "Wird ausgeführt …",
     "connectAction": "Im Repository speichern",
     "openAction": "Arbeitsbereich öffnen",
@@ -173,7 +173,10 @@
     "chooseReposHint": "Wähle, welche Repositories PageHut nutzen darf. GitHub bringt dich danach hierher zurück.",
     "chooseRepos": "Repositories auf GitHub auswählen",
     "saveHereInstead": "Stattdessen diesen Arbeitsbereich in diesem Repository speichern",
-    "openHereInstead": "Stattdessen den Arbeitsbereich aus diesem Repository öffnen"
+    "openHereInstead": "Stattdessen den Arbeitsbereich aus diesem Repository öffnen",
+    "folderLabel": "Ordner im Repository:",
+    "folderHint": "Empfohlen für Spiele-Repos: PageHut ändert nur diesen Ordner, nie dein Unity/Unreal-Projekt. Leer lassen für das Repository-Stammverzeichnis.",
+    "repoRoot": "Stammverzeichnis"
   },
   "share": {
     "title": "Mit dem Team teilen",
@@ -197,5 +200,19 @@
     "signedOut": "Zum Synchronisieren anmelden",
     "error": "Synchronisierung fehlgeschlagen",
     "pushHint": "klicken, um jetzt zu pushen"
+  },
+  "moveFolder": {
+    "menu": "Ordner im Repository …",
+    "title": "Arbeitsbereich in einen anderen Ordner verschieben",
+    "description": "Ein Commit verschiebt die Dateien des Arbeitsbereichs. Sonst ändert sich nichts im Repository.",
+    "current": "Jetzt:",
+    "newFolder": "Neuer Ordner:",
+    "hint": "Nutze einen Ordner außerhalb von Assets/ (z. B. GDD), damit Unity ihn ignoriert.",
+    "action": "Verschieben",
+    "cancel": "Abbrechen",
+    "done": "Arbeitsbereich nach {folder} verschoben",
+    "taken": "In diesem Ordner gibt es bereits einen Arbeitsbereich.",
+    "remoteChanged": "Jemand hat die Dateien des Arbeitsbereichs auf GitHub geändert. Erst synchronisieren (kommt mit P3), dann erneut versuchen.",
+    "invalid": "Bitte einen einfachen Ordnernamen wie GDD oder docs/gdd verwenden."
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLiveQuery } from "dexie-react-hooks";
-import { Check, ChevronsUpDown, FolderGit2, GitBranch, HardDrive, LogOut, Share2, UploadCloud } from "lucide-react";
+import { Check, ChevronsUpDown, FolderGit2, FolderInput, GitBranch, HardDrive, LogOut, Share2, UploadCloud } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { useRouter } from "@/i18n/navigation";
@@ -69,6 +69,11 @@ export function WorkspaceMenu() {
             <Share2 /> {t("share.title")}
           </MenuItem>
         )}
+        {workspace?.mode === "github" && (
+          <MenuItem onSelect={() => openDialog("moveFolder")}>
+            <FolderInput /> {t("moveFolder.menu")}
+          </MenuItem>
+        )}
         {github.status === "signedIn" && (
           <>
             <MenuSeparator />
@@ -100,6 +105,7 @@ export function StorageBadge() {
         <FolderGit2 className="size-3.5 shrink-0" aria-hidden="true" />
         <span className="truncate">
           {workspace.repo.owner}/{workspace.repo.name}
+          {workspace.repo.dir ? `/${workspace.repo.dir}` : ""}
         </span>
         <span className="sr-only"> ({t("a11y.newTab")})</span>
       </a>

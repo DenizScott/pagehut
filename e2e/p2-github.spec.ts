@@ -62,13 +62,14 @@ test("connect, push, conflict guard, and open on a second device", async ({ brow
   const dialog = page.getByRole("dialog", { name: "Save this workspace to GitHub" });
   await expect(dialog).toContainText("Signed in as octo-designer");
   await dialog.getByRole("radio", { name: "team/gdd" }).click();
+  await expect(dialog.getByRole("textbox", { name: "Folder in the repository:" })).toHaveValue("GDD");
   await dialog.getByRole("button", { name: "Save to repository" }).click();
   await expect(page.getByText("Workspace saved to team/gdd")).toBeVisible();
-  await expect(page.getByRole("link", { name: /team\/gdd/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /team\/gdd\/GDD/ })).toBeVisible();
 
   let files = gh.files("team/gdd");
-  expect(Object.keys(files)).toContain("workspace.json");
-  const combatFile = Object.entries(files).find(([p, t]) => p.startsWith("pages/") && t.includes('title: "Combat"'));
+  expect(Object.keys(files)).toContain("GDD/workspace.json");
+  const combatFile = Object.entries(files).find(([p, t]) => p.startsWith("GDD/pages/") && t.includes('title: "Combat"'));
   expect(combatFile?.[1]).toContain("Every fight is a puzzle.");
 
   // Edit, then push with the sync button.
@@ -84,8 +85,19 @@ test("connect, push, conflict guard, and open on a second device", async ({ brow
   expect(files[combatFile![0]]).toContain("Bosses have three phases.");
   expect(gh.lastCommitMessage("team/gdd")).toMatch(/^Update "Combat"/);
 
-  // A teammate pushes first: PageHut refuses to overwrite and keeps local text.
-  gh.commit("team/gdd", { "notes.md": "teammate" }, "Teammate change");
+  // A teammate pushes Unity code: unrelated, so the next push goes on top of it.
+  gh.commit("team/gdd", { "Assets/Scripts/Player.cs": "class Player {}" }, "Teammate: player script");
+  await page.locator(".ProseMirror:visible").click();
+  await page.keyboard.press("End");
+  await page.keyboard.type(" Arena is round.");
+  await expect(page.getByRole("status", { name: "Save status" })).toHaveAttribute("data-save-state", "saved");
+  await sync.click();
+  await expect(sync).toHaveAttribute("data-sync-state", "synced");
+  expect(gh.files("team/gdd")["Assets/Scripts/Player.cs"]).toBe("class Player {}");
+  expect(gh.files("team/gdd")[combatFile![0]]).toContain("Arena is round.");
+
+  // A teammate edits the SAME page: PageHut refuses to overwrite and keeps local text.
+  gh.commit("team/gdd", { [combatFile![0]]: `${gh.files("team/gdd")[combatFile![0]]}\nTeammate line.\n` }, "Teammate edits Combat");
   await page.locator(".ProseMirror:visible").click();
   await page.keyboard.press("End");
   await page.keyboard.type(" Local only.");
@@ -139,9 +151,45 @@ test("opening a repo without a workspace offers to save into it instead", async 
 
   const saveDialog = page.getByRole("dialog", { name: "Save this workspace to GitHub" });
   await expect(saveDialog.getByRole("radio", { name: "team/game-code" })).toHaveAttribute("aria-checked", "true");
-  await expect(saveDialog).toContainText("a repository just for your GDD");
+  await expect(saveDialog).toContainText("never your Unity/Unreal project");
+  await expect(saveDialog).toContainText("in GDD/");
   await saveDialog.getByRole("button", { name: "Save to repository" }).click();
   await expect(page.getByText("Workspace saved to team/game-code")).toBeVisible();
   expect(gh.files("team/game-code")["README.md"]).toBe("# Code");
+  expect(gh.files("team/game-code")["GDD/workspace.json"]).toBeDefined();
+  await ctx.close();
+});
+
+test("an existing root workspace can be moved into GDD/ of a game repo", async ({ browser }) => {
+  const gh = new FakeGitHub();
+  gh.addRepo("team", "game", { files: { "Assets/Scripts/Player.cs": "class Player {}" } });
+  const ctx = await browser.newContext();
+  await fakeSignedIn(ctx, gh);
+  const page = await ctx.newPage();
+  await page.goto("/en");
+  await page.waitForURL(/\/p\//);
+
+  // Connect at the repository root (empty folder field), like the first version did.
+  await page.getByRole("button", { name: /Local mode/ }).click();
+  const dialog = page.getByRole("dialog", { name: "Save this workspace to GitHub" });
+  await dialog.getByRole("radio", { name: "team/game" }).click();
+  await dialog.getByRole("textbox", { name: "Folder in the repository:" }).fill("");
+  await dialog.getByRole("button", { name: "Save to repository" }).click();
+  await expect(page.getByText("Workspace saved to team/game")).toBeVisible();
+  expect(Object.keys(gh.files("team/game"))).toContain("workspace.json");
+
+  await page.getByRole("button", { name: /Switch workspace/ }).click();
+  await page.getByRole("menuitem", { name: "Folder in repository…" }).click();
+  const move = page.getByRole("dialog", { name: "Move the workspace to another folder" });
+  await move.getByRole("textbox", { name: "New folder:" }).fill("GDD");
+  await move.getByRole("button", { name: "Move" }).click();
+  await expect(page.getByText("Workspace moved to GDD/")).toBeVisible();
+
+  const files = Object.keys(gh.files("team/game"));
+  expect(files).toContain("GDD/workspace.json");
+  expect(files).not.toContain("workspace.json");
+  expect(files.filter((p) => p.startsWith("pages/"))).toEqual([]);
+  expect(files).toContain("Assets/Scripts/Player.cs");
+  await expect(page.locator("[data-sync-state]:visible")).toHaveAttribute("data-sync-state", "synced");
   await ctx.close();
 });

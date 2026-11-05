@@ -6,7 +6,17 @@ import { createPage, ensureWorkspace, getPage, getWorkspace, listPages, savePage
 import { GitHubApi, OfflineError, RateLimitError, RemoteChangedError, SignedOutError } from "./api";
 import { FakeGitHub } from "./fake-github";
 import { commitChanges, listRepos } from "./repo";
-import { connectWorkspace, NotAWorkspaceError, openRepoWorkspace, pendingChanges, pushWorkspace, RepoHasWorkspaceError } from "./sync";
+import {
+  connectWorkspace,
+  moveWorkspaceDir,
+  NotAWorkspaceError,
+  openRepoWorkspace,
+  pendingChanges,
+  pendingCount,
+  PendingChangesError,
+  pushWorkspace,
+  RepoHasWorkspaceError,
+} from "./sync";
 
 const welcome = { title: "Welcome", markdown: "Hello\n", workspaceName: "Dungeon Game" };
 const repo = { owner: "team", name: "gdd", branch: "main" };
@@ -40,9 +50,11 @@ describe("GitHub API client", () => {
 
   it("never forces a ref update: a moved branch is reported, not overwritten", async () => {
     gh.addRepo("team", "gdd", { files: { "a.txt": "1" } });
-    const staleHead = gh.repos.get("team/gdd")!.refs.get("main")!;
+    const repoState = gh.repos.get("team/gdd")!;
+    const staleHead = repoState.refs.get("main")!;
+    const oldSha = repoState.trees.get(repoState.commits.get(staleHead)!.tree)!.get("a.txt")!;
     gh.commit("team/gdd", { "a.txt": "2 (someone else)" }, "Other change");
-    const change = { path: "a.txt", content: new TextEncoder().encode("3 (mine)") };
+    const change = { path: "a.txt", content: new TextEncoder().encode("3 (mine)"), expectedSha: oldSha };
     await expect(
       commitChanges(api, repo, { expectedHead: staleHead, changes: [change], message: "x", readmeForEmptyRepo: "" }),
     ).rejects.toBeInstanceOf(RemoteChangedError);
@@ -127,19 +139,33 @@ describe("push changes", () => {
     expect(JSON.parse(gh.files("team/gdd")["workspace.json"]).tree).toEqual([]);
   });
 
-  it("stops without losing anything when someone else pushed first", async () => {
+  it("pushes on top of teammates' commits to other files (e.g. Unity code)", async () => {
     const ws = await connected();
     const [page] = await listPages(ws.id);
-    gh.commit("team/gdd", { "notes.md": "teammate" }, "Teammate change");
+    gh.commit("team/gdd", { "Assets/Scripts/Player.cs": "class Player {}" }, "Teammate: player script");
+    await savePageContent(page.id, markdownToDoc("Design update\n"));
+    await pushWorkspace(api, ws.id);
+    const files = gh.files("team/gdd");
+    expect(files["Assets/Scripts/Player.cs"]).toBe("class Player {}");
+    expect(files[`pages/${page.id}.md`]).toContain("Design update");
+  });
+
+  it("stops without losing anything when a teammate changed the same page", async () => {
+    const ws = await connected();
+    const [page] = await listPages(ws.id);
+    gh.commit("team/gdd", { [`pages/${page.id}.md`]: "---\ntitle: \"Welcome\"\n---\nTheir edit\n" }, "Teammate edits the page");
     await savePageContent(page.id, markdownToDoc("My unsynced text\n"));
     await expect(pushWorkspace(api, ws.id)).rejects.toBeInstanceOf(RemoteChangedError);
     expect((await getPage(page.id))?.markdown).toBe("My unsynced text\n");
-    expect((await pendingChanges(ws.id)).changes.length).toBeGreaterThan(0);
+    expect(gh.files("team/gdd")[`pages/${page.id}.md`]).toContain("Their edit");
   });
 
-  it("does not report 'synced' when GitHub has newer commits and nothing is pending locally", async () => {
+  it("reports GitHub as ahead only when the workspace's own files changed there", async () => {
     const ws = await connected();
-    gh.commit("team/gdd", { "notes.md": "teammate" }, "Teammate change");
+    gh.commit("team/gdd", { "Assets/x.cs": "code" }, "Unrelated");
+    expect((await pushWorkspace(api, ws.id)).commit).toBeNull();
+    const [page] = await listPages(ws.id);
+    gh.commit("team/gdd", { [`pages/${page.id}.md`]: "changed remotely" }, "Page edited on GitHub");
     await expect(pushWorkspace(api, ws.id)).rejects.toBeInstanceOf(RemoteChangedError);
   });
 
@@ -182,5 +208,76 @@ describe("open a workspace from a repository", () => {
     await expect(openRepoWorkspace(api, repo)).rejects.toBeInstanceOf(NotAWorkspaceError);
     gh.addRepo("team", "empty");
     await expect(openRepoWorkspace(api, { ...repo, name: "empty" })).rejects.toBeInstanceOf(NotAWorkspaceError);
+  });
+});
+
+describe("workspace in a folder of a game repository", () => {
+  const gameFiles = { "README.md": "# Twin Coasters", "Assets/Scripts/Player.cs": "class Player {}", "ProjectSettings/ProjectVersion.txt": "6000.0" };
+
+  it("connects into GDD/ and leaves the game project untouched", async () => {
+    gh.addRepo("team", "gdd", { files: gameFiles });
+    const ws = await ensureWorkspace(welcome);
+    await connectWorkspace(api, ws.id, { ...repo, dir: "/GDD/" });
+    const files = gh.files("team/gdd");
+    for (const [p, t] of Object.entries(gameFiles)) expect(files[p]).toBe(t);
+    expect(files["GDD/workspace.json"]).toBeDefined();
+    expect(Object.keys(files).filter((p) => p.startsWith("GDD/pages/"))).toHaveLength(1);
+    expect(Object.keys(files).some((p) => p === "workspace.json" || p.startsWith("pages/"))).toBe(false);
+    expect((await getWorkspace(ws.id))?.repo?.dir).toBe("GDD");
+    expect(gh.lastCommitMessage("team/gdd")).toMatch(/in GDD\//);
+  });
+
+  it("opens a workspace from a folder without being told where it is", async () => {
+    gh.addRepo("team", "gdd", { files: gameFiles });
+    const ws = await ensureWorkspace(welcome);
+    await createPage(ws.id, { title: "Levels", markdown: "Forest\n" });
+    await connectWorkspace(api, ws.id, { ...repo, dir: "GDD" });
+
+    setDBForTests(new AppDB(`device2-${Math.random()}`));
+    const id = await openRepoWorkspace(api, repo);
+    expect((await getWorkspace(id))?.repo?.dir).toBe("GDD");
+    expect((await listPages(id)).map((p) => p.title).sort()).toEqual(["Levels", "Welcome"]);
+    expect(await pendingCount(id)).toBe(0);
+  });
+
+  it("moves an existing root workspace into GDD/ in one commit", async () => {
+    gh.addRepo("team", "gdd", { files: gameFiles });
+    const ws = await ensureWorkspace(welcome);
+    await connectWorkspace(api, ws.id, repo);
+    const [page] = await listPages(ws.id);
+
+    await moveWorkspaceDir(api, ws.id, "GDD");
+    const files = gh.files("team/gdd");
+    expect(files["workspace.json"]).toBeUndefined();
+    expect(files[`pages/${page.id}.md`]).toBeUndefined();
+    expect(files["GDD/workspace.json"]).toBeDefined();
+    expect(files[`GDD/pages/${page.id}.md`]).toContain('title: "Welcome"');
+    expect(files["Assets/Scripts/Player.cs"]).toBe("class Player {}");
+    expect(gh.lastCommitMessage("team/gdd")).toMatch(/^Move PageHut workspace to GDD\//);
+    expect(await pendingCount(ws.id)).toBe(0);
+
+    // Later edits go to the new folder.
+    await savePageContent(page.id, markdownToDoc("After the move\n"));
+    await pushWorkspace(api, ws.id);
+    expect(gh.files("team/gdd")[`GDD/pages/${page.id}.md`]).toContain("After the move");
+  });
+
+  it("refuses to move while changes are unpushed, and rejects unsafe folder names", async () => {
+    gh.addRepo("team", "gdd", { files: gameFiles });
+    const ws = await ensureWorkspace(welcome);
+    await connectWorkspace(api, ws.id, repo);
+    const [page] = await listPages(ws.id);
+    await savePageContent(page.id, markdownToDoc("unpushed\n"));
+    await expect(moveWorkspaceDir(api, ws.id, "GDD")).rejects.toBeInstanceOf(PendingChangesError);
+    await expect(connectWorkspace(api, (await ensureWorkspace(welcome)).id, { ...repo, dir: "../evil" })).rejects.toThrow(/Invalid folder/);
+  });
+
+  it("counts only real pending changes (not old trashed local pages)", async () => {
+    gh.addRepo("team", "gdd");
+    const ws = await ensureWorkspace(welcome);
+    const draft = await createPage(ws.id, { title: "Draft" });
+    await trashPage(draft.id);
+    await connectWorkspace(api, ws.id, repo);
+    expect(await pendingCount(ws.id)).toBe(0);
   });
 });

@@ -152,7 +152,7 @@
     "noRepos": "Depo bulunamadı. Önce uygulamayı bir depoya yükle.",
     "private": "Özel depo",
     "missingRepo": "Deponu göremiyor musun? Uygulamayı o depoya yükle",
-    "connectWarning": "Tüm sayfalar {repo} deposuna commit’lenecek. İpucu: GDD için ayrı bir depo, kod depolarını temiz tutar.",
+    "connectWarning": "Tüm sayfalar {repo} deposunda {folder} içine commit’lenecek.",
     "working": "Çalışıyor…",
     "connectAction": "Depoya kaydet",
     "openAction": "Çalışma alanını aç",
@@ -173,7 +173,10 @@
     "chooseReposHint": "PageHut’ın hangi depoları kullanabileceğini seç. Ardından GitHub seni buraya geri getirir.",
     "chooseRepos": "GitHub’da depo seç",
     "saveHereInstead": "Bunun yerine bu çalışma alanını bu depoya kaydet",
-    "openHereInstead": "Bunun yerine bu depodaki çalışma alanını aç"
+    "openHereInstead": "Bunun yerine bu depodaki çalışma alanını aç",
+    "folderLabel": "Depodaki klasör:",
+    "folderHint": "Oyun depoları için önerilir: PageHut yalnızca bu klasöre dokunur, Unity/Unreal projene asla dokunmaz. Deponun köküne koymak için boş bırak.",
+    "repoRoot": "deponun kökü"
   },
   "share": {
     "title": "Ekibinle paylaş",
@@ -197,5 +200,19 @@
     "signedOut": "Eşitlemek için giriş yap",
     "error": "Eşitleme başarısız",
     "pushHint": "şimdi göndermek için tıkla"
+  },
+  "moveFolder": {
+    "menu": "Depodaki klasör…",
+    "title": "Çalışma alanını başka bir klasöre taşı",
+    "description": "Çalışma alanı dosyaları tek bir commit ile taşınır. Depodaki başka hiçbir şey değişmez.",
+    "current": "Şu an:",
+    "newFolder": "Yeni klasör:",
+    "hint": "Unity’nin görmezden gelmesi için Assets/ dışında bir klasör kullan (ör. GDD).",
+    "action": "Taşı",
+    "cancel": "Vazgeç",
+    "done": "Çalışma alanı {folder} klasörüne taşındı",
+    "taken": "Bu klasörde zaten bir çalışma alanı var.",
+    "remoteChanged": "Biri GitHub’da çalışma alanı dosyalarını değiştirmiş. Önce eşitle (P3 ile geliyor), sonra tekrar dene.",
+    "invalid": "Lütfen GDD ya da docs/gdd gibi basit bir klasör adı kullan."
   }
 }

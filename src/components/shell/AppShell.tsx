@@ -9,6 +9,7 @@ import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
 import { useGitHub } from "@/lib/github/session";
 import { GitHubDialog } from "./GitHubDialog";
+import { MoveFolderDialog } from "./MoveFolderDialog";
 import { PillarsDialog } from "./PillarsDialog";
 import { SearchDialog } from "./SearchDialog";
 import { ShareDialog } from "./ShareDialog";
@@ -126,6 +127,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <PillarsDialog />
         <GitHubDialog />
         <ShareDialog />
+        <MoveFolderDialog />
       </Suspense>
     </div>
   );

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -8,7 +8,7 @@ import { dirFor, routing } from "@/i18n/routing";
 import { Providers } from "@/components/shell/Providers";
 import "../globals.css";
 
-const inter = Inter({ variable: "--font-inter", subsets: ["latin", "latin-ext"] });
+const sans = Bricolage_Grotesque({ variable: "--font-sans-face", subsets: ["latin", "latin-ext"] });
 const mono = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin", "latin-ext"] });
 
 export function generateStaticParams() {
@@ -39,7 +39,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} dir={dirFor(locale)} className={`${inter.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang={locale} dir={dirFor(locale)} className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
       <body>
         <NextIntlClientProvider>
           <Providers>{children}</Providers>

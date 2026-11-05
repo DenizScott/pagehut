@@ -152,7 +152,7 @@
     "noRepos": "No repositories found. Install the app on a repository first.",
     "private": "Private repository",
     "missingRepo": "Don't see your repository? Install the app on it",
-    "connectWarning": "All pages will be committed to {repo}. Tip: a repository just for your GDD keeps your code repositories clean.",
+    "connectWarning": "All pages will be committed to {repo} in {folder}.",
     "working": "Working…",
     "connectAction": "Save to repository",
     "openAction": "Open workspace",
@@ -173,7 +173,10 @@
     "chooseReposHint": "Choose which repositories PageHut may use. GitHub will bring you back here afterwards.",
     "chooseRepos": "Choose repositories on GitHub",
     "saveHereInstead": "Save this workspace to this repository instead",
-    "openHereInstead": "Open the workspace from this repository instead"
+    "openHereInstead": "Open the workspace from this repository instead",
+    "folderLabel": "Folder in the repository:",
+    "folderHint": "Recommended for game repos: PageHut only touches this folder, never your Unity/Unreal project. Leave empty to use the repository root.",
+    "repoRoot": "repository root"
   },
   "share": {
     "title": "Share with your team",
@@ -197,5 +200,19 @@
     "signedOut": "Sign in to sync",
     "error": "Sync failed",
     "pushHint": "click to push now"
+  },
+  "moveFolder": {
+    "menu": "Folder in repository…",
+    "title": "Move the workspace to another folder",
+    "description": "One commit moves the workspace files. Nothing else in the repository changes.",
+    "current": "Now:",
+    "newFolder": "New folder:",
+    "hint": "Use a folder outside Assets/ (e.g. GDD) so Unity ignores it.",
+    "action": "Move",
+    "cancel": "Cancel",
+    "done": "Workspace moved to {folder}",
+    "taken": "That folder already contains a workspace.",
+    "remoteChanged": "Someone changed the workspace files on GitHub. Sync first (comes with P3), then try again.",
+    "invalid": "Please use a simple folder name like GDD or docs/gdd."
   }
 }

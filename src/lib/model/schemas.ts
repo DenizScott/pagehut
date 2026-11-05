@@ -61,11 +61,13 @@ export interface WorkspaceRecord {
   /** Design pillars shown above every page. */
   pillars?: Pillar[];
   /** github mode only: the repository this workspace lives in. */
-  repo?: { owner: string; name: string; branch: string };
+  repo?: { owner: string; name: string; branch: string; /** folder in the repo, "" = root */ dir?: string };
   /** github mode: commit the local copy was last synced with (null = repo was empty). */
   headSha?: string | null;
   /** github mode: workspace.json text as last synced, to detect tree/pillar changes. */
   workspaceFileBase?: string;
+  /** github mode: blob sha of workspace.json as last synced. */
+  workspaceFileSha?: string;
   lastSyncedAt?: number;
 }
 
