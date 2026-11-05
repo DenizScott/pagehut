@@ -47,9 +47,17 @@ function Body({ mode }: { mode: "connect" | "open" }) {
   if (github.status === "unknown") return <p className="p-4 text-sm text-fg-muted">{t("checking")}</p>;
   if (github.status === "unconfigured")
     return (
-      <div className="space-y-2 p-4 text-sm">
+      <div className="space-y-3 p-4 text-sm">
         <p>{t("unconfigured")}</p>
         <p className="text-fg-muted">{t("unconfiguredHint")}</p>
+        {/* Works only on the developer's own machine (the route refuses everywhere else). */}
+        {["localhost", "127.0.0.1"].includes(window.location.hostname) && (
+          // A route handler that renders its own page and posts to GitHub: needs a full navigation, not <Link>.
+          // eslint-disable-next-line @next/next/no-html-link-for-pages
+          <a href="/api/setup/github" className="inline-flex items-center gap-2 rounded-md bg-accent px-3 py-1.5 font-medium text-accent-fg">
+            <GitHubMark /> {t("setupAction")}
+          </a>
+        )}
       </div>
     );
   if (github.status === "signedOut")
@@ -158,7 +166,16 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
       <div role="radiogroup" aria-label={t("repositories")} className="min-h-24 overflow-y-auto p-2">
         {!repos && !loadError && <p className="p-3 text-sm text-fg-muted">{t("loadingRepos")}</p>}
         {loadError && <p role="alert" className="p-3 text-sm text-danger">{loadError}</p>}
-        {repos && shown.length === 0 && <p className="p-3 text-sm text-fg-muted">{t("noRepos")}</p>}
+        {repos && repos.length === 0 && appSlug && (
+          <div className="space-y-3 p-3 text-sm">
+            <p className="text-fg-muted">{t("chooseReposHint")}</p>
+            {/* Same tab: after choosing, GitHub sends the user back here (the app's setup URL). */}
+            <a href={installUrl(appSlug)} className="inline-flex items-center gap-2 rounded-md bg-accent px-3 py-1.5 font-medium text-accent-fg">
+              <GitHubMark /> {t("chooseRepos")}
+            </a>
+          </div>
+        )}
+        {repos && repos.length > 0 && shown.length === 0 && <p className="p-3 text-sm text-fg-muted">{t("noRepos")}</p>}
         {shown.map((r) => (
           <button
             key={r.fullName}
@@ -177,13 +194,8 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
           </button>
         ))}
       </div>
-      {appSlug && (
-        <a
-          href={installUrl(appSlug)}
-          target="_blank"
-          rel="noreferrer"
-          className="mx-4 mb-2 inline-flex items-center gap-1 text-xs text-accent-text underline underline-offset-2"
-        >
+      {appSlug && repos && repos.length > 0 && (
+        <a href={installUrl(appSlug)} className="mx-4 mb-2 inline-flex items-center gap-1 text-xs text-accent-text underline underline-offset-2">
           {t("missingRepo")} <ExternalLink className="size-3" aria-hidden="true" />
         </a>
       )}

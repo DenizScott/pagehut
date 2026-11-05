@@ -140,7 +140,7 @@
     "openDescription": "Wähle ein Repository, das bereits einen Arbeitsbereich enthält.",
     "checking": "GitHub-Anmeldung wird geprüft …",
     "unconfigured": "Die GitHub-Anmeldung ist auf diesem Server nicht eingerichtet.",
-    "unconfiguredHint": "Wer diesen Server betreibt, muss eine GitHub App anlegen und ihre Schlüssel hinterlegen (siehe docs/GITHUB-SETUP.md). Der lokale Modus funktioniert weiterhin.",
+    "unconfiguredHint": "Wer PageHut betreibt, richtet das einmal ein; Nutzer haben nie mit Schlüsseln zu tun. Auf deinem eigenen Rechner erledigt der Button unten das mit einem Klick.",
     "signInWhy": "Melde dich mit GitHub an, um diesen Arbeitsbereich in einem Repository zu speichern und mit deinem Team zu teilen.",
     "privacy1": "Dokumente gehen direkt von deinem Browser zu GitHub; dieser Server speichert sie nie.",
     "privacy2": "Die App erreicht nur Repositories, auf denen du sie ausdrücklich installierst.",
@@ -168,7 +168,10 @@
       "generic": "Bei der Verbindung mit GitHub ist etwas schiefgelaufen. Deine lokale Arbeit ist sicher.",
       "denied": "Die GitHub-Anmeldung wurde abgebrochen.",
       "signInFailed": "Die GitHub-Anmeldung ist fehlgeschlagen. Bitte versuch es erneut."
-    }
+    },
+    "setupAction": "GitHub-Anmeldung einrichten",
+    "chooseReposHint": "Wähle, welche Repositories PageHut nutzen darf. GitHub bringt dich danach hierher zurück.",
+    "chooseRepos": "Repositories auf GitHub auswählen"
   },
   "share": {
     "title": "Mit dem Team teilen",

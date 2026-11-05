@@ -140,7 +140,7 @@
     "openDescription": "İçinde zaten bir çalışma alanı olan bir depo seç.",
     "checking": "GitHub oturumu kontrol ediliyor…",
     "unconfigured": "Bu sunucuda GitHub ile giriş ayarlanmamış.",
-    "unconfiguredHint": "Sunucuyu çalıştıran kişinin bir GitHub App oluşturup anahtarlarını girmesi gerekiyor (bkz. docs/GITHUB-SETUP.md). Bu arada yerel mod çalışmaya devam eder.",
+    "unconfiguredHint": "Bunu PageHut’ı çalıştıran kişi bir kez kurar; kullanıcılar hiçbir anahtarla uğraşmaz. Kendi bilgisayarında aşağıdaki düğme bunu tek tıkla yapar.",
     "signInWhy": "Bu çalışma alanını bir depoda saklamak ve ekibinle paylaşmak için GitHub ile giriş yap.",
     "privacy1": "Belgeler tarayıcından doğrudan GitHub'a gider; bu sunucu onları hiç saklamaz.",
     "privacy2": "Uygulama yalnızca açıkça yüklediğin depolara erişebilir.",
@@ -168,7 +168,10 @@
       "generic": "GitHub ile iletişimde bir sorun oldu. Yerel çalışman güvende.",
       "denied": "GitHub ile giriş iptal edildi.",
       "signInFailed": "GitHub ile giriş başarısız oldu. Lütfen tekrar dene."
-    }
+    },
+    "setupAction": "GitHub ile girişi kur",
+    "chooseReposHint": "PageHut’ın hangi depoları kullanabileceğini seç. Ardından GitHub seni buraya geri getirir.",
+    "chooseRepos": "GitHub’da depo seç"
   },
   "share": {
     "title": "Ekibinle paylaş",
