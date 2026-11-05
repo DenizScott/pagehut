@@ -5,7 +5,7 @@ import { Check, ChevronsUpDown, FolderGit2, FolderInput, GitBranch, HardDrive, L
 import { useTranslations } from "next-intl";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { useRouter } from "@/i18n/navigation";
-import { repoUrl } from "@/lib/github/repo";
+import { workspaceUrl } from "@/lib/github/repo";
 import { useGitHub } from "@/lib/github/session";
 import { listWorkspaces, setActiveWorkspace } from "@/lib/storage/local-repo";
 import { useSync } from "@/lib/stores/sync";
@@ -96,7 +96,7 @@ export function StorageBadge() {
   if (workspace?.mode === "github" && workspace.repo) {
     return (
       <a
-        href={repoUrl(workspace.repo)}
+        href={workspaceUrl(workspace.repo)}
         target="_blank"
         rel="noreferrer"
         className="mx-3 mb-2 flex items-center gap-1.5 rounded-md bg-surface-hover px-2 py-1 text-xs text-fg-muted hover:text-fg"

@@ -281,3 +281,33 @@ describe("workspace in a folder of a game repository", () => {
     expect(await pendingCount(ws.id)).toBe(0);
   });
 });
+
+describe("workspaces connected by an older version (no stored workspace.json sha)", () => {
+  it("still push and move after teammates commit Unity code", async () => {
+    gh.addRepo("team", "gdd", { files: { "Assets/Scripts/Player.cs": "class Player {}" } });
+    const ws = await ensureWorkspace(welcome);
+    await connectWorkspace(api, ws.id, { ...repo, dir: "" });
+    // Simulate the earlier version: the sha of workspace.json was never stored.
+    await getDB().workspaces.update(ws.id, { workspaceFileSha: undefined });
+
+    gh.commit("team/gdd", { "Assets/Scripts/Enemy.cs": "class Enemy {}" }, "Teammate: enemy");
+    const [page] = await listPages(ws.id);
+    await savePageTitle(page.id, "TwinCoasters");
+    await pushWorkspace(api, ws.id);
+    expect(JSON.parse(gh.files("team/gdd")["workspace.json"]).tree[0].title).toBe("TwinCoasters");
+
+    gh.commit("team/gdd", { "Assets/Scripts/Boss.cs": "class Boss {}" }, "Teammate: boss");
+    await getDB().workspaces.update(ws.id, { workspaceFileSha: undefined });
+    await moveWorkspaceDir(api, ws.id, "GDD");
+    const files = gh.files("team/gdd");
+    expect(files["GDD/workspace.json"]).toBeDefined();
+    expect(files["workspace.json"]).toBeUndefined();
+    expect(files["Assets/Scripts/Boss.cs"]).toBe("class Boss {}");
+  });
+
+  it("computes the same blob id as git", async () => {
+    const { gitBlobSha } = await import("./api");
+    // `printf 'hello\n' | git hash-object --stdin`
+    expect(await gitBlobSha(new TextEncoder().encode("hello\n"))).toBe("ce013625030ba8dba906f756967f9e9ca394464a");
+  });
+});

@@ -6,7 +6,7 @@ import { workspaceFileSchema, type AssetRecord, type PageRecord, type WorkspaceR
 import { getDB } from "@/lib/storage/db";
 import { pageFile, workspaceFile } from "@/lib/transfer/bundle";
 import { parseFrontMatter } from "@/lib/transfer/frontmatter";
-import { GitHubError, RemoteChangedError, utf8, type GitHubApi } from "./api";
+import { gitBlobSha, GitHubError, RemoteChangedError, utf8, type GitHubApi } from "./api";
 import { commitChanges, getHead, inRepo, normalizeDir, readBlob, readTree, type FileChange, type RepoRef } from "./repo";
 
 /**
@@ -56,6 +56,19 @@ function workspaceJsonText(ws: WorkspaceRecord, pages: PageRecord[]): string {
 
 const readme = (name: string) =>
   `# ${name}\n\nGame design documents written with ${BRAND.name}. Pages are Markdown files in \`pages/\`; the page tree is in \`workspace.json\`.\n`;
+
+/**
+ * Blob shas of what we last synced. Computed from the synced content when not stored (git ids are
+ * content hashes), so workspaces connected by older versions keep working.
+ */
+async function baseWorkspaceSha(ws: WorkspaceRecord): Promise<string | null> {
+  if (ws.workspaceFileSha) return ws.workspaceFileSha;
+  return ws.workspaceFileBase ? gitBlobSha(utf8.encode(ws.workspaceFileBase)) : null;
+}
+async function basePageSha(page: PageRecord): Promise<string | null> {
+  if (!page.base) return null;
+  return page.base.sha || gitBlobSha(utf8.encode(page.base.markdown));
+}
 
 interface Plan {
   ws: WorkspaceRecord & { repo: RepoRef };
@@ -109,11 +122,11 @@ export async function pendingChanges(workspaceId: string): Promise<PendingChange
   for (const page of p.changedPages) {
     const text = pageFileText(page);
     pageTexts.set(page.id, text);
-    changes.push({ path: inRepo(repo, pagePath(page.id)), content: utf8.encode(text), expectedSha: page.base?.sha ?? null });
+    changes.push({ path: inRepo(repo, pagePath(page.id)), content: utf8.encode(text), expectedSha: await basePageSha(page) });
   }
-  for (const page of p.deletedPages) changes.push({ path: inRepo(repo, pagePath(page.id)), delete: true, expectedSha: page.base!.sha });
+  for (const page of p.deletedPages) changes.push({ path: inRepo(repo, pagePath(page.id)), delete: true, expectedSha: await basePageSha(page) });
   if (p.workspaceJsonChanged) {
-    changes.push({ path: inRepo(repo, WORKSPACE_FILE), content: utf8.encode(p.workspaceJson), expectedSha: p.ws.workspaceFileSha ?? null });
+    changes.push({ path: inRepo(repo, WORKSPACE_FILE), content: utf8.encode(p.workspaceJson), expectedSha: await baseWorkspaceSha(p.ws) });
   }
   for (const a of p.newAssets) {
     changes.push({ path: inRepo(repo, a.path), content: new Uint8Array(await a.blob.arrayBuffer()), expectedSha: null });
@@ -190,10 +203,10 @@ export async function pushWorkspace(api: GitHubApi, workspaceId: string, message
 async function workspaceFilesChanged(api: GitHubApi, ws: Plan["ws"], treeSha: string): Promise<boolean> {
   const db = getDB();
   const remote = new Map((await readTree(api, ws.repo, treeSha)).map((e) => [e.path, e.sha]));
-  if ((remote.get(inRepo(ws.repo, WORKSPACE_FILE)) ?? null) !== (ws.workspaceFileSha ?? null)) return true;
+  if ((remote.get(inRepo(ws.repo, WORKSPACE_FILE)) ?? null) !== (await baseWorkspaceSha(ws))) return true;
   const pages = await db.pages.where("workspaceId").equals(ws.id).toArray();
   for (const p of pages) {
-    if (p.base && remote.get(inRepo(ws.repo, pagePath(p.id))) !== p.base.sha) return true;
+    if (p.base && remote.get(inRepo(ws.repo, pagePath(p.id))) !== (await basePageSha(p))) return true;
   }
   const prefix = inRepo(ws.repo, "pages/");
   const known = new Set(pages.filter((p) => p.base).map((p) => inRepo(ws.repo, pagePath(p.id))));
@@ -262,8 +275,8 @@ export async function moveWorkspaceDir(api: GitHubApi, workspaceId: string, newD
     changes.push({ path: inRepo(oldRepo, path), delete: true, expectedSha: sha });
     changes.push({ path: inRepo(newRepo, path), content, expectedSha: null });
   };
-  for (const p of pages) move(pagePath(p.id), utf8.encode(p.base!.markdown), p.base!.sha);
-  if (ws.workspaceFileBase) move(WORKSPACE_FILE, utf8.encode(ws.workspaceFileBase), ws.workspaceFileSha ?? null);
+  for (const p of pages) move(pagePath(p.id), utf8.encode(p.base!.markdown), await basePageSha(p));
+  if (ws.workspaceFileBase) move(WORKSPACE_FILE, utf8.encode(ws.workspaceFileBase), await baseWorkspaceSha(ws));
   for (const a of assets) move(a.path, new Uint8Array(await a.blob.arrayBuffer()), a.sha!);
 
   const { commit, blobShas } = await commitChanges(api, oldRepo, {

@@ -3,6 +3,7 @@
  * refs, commits, trees, blobs, contents). Behaves like GitHub where it matters: empty repos refuse
  * Git Data writes (409), and ref updates must be fast-forwards (422).
  */
+import { createHash } from "node:crypto";
 import { base64ToBytes, bytesToBase64, utf8 } from "./api";
 
 interface Commit {
@@ -23,6 +24,9 @@ export interface FakeRepo {
 
 let counter = 0;
 const newSha = () => (++counter).toString(16).padStart(40, "0");
+/** Blobs use real git ids (like GitHub), so clients can compute them from content. */
+const blobSha = (bytes: Uint8Array) =>
+  createHash("sha1").update(Buffer.concat([Buffer.from(`blob ${bytes.length}\0`), Buffer.from(bytes)])).digest("hex");
 
 export class FakeGitHub {
   repos = new Map<string, FakeRepo>();
@@ -53,8 +57,9 @@ export class FakeGitHub {
     for (const [path, content] of Object.entries(files)) {
       if (content === null) entries.delete(path);
       else {
-        const sha = newSha();
-        repo.blobs.set(sha, utf8.encode(content));
+        const bytes = utf8.encode(content);
+        const sha = blobSha(bytes);
+        repo.blobs.set(sha, bytes);
         entries.set(path, sha);
       }
     }
@@ -148,8 +153,9 @@ export class FakeGitHub {
     }
     if (rest === "git/blobs" && method === "POST") {
       if (empty) return fail(409, "Git Repository is empty.");
-      const sha = newSha();
-      repo.blobs.set(sha, body.encoding === "base64" ? base64ToBytes(body.content) : utf8.encode(body.content));
+      const bytes = body.encoding === "base64" ? base64ToBytes(body.content) : utf8.encode(body.content);
+      const sha = blobSha(bytes);
+      repo.blobs.set(sha, bytes);
       return json({ sha }, 201);
     }
     if (rest === "git/trees" && method === "POST") {

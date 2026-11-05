@@ -140,6 +140,21 @@ export async function commitChanges(
   repo: RepoRef,
   input: { expectedHead: string | null; changes: FileChange[]; message: string; readmeForEmptyRepo: string },
 ): Promise<{ commit: string; blobShas: Map<string, string> }> {
+  // A teammate may push between our check and the ref update (422). Re-check once and retry;
+  // the per-file check still refuses anything that would overwrite their work.
+  try {
+    return await commitOnce(api, repo, input);
+  } catch (err) {
+    if (!(err instanceof RemoteChangedError) || !input.changes.every((c) => c.expectedSha !== undefined)) throw err;
+    return commitOnce(api, repo, input);
+  }
+}
+
+async function commitOnce(
+  api: GitHubApi,
+  repo: RepoRef,
+  input: { expectedHead: string | null; changes: FileChange[]; message: string; readmeForEmptyRepo: string },
+): Promise<{ commit: string; blobShas: Map<string, string> }> {
   let head = await getHead(api, repo);
   if (head && input.expectedHead !== head.commit) {
     // The branch moved. Safe to continue only if every file we touch is still as we last saw it.
@@ -183,4 +198,7 @@ export async function commitChanges(
 export const collaboratorsUrl = (repo: { owner: string; name: string }) =>
   `https://github.com/${enc(repo.owner)}/${enc(repo.name)}/settings/access`;
 export const repoUrl = (repo: { owner: string; name: string }) => `https://github.com/${enc(repo.owner)}/${enc(repo.name)}`;
+/** The workspace folder on github.com (the repository page when it lives at the root). */
+export const workspaceUrl = (repo: RepoRef) =>
+  repo.dir ? `${repoUrl(repo)}/tree/${enc(repo.branch)}/${repo.dir.split("/").map(enc).join("/")}` : repoUrl(repo);
 export const installUrl = (appSlug: string) => `https://github.com/apps/${enc(appSlug)}/installations/new`;

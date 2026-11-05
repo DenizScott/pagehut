@@ -110,3 +110,13 @@ export const utf8 = {
   encode: (s: string) => new TextEncoder().encode(s),
   decode: (b: Uint8Array) => new TextDecoder().decode(b),
 };
+
+/** Git's blob id for some content: sha1("blob <size>\0" + content). Same bytes, same sha. */
+export async function gitBlobSha(content: Uint8Array): Promise<string> {
+  const header = utf8.encode(`blob ${content.length}\0`);
+  const data = new Uint8Array(header.length + content.length);
+  data.set(header);
+  data.set(content, header.length);
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-1", data));
+  return [...digest].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
