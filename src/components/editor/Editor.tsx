@@ -56,6 +56,7 @@ export function Editor({ page, onReady, onEmptyChange }: EditorProps) {
   const ts = useTranslations("slash");
   const locale = useLocale();
   const toast = useStatus((s) => s.toast);
+  const noteUserEdit = useStatus((s) => s.noteUserEdit);
   const editorRef = useRef<TiptapEditor | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const saver = useDebouncedSaver((doc: unknown) => savePageContent(page.id, doc));
@@ -191,7 +192,8 @@ export function Editor({ page, onReady, onEmptyChange }: EditorProps) {
           <BubbleToolbar editor={editor} />
         </>
       )}
-      <EditorContent editor={editor} />
+      {/* Real input only (not load-time normalization) marks the page as being edited. */}
+      <EditorContent editor={editor} onKeyDown={noteUserEdit} onInput={noteUserEdit} onPaste={noteUserEdit} onDrop={noteUserEdit} />
       <input
         ref={fileInput}
         type="file"

@@ -20,8 +20,12 @@ interface StatusStore {
   /** Savers with unsaved changes, by saver id. */
   pending: ReadonlySet<string>;
   failed: ReadonlySet<string>;
-  /** Last local edit (any saver), so background sync can leave the page being typed in alone. */
+  /**
+   * Last real user input (typing, pasting, title edits), so background sync can leave the page being
+   * typed in alone. Programmatic editor updates (normalization on load) don't count.
+   */
   lastEditAt: number;
+  noteUserEdit: () => void;
   /** The page open in the editor right now. */
   activePageId: string | null;
   setActivePage: (id: string | null) => void;
@@ -57,10 +61,11 @@ export const useStatus = create<StatusStore>((set) => ({
   lastEditAt: 0,
   activePageId: null,
   setActivePage: (activePageId) => set({ activePageId }),
+  noteUserEdit: () => set({ lastEditAt: Date.now() }),
   markPending: (id) =>
     set((s) => {
       const pending = new Set(s.pending).add(id);
-      return { pending, save: derive(pending, s.failed), lastEditAt: Date.now() };
+      return { pending, save: derive(pending, s.failed) };
     }),
   markSaved: (id) =>
     set((s) => {

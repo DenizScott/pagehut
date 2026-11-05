@@ -1,22 +1,55 @@
 # GitHub sync and conflicts
 
-Status: **P2 implemented** (sign-in, connect, open, manual push with fast-forward only).
-**P3 pending** (automatic sync, pull, three-way merge, conflict UI, history).
+Status: **P3 implemented**: sign-in, connect/open, a workspace in a folder of a game repository,
+automatic two-way sync, three-way merge, conflict resolution, page history.
 
-## What P2 does today
+## How syncing works today
 
-- **Connect:** commits every page, `workspace.json` and (if missing) a `README.md` to an empty or
-  non-workspace repo. An empty repo is initialized through the Contents API first.
-- **Push** (sync button): content-based. Only files whose text differs from `base` are sent, in
-  one commit through the Git Data API (blobs, tree, commit, then a ref update with `force: false`).
-- **Branch moved** (a teammate pushed): the push fails with `RemoteChangedError` and local text
-  stays. This also happens when nothing is pending locally, so the UI never shows "synced" while
-  GitHub is ahead.
-- **Open:** reads `workspace.json`, pages and assets into a new local workspace with `base` set. A
-  second open of the same repo switches to the existing copy.
+- **Where.** A workspace lives in one folder of a repository (`repo.dir`, default `GDD`). PageHut
+  only reads and writes inside that folder, plus `README.md` when it initializes an empty
+  repository.
+- **When.** Automatically while the tab is visible:
+  - pushes about 5 s after the last edit;
+  - pulls every minute, on window focus and when the network comes back.
 
-Tested against an in-memory GitHub (`src/lib/github/fake-github.ts`) in unit tests and through the
-real UI in `e2e/p2-github.spec.ts`.
+  The sync button runs a sync at once. Sync pauses while offline, rate limited (until the reset
+  time) or signed out.
+- **Sync = pull, then push.**
+- **Push.** One commit through the Git Data API: blobs, tree, commit, then a ref update with
+  `force: false`. Each file carries the blob sha we last synced (`expectedSha`).
+  - If teammates pushed other files (for example Unity code), the commit goes on top of theirs.
+  - If one of the workspace's own files changed remotely, the push stops (`RemoteChangedError`)
+    and the next pull merges it.
+  - A ref race (422) is re-checked and retried once.
+- **Pull.** Compares every page file with its last synced blob sha:
+
+  | Situation | Result |
+  |---|---|
+  | Changed only on GitHub | Theirs is taken |
+  | Changed on both sides, different lines | Three-way merge (line-based, `node-diff3`); the merged text is pushed next |
+  | Changed on both sides, same lines | **Conflict**: local text stays in the editor, theirs is kept in `page.conflict` |
+  | Added on GitHub | New local page (and new images under `assets/`) |
+  | Deleted on GitHub | Removed locally if untouched; if edited locally, kept and re-added |
+  | Deleted locally, edited on GitHub | Restored with their edit (an edit beats a delete) |
+  | Moved in the tree on GitHub | Remote position taken, unless the page was also moved locally |
+  | Pillars or name changed on GitHub | Taken, unless also changed locally |
+
+- **Typing is never interrupted.** The page open in the editor is postponed while it has unsaved
+  changes or was typed in during the last 8 s (`canTouchPage`). Only real input counts (keys,
+  input, paste, drop), not editor normalization. Postponed pages are retried soon after typing
+  stops. When the open page changes underneath, the editor reloads only once it is idle.
+- **Conflicts.** A banner offers *Compare* (line diff), *Keep mine* (theirs becomes the base, so
+  the next push replaces it without forcing) and *Keep theirs*. Pages in conflict are left out of
+  pushes until resolved; the rest of the workspace keeps syncing.
+- **History.** `GET /repos/{o}/{r}/commits?path=` lists versions with author and date, and
+  `contents?ref=` shows one. Restoring makes the old text a normal local edit, which the next
+  sync commits; history is never rewritten. The page header shows the last editor.
+- **Tokens and tabs.** GitHub rotates refresh tokens on every use. Token refreshes are serialized
+  across tabs with the Web Locks API, so two tabs never spend the same refresh token.
+
+Tested against an in-memory GitHub (`src/lib/github/fake-github.ts`, which uses real git blob ids)
+in unit tests (`sync.test.ts`, `pull.test.ts`, `merge.test.ts`) and through the real UI in
+`e2e/p2-github.spec.ts` and `e2e/p3-sync.spec.ts`.
 
 ## Goals
 

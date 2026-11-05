@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useGitHub } from "@/lib/github/session";
 import { pendingCount } from "@/lib/github/sync";
+import { getWorkspace } from "@/lib/storage/local-repo";
 import { useStatus } from "@/lib/stores/status";
 import { useSync } from "@/lib/stores/sync";
 import { useWorkspace } from "@/lib/stores/workspace";
@@ -47,6 +48,8 @@ export function AutoSync() {
       const idle = pending.size === 0 && Date.now() - lastEditAt > PUSH_AFTER_IDLE_MS;
       if (Date.now() - lastPull > PULL_EVERY_MS) return run();
       if (idle && (await pendingCount(workspaceId)) > 0) return run();
+      // Pages postponed because they were being edited: retry soon after typing stops.
+      if (idle && (await getWorkspace(workspaceId))?.pullDeferred) return run();
     };
 
     void run();

@@ -193,6 +193,7 @@ function PageEditor({ page }: { page: PageRecord }) {
             aria-label={t("page.titleLabel")}
             placeholder={t("page.titlePlaceholder")}
             onChange={(e) => {
+              useStatus.getState().noteUserEdit();
               const value = e.target.value.replace(/\n/g, " ");
               setTitle(value);
               titleSaver.schedule(value);

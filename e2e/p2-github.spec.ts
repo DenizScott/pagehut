@@ -46,7 +46,8 @@ test("a sign-in error from the OAuth redirect is explained", async ({ page }) =>
   await expect(page).not.toHaveURL(/github_error/);
 });
 
-test("connect, push, conflict guard, and open on a second device", async ({ browser }) => {
+test("connect, push, merge a teammate's edit, and open on a second device", async ({ browser }) => {
+  test.setTimeout(60_000);
   const gh = new FakeGitHub();
   gh.addRepo("team", "gdd");
 
@@ -96,16 +97,21 @@ test("connect, push, conflict guard, and open on a second device", async ({ brow
   expect(gh.files("team/gdd")["Assets/Scripts/Player.cs"]).toBe("class Player {}");
   expect(gh.files("team/gdd")[combatFile![0]]).toContain("Arena is round.");
 
-  // A teammate edits the SAME page: PageHut refuses to overwrite and keeps local text.
+  // A teammate edits the SAME page: nothing is overwritten; once I pause, both edits are merged.
   gh.commit("team/gdd", { [combatFile![0]]: `${gh.files("team/gdd")[combatFile![0]]}\nTeammate line.\n` }, "Teammate edits Combat");
   await page.locator(".ProseMirror:visible").click();
   await page.keyboard.press("End");
   await page.keyboard.type(" Local only.");
   await expect(page.getByRole("status", { name: "Save status" })).toHaveAttribute("data-save-state", "saved");
-  await sync.click();
-  await expect(sync).toHaveAttribute("data-sync-state", "remoteChanged");
+  await sync.click(); // while I'm still typing, the open page is left alone
   expect(gh.files("team/gdd")[combatFile![0]]).not.toContain("Local only.");
   await expect(page.locator(".ProseMirror:visible")).toContainText("Local only.");
+  await page.waitForTimeout(9_000);
+  await sync.click();
+  await expect(sync).toHaveAttribute("data-sync-state", "synced");
+  await expect(page.locator(".ProseMirror:visible")).toContainText("Teammate line.");
+  expect(gh.files("team/gdd")[combatFile![0]]).toContain("Local only.");
+  expect(gh.files("team/gdd")[combatFile![0]]).toContain("Teammate line.");
 
   // Device 2: fresh browser profile opens the workspace from the repository.
   const ctx2 = await browser.newContext();

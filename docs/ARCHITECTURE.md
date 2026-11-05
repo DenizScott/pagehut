@@ -1,18 +1,18 @@
 # Architecture
 
-Status: P2. Sections marked *(planned)* describe the approved design for later phases.
+Status: P3. Sections marked *(planned)* describe the approved design for later phases.
 
 ## Overview
 
 ```
 UI (React, Tailwind)  ->  small stores (Zustand)  ->  storage layer (src/lib/storage)
                                                       +- Dexie / IndexedDB: always the working copy
-                                                      +- GitHub remote (planned, P2-P3)
-Server: Next.js route handlers for the GitHub OAuth exchange only (planned, P2).
+                                                      +- GitHub remote (src/lib/github, browser -> api.github.com)
+Server: Next.js route handlers for the GitHub sign-in exchange and first-run app setup only.
 ```
 
-Everything a user writes lives in the browser until GitHub sync exists. The server renders the
-static shell and never stores documents.
+The browser is always the working copy; GitHub is the shared copy (see `docs/SYNC.md`). The
+server renders the static shell and never stores or sees documents.
 
 ## Stack
 
@@ -48,7 +48,8 @@ Next.js 16 notes for contributors:
 | `src/lib/transfer/` | Front matter, ZIP/JSON bundles, import with id remapping, downloads |
 | `src/lib/server/` | Server-only auth: GitHub App config, sealed cookies, OAuth/PKCE handlers |
 | `src/app/api/auth/*` | Route handlers: `status`, `login`, `callback`, `token`, `logout` |
-| `src/lib/github/` | Browser GitHub client: REST wrapper, repo operations (Git Data API), workspace sync, in-memory fake for tests |
+| `src/lib/github/` | Browser GitHub client: REST wrapper, repo operations (Git Data API), push (`sync.ts`), pull and merge (`pull.ts`), in-memory fake for tests |
+| `src/lib/merge.ts` | Line-based three-way merge and diff (node-diff3) |
 | `src/templates/` | GDD templates, one file per language (`en.ts`, `tr.ts`, `de.ts`) |
 
 ## Data model
