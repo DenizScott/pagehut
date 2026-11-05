@@ -200,7 +200,8 @@
     "rateLimited": "{time} saatine kadar duraklatıldı",
     "signedOut": "Eşitlemek için giriş yap",
     "error": "Eşitleme başarısız",
-    "pushHint": "şimdi göndermek için tıkla"
+    "pushHint": "şimdi eşitlemek için tıkla",
+    "conflict": "{count, plural, one {# sayfa kararını bekliyor} other {# sayfa kararını bekliyor}}"
   },
   "moveFolder": {
     "menu": "Depodaki klasör…",
@@ -215,5 +216,25 @@
     "taken": "Bu klasörde zaten bir çalışma alanı var.",
     "remoteChanged": "Biri GitHub’da çalışma alanı dosyalarını değiştirmiş. Önce eşitle (P3 ile geliyor), sonra tekrar dene.",
     "invalid": "Lütfen GDD ya da docs/gdd gibi basit bir klasör adı kullan."
+  },
+  "conflict": {
+    "message": "Bu sayfa GitHub'da da, senin düzenlediğin yerde değişmiş. Hiçbir şey kaybolmadı: senin metnin editörde, onunki kenarda bekliyor.",
+    "compare": "Karşılaştır",
+    "keepMine": "Benimkini tut",
+    "keepTheirs": "Onunkini tut",
+    "compareTitle": "Senin sürümün ve GitHub'daki sürüm",
+    "compareDescription": "Yalnızca senin sürümünde olan satırlar turuncu, yalnızca GitHub'daki sürümde olanlar mavi.",
+    "mine": "Senin",
+    "theirs": "GitHub'da"
+  },
+  "history": {
+    "title": "Sayfa geçmişi",
+    "description": "Bu sayfanın GitHub'daki tüm kayıtlı sürümleri. Bir sürümü geri yüklemek onu yeni bir değişiklik olarak kaydeder; geçmiş yeniden yazılmaz.",
+    "versions": "Sürümler",
+    "loading": "Yükleniyor…",
+    "empty": "Henüz geçmiş yok. İlk eşitlemeyle başlar.",
+    "current": "güncel",
+    "restore": "Bu sürümü geri yükle",
+    "lastEdited": "{author} · {time}"
   }
 }

@@ -20,6 +20,11 @@ interface StatusStore {
   /** Savers with unsaved changes, by saver id. */
   pending: ReadonlySet<string>;
   failed: ReadonlySet<string>;
+  /** Last local edit (any saver), so background sync can leave the page being typed in alone. */
+  lastEditAt: number;
+  /** The page open in the editor right now. */
+  activePageId: string | null;
+  setActivePage: (id: string | null) => void;
   markPending: (saverId: string) => void;
   markSaved: (saverId: string) => void;
   markFailed: (saverId: string) => void;
@@ -49,10 +54,13 @@ export const useStatus = create<StatusStore>((set) => ({
   toasts: [],
   pending: new Set(),
   failed: new Set(),
+  lastEditAt: 0,
+  activePageId: null,
+  setActivePage: (activePageId) => set({ activePageId }),
   markPending: (id) =>
     set((s) => {
       const pending = new Set(s.pending).add(id);
-      return { pending, save: derive(pending, s.failed) };
+      return { pending, save: derive(pending, s.failed), lastEditAt: Date.now() };
     }),
   markSaved: (id) =>
     set((s) => {
@@ -75,3 +83,9 @@ export const useStatus = create<StatusStore>((set) => ({
   },
   dismiss: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
 }));
+
+/** Pages that background sync may change now: not the one being typed in (unsaved or edited < 8 s ago). */
+export function canTouchPage(pageId: string): boolean {
+  const { activePageId, pending, lastEditAt } = useStatus.getState();
+  return pageId !== activePageId || (pending.size === 0 && Date.now() - lastEditAt > 8000);
+}

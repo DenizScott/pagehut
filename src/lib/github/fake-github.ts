@@ -10,7 +10,12 @@ interface Commit {
   tree: string;
   parents: string[];
   message: string;
+  author: string;
+  date: string;
 }
+
+let clock = Date.parse("2026-01-01T00:00:00Z");
+const nextDate = () => new Date((clock += 60_000)).toISOString();
 
 export interface FakeRepo {
   owner: string;
@@ -49,7 +54,7 @@ export class FakeGitHub {
   }
 
   /** Commits directly (simulates another collaborator pushing). null deletes a file. */
-  commit(fullName: string, files: Record<string, string | null>, message: string, branch?: string): string {
+  commit(fullName: string, files: Record<string, string | null>, message: string, branch?: string, author = "teammate"): string {
     const repo = this.repos.get(fullName)!;
     const b = branch ?? repo.defaultBranch;
     const head = repo.refs.get(b);
@@ -66,7 +71,7 @@ export class FakeGitHub {
     const treeSha = newSha();
     repo.trees.set(treeSha, entries);
     const sha = newSha();
-    repo.commits.set(sha, { tree: treeSha, parents: head ? [head] : [], message });
+    repo.commits.set(sha, { tree: treeSha, parents: head ? [head] : [], message, author, date: nextDate() });
     repo.refs.set(b, sha);
     return sha;
   }
@@ -170,7 +175,7 @@ export class FakeGitHub {
     }
     if (rest === "git/commits" && method === "POST") {
       const sha = newSha();
-      repo.commits.set(sha, { tree: body.tree, parents: body.parents, message: body.message });
+      repo.commits.set(sha, { tree: body.tree, parents: body.parents, message: body.message, author: this.user.login, date: nextDate() });
       return json({ sha }, 201);
     }
     if ((r = /^git\/refs\/heads\/(.+)$/.exec(rest)) && method === "PATCH") {
@@ -180,6 +185,33 @@ export class FakeGitHub {
       if (!body.force && !this.isAncestor(repo, current, body.sha)) return fail(422, "Update is not a fast forward");
       repo.refs.set(branch, body.sha);
       return json({ object: { sha: body.sha } });
+    }
+    if (rest === "commits" && method === "GET") {
+      // Commits on the branch (first parent) that changed ?path=, newest first.
+      const path = url.searchParams.get("path") ?? "";
+      let sha = repo.refs.get(url.searchParams.get("sha") ?? repo.defaultBranch);
+      const out = [];
+      while (sha) {
+        const c: Commit = repo.commits.get(sha)!;
+        const parent = c.parents[0] ? repo.commits.get(c.parents[0]) : undefined;
+        const now = repo.trees.get(c.tree)!.get(path);
+        const before = parent ? repo.trees.get(parent.tree)!.get(path) : undefined;
+        if (!path || now !== before) {
+          out.push({
+            sha,
+            commit: { message: c.message, author: { name: c.author, date: c.date } },
+            author: { login: c.author, avatar_url: `https://avatars.example/${c.author}` },
+          });
+        }
+        sha = c.parents[0];
+      }
+      return json(out.slice(0, Number(url.searchParams.get("per_page") ?? 30)));
+    }
+    if ((r = /^contents\/(.+)$/.exec(rest)) && method === "GET") {
+      const ref = url.searchParams.get("ref") ?? repo.refs.get(repo.defaultBranch) ?? "";
+      const c = repo.commits.get(ref) ?? repo.commits.get(repo.refs.get(ref) ?? "");
+      const blob = c ? repo.trees.get(c.tree)!.get(decodeURIComponent(r[1])) : undefined;
+      return blob ? json({ content: bytesToBase64(repo.blobs.get(blob)!), encoding: "base64", sha: blob }) : fail(404, "Not Found");
     }
     if ((r = /^contents\/(.+)$/.exec(rest)) && method === "PUT") {
       const sha = this.commit(`${repo.owner}/${repo.name}`, { [decodeURIComponent(r[1])]: utf8.decode(base64ToBytes(body.content)) }, body.message, body.branch);

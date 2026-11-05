@@ -37,8 +37,8 @@ export class PendingChangesError extends Error {
   }
 }
 
-const WORKSPACE_FILE = "workspace.json";
-const pagePath = (id: string) => `pages/${id}.md`;
+export const WORKSPACE_FILE = "workspace.json";
+export const pagePath = (id: string) => `pages/${id}.md`;
 
 export function pageFileText(page: PageRecord): string {
   return pageFile({ id: page.id, parentId: page.parentId, order: page.order, title: page.title, icon: page.icon, markdown: page.markdown });
@@ -61,11 +61,11 @@ const readme = (name: string) =>
  * Blob shas of what we last synced. Computed from the synced content when not stored (git ids are
  * content hashes), so workspaces connected by older versions keep working.
  */
-async function baseWorkspaceSha(ws: WorkspaceRecord): Promise<string | null> {
+export async function baseWorkspaceSha(ws: WorkspaceRecord): Promise<string | null> {
   if (ws.workspaceFileSha) return ws.workspaceFileSha;
   return ws.workspaceFileBase ? gitBlobSha(utf8.encode(ws.workspaceFileBase)) : null;
 }
-async function basePageSha(page: PageRecord): Promise<string | null> {
+export async function basePageSha(page: PageRecord): Promise<string | null> {
   if (!page.base) return null;
   return page.base.sha || gitBlobSha(utf8.encode(page.base.markdown));
 }
@@ -79,7 +79,7 @@ interface Plan {
   newAssets: AssetRecord[];
 }
 
-async function plan(workspaceId: string): Promise<Plan> {
+async function plan(workspaceId: string, exclude: ReadonlySet<string> = new Set()): Promise<Plan> {
   const db = getDB();
   const ws = await db.workspaces.get(workspaceId);
   if (!ws?.repo) throw new Error("Workspace is not connected to a repository");
@@ -88,8 +88,9 @@ async function plan(workspaceId: string): Promise<Plan> {
   const workspaceJson = workspaceJsonText(ws, live);
   return {
     ws: ws as Plan["ws"],
-    changedPages: live.filter((p) => p.base?.markdown !== pageFileText(p)),
-    deletedPages: all.filter((p) => p.deletedAt && p.base),
+    // Pages in conflict wait for the user's decision; everything else can still be pushed.
+    changedPages: live.filter((p) => !p.conflict && !exclude.has(p.id) && p.base?.markdown !== pageFileText(p)),
+    deletedPages: all.filter((p) => p.deletedAt && p.base && !p.conflict && !exclude.has(p.id)),
     workspaceJson,
     workspaceJsonChanged: workspaceJson !== ws.workspaceFileBase,
     newAssets: (await db.assets.where("workspaceId").equals(workspaceId).toArray()).filter((a) => !a.sha),
@@ -114,8 +115,8 @@ export interface PendingChanges {
 }
 
 /** What a push would send right now (content-based: unchanged files are skipped). */
-export async function pendingChanges(workspaceId: string): Promise<PendingChanges> {
-  const p = await plan(workspaceId);
+export async function pendingChanges(workspaceId: string, exclude?: ReadonlySet<string>): Promise<PendingChanges> {
+  const p = await plan(workspaceId, exclude);
   const repo = p.ws.repo;
   const changes: FileChange[] = [];
   const pageTexts = new Map<string, string>();
@@ -154,11 +155,17 @@ export interface PushResult {
 }
 
 /** Pushes all pending changes as one commit, then records the new sync base locally. */
-export async function pushWorkspace(api: GitHubApi, workspaceId: string, messageOverride?: string): Promise<PushResult> {
+export async function pushWorkspace(
+  api: GitHubApi,
+  workspaceId: string,
+  messageOverride?: string,
+  /** Pages to leave out of this push (e.g. postponed by a pull while being edited). */
+  exclude?: ReadonlySet<string>,
+): Promise<PushResult> {
   const db = getDB();
   const ws = await db.workspaces.get(workspaceId);
   if (!ws?.repo) throw new Error("Workspace is not connected to a repository");
-  const pending = await pendingChanges(workspaceId);
+  const pending = await pendingChanges(workspaceId, exclude);
   if (!pending.changes.length) {
     // Nothing to send. Report "synced" only if no one changed the workspace's own files on GitHub.
     const head = await getHead(api, ws.repo);
@@ -206,10 +213,10 @@ async function workspaceFilesChanged(api: GitHubApi, ws: Plan["ws"], treeSha: st
   if ((remote.get(inRepo(ws.repo, WORKSPACE_FILE)) ?? null) !== (await baseWorkspaceSha(ws))) return true;
   const pages = await db.pages.where("workspaceId").equals(ws.id).toArray();
   for (const p of pages) {
-    if (p.base && remote.get(inRepo(ws.repo, pagePath(p.id))) !== (await basePageSha(p))) return true;
+    if (p.base && !p.conflict && remote.get(inRepo(ws.repo, pagePath(p.id))) !== (await basePageSha(p))) return true;
   }
   const prefix = inRepo(ws.repo, "pages/");
-  const known = new Set(pages.filter((p) => p.base).map((p) => inRepo(ws.repo, pagePath(p.id))));
+  const known = new Set(pages.filter((p) => p.base || p.conflict).map((p) => inRepo(ws.repo, pagePath(p.id))));
   for (const path of remote.keys()) if (path.startsWith(prefix) && !known.has(path)) return true; // page added remotely
   return false;
 }

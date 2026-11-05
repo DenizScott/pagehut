@@ -68,6 +68,8 @@ export interface WorkspaceRecord {
   workspaceFileBase?: string;
   /** github mode: blob sha of workspace.json as last synced. */
   workspaceFileSha?: string;
+  /** github mode: some remote changes were postponed (page being edited); pull again next time. */
+  pullDeferred?: boolean;
   lastSyncedAt?: number;
 }
 
@@ -96,6 +98,11 @@ export interface PageRecord {
   /** true when the page changed since `base` (always true in local mode). */
   dirty: boolean;
   base?: SyncBase;
+  /**
+   * Set when the page changed both here and on GitHub in the same lines. The local text stays
+   * as it is; the remote version waits here until the user chooses (keep mine / keep theirs).
+   */
+  conflict?: { remoteText: string; remoteSha: string; detectedAt: number };
 }
 
 export interface AssetRecord {

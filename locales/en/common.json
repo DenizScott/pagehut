@@ -200,7 +200,8 @@
     "rateLimited": "Paused until {time}",
     "signedOut": "Sign in to sync",
     "error": "Sync failed",
-    "pushHint": "click to push now"
+    "pushHint": "click to sync now",
+    "conflict": "{count, plural, one {# page needs your decision} other {# pages need your decision}}"
   },
   "moveFolder": {
     "menu": "Folder in repository…",
@@ -215,5 +216,25 @@
     "taken": "That folder already contains a workspace.",
     "remoteChanged": "Someone changed the workspace files on GitHub. Sync first (comes with P3), then try again.",
     "invalid": "Please use a simple folder name like GDD or docs/gdd."
+  },
+  "conflict": {
+    "message": "This page was also changed on GitHub, in the same place you edited. Nothing is lost: your text is in the editor, theirs is kept aside.",
+    "compare": "Compare",
+    "keepMine": "Keep mine",
+    "keepTheirs": "Keep theirs",
+    "compareTitle": "Your version and the GitHub version",
+    "compareDescription": "Lines only in your version are orange; lines only in the GitHub version are blue.",
+    "mine": "Yours",
+    "theirs": "On GitHub"
+  },
+  "history": {
+    "title": "Page history",
+    "description": "Every saved version of this page on GitHub. Restoring a version saves it as a new change; nothing is rewritten.",
+    "versions": "Versions",
+    "loading": "Loading…",
+    "empty": "No history yet. It starts with the first sync.",
+    "current": "current",
+    "restore": "Restore this version",
+    "lastEdited": "{author} · {time}"
   }
 }

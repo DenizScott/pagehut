@@ -1,7 +1,7 @@
 "use client";
 
 import { useLiveQuery } from "dexie-react-hooks";
-import { ChevronRight, FileDown, LayoutTemplate, Menu as MenuIcon, MoreHorizontal, Printer, Trash2 } from "lucide-react";
+import { ChevronRight, FileDown, History, LayoutTemplate, Menu as MenuIcon, MoreHorizontal, Printer, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -20,6 +20,9 @@ import { Backlinks } from "./Backlinks";
 import { PillarsStrip } from "./PillarsStrip";
 import { SaveStatus } from "./SaveStatus";
 import { SyncButton } from "./SyncButton";
+import { ConflictBanner } from "./ConflictBanner";
+import { LastEditor, PageHistoryDialog } from "./PageHistory";
+import { useStatus } from "@/lib/stores/status";
 
 type Load = { state: "loading" } | { state: "missing" } | { state: "ready"; page: PageRecord };
 
@@ -78,6 +81,16 @@ function PageEditor({ page }: { page: PageRecord }) {
   const titleSaver = useDebouncedSaver((value: string) => savePageTitle(page.id, value));
   const pages = useLiveQuery(() => listPages(page.workspaceId), [page.workspaceId]);
   const ancestors = pages ? ancestorsOf(pages, page.id) : [];
+  const workspace = useWorkspace((s) => s.workspace);
+  const repo = workspace?.mode === "github" ? workspace.repo : undefined;
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const setActivePage = useStatus((s) => s.setActivePage);
+
+  // Background sync leaves the page being typed in alone (see canTouchPage).
+  useEffect(() => {
+    setActivePage(page.id);
+    return () => setActivePage(null);
+  }, [page.id, setActivePage]);
 
   // A brand-new page starts with the cursor in the title.
   useEffect(() => {
@@ -128,6 +141,7 @@ function PageEditor({ page }: { page: PageRecord }) {
             </li>
           </ol>
         </nav>
+        {repo && page.base && <LastEditor repo={repo} pageId={page.id} headSha={workspace?.headSha} />}
         <SaveStatus />
         <SyncButton />
         <Menu>
@@ -138,6 +152,11 @@ function PageEditor({ page }: { page: PageRecord }) {
             <MenuItem onSelect={() => openDialog("templates", { targetPageId: page.id })}>
               <LayoutTemplate /> {t("templates.applyHere")}
             </MenuItem>
+            {repo && (
+              <MenuItem onSelect={() => setHistoryOpen(true)}>
+                <History /> {t("history.title")}
+              </MenuItem>
+            )}
             <MenuSeparator />
             <MenuItem onSelect={() => void onExportMarkdown()}>
               <FileDown /> {t("transfer.exportMarkdown")}
@@ -153,6 +172,17 @@ function PageEditor({ page }: { page: PageRecord }) {
         </Menu>
       </header>
       <PillarsStrip />
+      <ConflictBanner pageId={page.id} />
+      {repo && (
+        <PageHistoryDialog
+          repo={repo}
+          pageId={page.id}
+          workspaceId={page.workspaceId}
+          headSha={workspace?.headSha}
+          open={historyOpen}
+          onOpenChange={setHistoryOpen}
+        />
+      )}
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         <article className="mx-auto w-full max-w-3xl px-6 pt-10 md:px-16 md:pt-14">

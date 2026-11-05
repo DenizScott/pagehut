@@ -66,7 +66,16 @@ ağırlığı); "sıcak bir turuncu" gibi muğlak tarifler yetmez.
    altta geri bağlantılar.
 3. **Diyaloglar:** Ctrl+K arama, şablon galerisi (14 GDD şablonu, 4 kategori, sağda önizleme),
    GitHub'a kaydet/aç (depo listesi, klasör alanı), paylaş, tasarım ilkeleri düzenleyici.
-4. **Mobil:** kenar çubuğu çekmece olarak açılıyor.
+4. **Eşitleme ve ekip çalışması:**
+   - Üst çubuktaki eşitleme düğmesinin durumları: eşitlendi, gönderiliyor, "3 değişiklik
+     gönderilecek", "1 sayfa kararını bekliyor", çevrimdışı.
+   - Çakışma şeridi: "Bu sayfa GitHub'da da değişti", yanında *Karşılaştır / Benimkini tut /
+     Onunkini tut* düğmeleri.
+   - Karşılaştırma görünümü: satır satır, "senin" ve "GitHub'daki" sürüm.
+   - Sayfa geçmişi diyaloğu: solda sürüm listesi (kim, ne zaman), sağda önizleme ve "Bu sürümü
+     geri yükle" düğmesi.
+   - Üst çubukta "son düzenleyen: avatar + kullanıcı adı + ne zaman".
+5. **Mobil:** kenar çubuğu çekmece olarak açılıyor.
 
 ## İstediğim çıktı (bu sırayla)
 

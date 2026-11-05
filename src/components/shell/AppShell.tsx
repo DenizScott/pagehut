@@ -9,6 +9,7 @@ import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
 import { githubApi, useGitHub } from "@/lib/github/session";
 import { migrateLegacyRootWorkspace } from "@/lib/github/sync";
+import { AutoSync } from "./AutoSync";
 import { GitHubDialog } from "./GitHubDialog";
 import { MoveFolderDialog } from "./MoveFolderDialog";
 import { PillarsDialog } from "./PillarsDialog";
@@ -136,6 +137,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
       </main>
       <Toasts />
+      <AutoSync />
       <Suspense fallback={null}>
         <SearchDialog />
         <TemplatesDialog />

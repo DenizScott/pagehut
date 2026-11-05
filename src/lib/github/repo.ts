@@ -202,3 +202,36 @@ export const repoUrl = (repo: { owner: string; name: string }) => `https://githu
 export const workspaceUrl = (repo: RepoRef) =>
   repo.dir ? `${repoUrl(repo)}/tree/${enc(repo.branch)}/${repo.dir.split("/").map(enc).join("/")}` : repoUrl(repo);
 export const installUrl = (appSlug: string) => `https://github.com/apps/${enc(appSlug)}/installations/new`;
+
+export interface FileCommit {
+  sha: string;
+  message: string;
+  date: string;
+  /** GitHub login when the author is a GitHub user, otherwise the git author name. */
+  author: string;
+  avatarUrl: string | null;
+}
+
+/** Commits that changed one file, newest first. */
+export async function listFileCommits(api: GitHubApi, repo: RepoRef, path: string, perPage = 30): Promise<FileCommit[]> {
+  const { data } = await api.get<
+    { sha: string; commit: { message: string; author: { name: string; date: string } }; author: { login: string; avatar_url: string } | null }[]
+  >(`${repoPath(repo)}/commits?path=${enc(path)}&sha=${enc(repo.branch)}&per_page=${perPage}`);
+  return data.map((c) => ({
+    sha: c.sha,
+    message: c.commit.message.split("\n")[0],
+    date: c.commit.author.date,
+    author: c.author?.login ?? c.commit.author.name,
+    avatarUrl: c.author?.avatar_url ?? null,
+  }));
+}
+
+/** A file's text at a given commit, or null if it didn't exist there. */
+export async function readFileAt(api: GitHubApi, repo: RepoRef, path: string, ref: string): Promise<string | null> {
+  const res = await api.get<{ content?: string; encoding?: string }>(
+    `${repoPath(repo)}/contents/${path.split("/").map(enc).join("/")}?ref=${enc(ref)}`,
+    [404],
+  );
+  if (res.status === 404 || !res.data.content) return null;
+  return utf8.decode(base64ToBytes(res.data.content));
+}

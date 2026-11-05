@@ -200,7 +200,8 @@
     "rateLimited": "Pausiert bis {time}",
     "signedOut": "Zum Synchronisieren anmelden",
     "error": "Synchronisierung fehlgeschlagen",
-    "pushHint": "klicken, um jetzt zu pushen"
+    "pushHint": "klicken, um jetzt zu synchronisieren",
+    "conflict": "{count, plural, one {# Seite wartet auf deine Entscheidung} other {# Seiten warten auf deine Entscheidung}}"
   },
   "moveFolder": {
     "menu": "Ordner im Repository …",
@@ -215,5 +216,25 @@
     "taken": "In diesem Ordner gibt es bereits einen Arbeitsbereich.",
     "remoteChanged": "Jemand hat die Dateien des Arbeitsbereichs auf GitHub geändert. Erst synchronisieren (kommt mit P3), dann erneut versuchen.",
     "invalid": "Bitte einen einfachen Ordnernamen wie GDD oder docs/gdd verwenden."
+  },
+  "conflict": {
+    "message": "Diese Seite wurde auch auf GitHub geändert, an derselben Stelle wie bei dir. Nichts ist verloren: Dein Text ist im Editor, die andere Fassung liegt bereit.",
+    "compare": "Vergleichen",
+    "keepMine": "Meine behalten",
+    "keepTheirs": "Deren behalten",
+    "compareTitle": "Deine Fassung und die Fassung auf GitHub",
+    "compareDescription": "Zeilen nur in deiner Fassung sind orange, Zeilen nur in der GitHub-Fassung blau.",
+    "mine": "Deine",
+    "theirs": "Auf GitHub"
+  },
+  "history": {
+    "title": "Seitenverlauf",
+    "description": "Alle gespeicherten Fassungen dieser Seite auf GitHub. Eine Fassung wiederherzustellen speichert sie als neue Änderung; nichts wird umgeschrieben.",
+    "versions": "Fassungen",
+    "loading": "Wird geladen …",
+    "empty": "Noch kein Verlauf. Er beginnt mit der ersten Synchronisierung.",
+    "current": "aktuell",
+    "restore": "Diese Fassung wiederherstellen",
+    "lastEdited": "{author} · {time}"
   }
 }
