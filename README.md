@@ -11,8 +11,33 @@ students, indie teams, small studios and university classes.
   beats, playtests and balancing ([docs/FEATURES.md](docs/FEATURES.md)).
 - **Localized.** Turkish, English and German at launch, with RTL support ready.
 
-> Status: **P6 (polish and release)**. Every planned feature is in; the first public release is
-> waiting on the items in [docs/LAUNCH-CHECKLIST.md](docs/LAUNCH-CHECKLIST.md).
+## Download
+
+<p>
+  <a href="https://github.com/DenizScott/pagehut/releases/latest/download/PageHut-Setup-win-x64.exe"><img alt="Download for Windows" src="https://img.shields.io/badge/Download-Windows%2010%2F11-466D50?style=for-the-badge&logo=windows&logoColor=white"></a>
+  <a href="https://github.com/DenizScott/pagehut/releases/latest/download/PageHut-mac-arm64.dmg"><img alt="Download for macOS (Apple Silicon)" src="https://img.shields.io/badge/Download-macOS%20Apple%20Silicon-466D50?style=for-the-badge&logo=apple&logoColor=white"></a>
+  <a href="https://github.com/DenizScott/pagehut/releases/latest/download/PageHut-mac-x64.dmg"><img alt="Download for macOS (Intel)" src="https://img.shields.io/badge/Download-macOS%20Intel-466D50?style=for-the-badge&logo=apple&logoColor=white"></a>
+  <a href="https://github.com/DenizScott/pagehut/releases/latest/download/PageHut-linux-x86_64.AppImage"><img alt="Download for Linux (AppImage)" src="https://img.shields.io/badge/Download-Linux%20AppImage-466D50?style=for-the-badge&logo=linux&logoColor=white"></a>
+</p>
+
+Click, install, open: nothing to set up, no commands, no account. The desktop app carries the
+whole of PageHut and runs **on your computer, without an internet connection**; your pages are
+saved there. On Debian or Ubuntu you can also use the
+[.deb package](https://github.com/DenizScott/pagehut/releases/latest/download/PageHut-linux-amd64.deb). Every version is listed under
+[Releases](https://github.com/DenizScott/pagehut/releases).
+
+The installers aren't code-signed yet (a signing certificate costs money every year), so the
+system asks once on first start:
+
+- **Windows:** "Windows protected your PC" → **More info** → **Run anyway**.
+- **macOS:** right-click PageHut in Applications → **Open** → **Open**.
+
+**Türkçe:** Yukarıdaki düğmeden işletim sistemine uygun dosyayı indir, kur ve aç. Komut
+çalıştırmana ya da siteye girmene gerek yok; uygulama tamamen bilgisayarında, internetsiz çalışır.
+Windows ilk açılışta uyarırsa **Ek bilgi → Yine de çalıştır**'ı seç.
+
+To work with your team in a GitHub repository, use the web version at
+<https://pagehut.vercel.app>; you can move pages between the two with Export as ZIP and Import.
 
 ## What works today
 
@@ -27,29 +52,21 @@ students, indie teams, small studios and university classes.
 - Import Markdown files, ZIPs (folders become parent pages), JSON backups or a **Markdown & CSV folder export** from another workspace app: the page tree, links between pages, images and callouts come along, and CSV tables become databases.
 - **GitHub:** sign in, save a workspace to a repository (one readable Markdown file per page), push changes as one commit, open a workspace from a repository on another device, and share by adding collaborators. Automatic two-way sync with three-way merge; overlapping edits show a compare / keep mine / keep theirs choice, and every page has a restorable history. Nothing is ever force-pushed. A workspace can live in a `GDD/` folder inside a Unity or Unreal repository.
 
-## Desktop app
+## Desktop app (for developers)
 
-Download the installer for your system from the
-[latest release](https://github.com/DenizScott/pagehut/releases/latest):
+The source is in [desktop/](desktop/). It bundles the Next.js standalone server and starts it on
+`127.0.0.1:47821` when the app opens. To build an installer for the system you're on:
 
-| System | File |
-|---|---|
-| Windows 10/11 (64-bit) | `PageHut-Setup-<version>-win-x64.exe` |
-| macOS (Apple Silicon or Intel) | `PageHut-<version>-mac-arm64.dmg` / `-mac-x64.dmg` |
-| Linux | `PageHut-<version>-linux-x86_64.AppImage` or `.deb` |
+```bash
+PAGEHUT_STANDALONE=1 pnpm build
+```
 
-The desktop app opens <https://pagehut.vercel.app> in its own window, so GitHub sign-in and team
-sync work exactly as on the web, and every update of the site reaches the app at once. It needs an
-internet connection to open. Your pages are kept in the app's own storage, separate from your
-browser's.
+```bash
+cd desktop && npm install && npm run prepare-server && npm run dist
+```
 
-The installers are not code-signed yet, so the system warns on first start:
-
-- **Windows:** "Windows protected your PC" → **More info** → **Run anyway**.
-- **macOS:** right-click the app → **Open** → **Open**.
-
-The source is in [desktop/](desktop/); `npm install` then `npm run dist` in that folder builds an
-installer for the system you're on.
+Publishing a GitHub release builds the Windows, macOS and Linux installers and attaches them to
+it (`.github/workflows/desktop.yml`).
 
 ## GitHub sign-in (optional)
 

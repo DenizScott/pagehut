@@ -61,9 +61,9 @@ function redirectWithError(req: NextRequest, returnTo: string, code: string) {
   return NextResponse.redirect(url);
 }
 
-export async function handleStatus(config: GitHubAppConfig | null) {
+export async function handleStatus(config: GitHubAppConfig | null, desktop = false) {
   return NextResponse.json(
-    config ? { configured: true, appSlug: config.appSlug } : { configured: false },
+    config ? { configured: true, appSlug: config.appSlug } : { configured: false, ...(desktop ? { desktop: true } : {}) },
     { headers: noStore },
   );
 }

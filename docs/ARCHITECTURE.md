@@ -253,6 +253,16 @@ desktop and mobile; performance 97–98 on desktop.
   client-side navigation over a slow 4G profile. Rendering the first-run welcome page on the
   server would be the next step if this matters.
 
+## Desktop app
+
+`desktop/` wraps the app in Electron. The installer carries the Next.js standalone server
+(`desktop/scripts/prepare-server.mjs` copies it in, flattens pnpm's `node_modules` and removes any
+`.env` file). On start, the app runs that server on `127.0.0.1:47821` and opens it in a sandboxed
+window, so everything works offline. The port is fixed because IndexedDB is per origin: a
+different port would look like an empty workspace. The server reports `desktop: true` from
+`/api/auth/status`, and the GitHub dialog then explains that team sync is done in the web
+version. Installers for all three systems are built by `.github/workflows/desktop.yml`.
+
 ## Deployment
 
 See [DEPLOY.md](DEPLOY.md): Vercel, Docker (`Dockerfile`, Next.js standalone output enabled with

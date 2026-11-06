@@ -1,14 +1,15 @@
 name: Desktop installers
 
-# Builds the desktop app (desktop/) for Windows, macOS and Linux and attaches the installers to
-# the GitHub release that triggered it. Run it by publishing a release, or by hand for a tag.
+# Builds the desktop app for Windows, macOS and Linux and attaches the installers to the GitHub
+# release that triggered it. Each installer carries the whole web app (Next.js standalone server),
+# so it runs offline. Run it by publishing a release, or by hand for an existing tag.
 on:
   release:
     types: [published]
   workflow_dispatch:
     inputs:
       tag:
-        description: Release tag to attach the installers to (e.g. v0.1.0)
+        description: Release tag to attach the installers to (e.g. v0.2.0)
         required: true
       ref:
         description: Branch or commit to build (defaults to the tag)
@@ -24,21 +25,31 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: desktop
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.release.tag_name || inputs.ref || inputs.tag }}
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: desktop/package-lock.json
+          cache: pnpm
+
+      # 1. The web app as a standalone server (no environment files exist here, so no secrets).
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+        env:
+          PAGEHUT_STANDALONE: "1"
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      # 2. The desktop shell with that server inside.
       - run: npm ci
+        working-directory: desktop
+      - run: node scripts/prepare-server.mjs
+        working-directory: desktop
       - name: Build installers (unsigned)
+        working-directory: desktop
         shell: bash
         run: |
           case "${{ runner.os }}" in
@@ -46,7 +57,9 @@ jobs:
             macOS)   npx electron-builder --mac --publish never ;;
             Linux)   npx electron-builder --linux --publish never ;;
           esac
+
       - name: Attach to the release
+        working-directory: desktop
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}

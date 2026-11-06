@@ -1,8 +1,8 @@
 {
   "name": "pagehut-desktop",
   "productName": "PageHut",
-  "version": "0.1.0",
-  "description": "PageHut desktop app: the game design workspace in its own window.",
+  "version": "0.2.0",
+  "description": "PageHut desktop app: the game design workspace, running entirely on your computer.",
   "author": "DenizScott and PageHut contributors",
   "homepage": "https://pagehut.vercel.app",
   "desktopName": "pagehut.desktop",
@@ -14,7 +14,8 @@
     "dist": "electron-builder",
     "dist:win": "electron-builder --win",
     "dist:mac": "electron-builder --mac",
-    "dist:linux": "electron-builder --linux"
+    "dist:linux": "electron-builder --linux",
+    "prepare-server": "node scripts/prepare-server.mjs"
   },
   "devDependencies": {
     "electron": "44.9.3",
@@ -31,9 +32,12 @@
     "files": [
       "main.js",
       "offline.html",
-      "build/icon.png"
+      "build/icon.png",
+      "server/**/*",
+      "server/**/.next/**/*",
+      "server/**/node_modules/**/*"
     ],
-    "artifactName": "PageHut-Setup-${version}-${os}-${arch}.${ext}",
+    "artifactName": "PageHut-Setup-${os}-${arch}.${ext}",
     "publish": null,
     "win": {
       "target": [
@@ -70,7 +74,7 @@
       "identity": "-"
     },
     "dmg": {
-      "artifactName": "PageHut-${version}-mac-${arch}.${ext}"
+      "artifactName": "PageHut-mac-${arch}.${ext}"
     },
     "linux": {
       "target": [
@@ -83,10 +87,13 @@
       "syncDesktopName": true
     },
     "appImage": {
-      "artifactName": "PageHut-${version}-linux-${arch}.${ext}"
+      "artifactName": "PageHut-linux-${arch}.${ext}"
     },
     "deb": {
-      "artifactName": "PageHut-${version}-linux-${arch}.${ext}"
-    }
+      "artifactName": "PageHut-linux-${arch}.${ext}"
+    },
+    "asarUnpack": [
+      "server/**"
+    ]
   }
 }

@@ -68,6 +68,7 @@ describe("config", () => {
   it("status exposes only whether sign-in is configured and the public app slug", async () => {
     expect(await (await handleStatus(config)).json()).toEqual({ configured: true, appSlug: "pagehut-test" });
     expect(await (await handleStatus(null)).json()).toEqual({ configured: false });
+    expect(await (await handleStatus(null, true)).json()).toEqual({ configured: false, desktop: true });
   });
 });
 

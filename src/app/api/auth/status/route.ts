@@ -5,5 +5,6 @@ import { readConfig } from "@/lib/server/config";
 /** Whether GitHub sign-in is configured on this server (read at request time, never prerendered). */
 export async function GET() {
   await connection();
-  return handleStatus(readConfig());
+  // The desktop app runs this server on the user's own computer, without GitHub keys.
+  return handleStatus(readConfig(), process.env.PAGEHUT_DESKTOP === "1");
 }

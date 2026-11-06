@@ -54,3 +54,4 @@ next-env.d.ts
 # desktop app build output
 /desktop/node_modules/
 /desktop/dist/
+/desktop/server/

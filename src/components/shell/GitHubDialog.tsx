@@ -45,6 +45,16 @@ function Body({ mode }: { mode: "connect" | "open" }) {
   const pathname = usePathname();
 
   if (github.status === "unknown") return <p className="p-4 text-sm text-fg-muted">{t("checking")}</p>;
+  if (github.status === "unconfigured" && github.desktop)
+    return (
+      <div className="space-y-3 p-4 text-sm">
+        <p>{t("desktopLocal")}</p>
+        <p className="text-fg-muted">{t("desktopLocalHint")}</p>
+        <a href="https://pagehut.vercel.app" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-md bg-accent px-3 py-1.5 font-medium text-accent-fg">
+          <GitHubMark /> {t("desktopOpenWeb")}
+        </a>
+      </div>
+    );
   if (github.status === "unconfigured")
     return (
       <div className="space-y-3 p-4 text-sm">

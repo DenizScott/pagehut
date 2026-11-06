@@ -49,6 +49,8 @@ export type GitHubStatus = "unknown" | "unconfigured" | "signedOut" | "signedIn"
 interface GitHubStore {
   status: GitHubStatus;
   appSlug: string | null;
+  /** Running in the desktop app, which keeps everything on this computer (no GitHub keys). */
+  desktop: boolean;
   user: GitHubUser | null;
   init: () => Promise<void>;
   signIn: (returnTo: string) => void;
@@ -58,13 +60,14 @@ interface GitHubStore {
 export const useGitHub = create<GitHubStore>((set, get) => ({
   status: "unknown",
   appSlug: null,
+  desktop: false,
   user: null,
   init: async () => {
     if (get().status !== "unknown") return;
     try {
       const res = await fetch("/api/auth/status", { cache: "no-store" });
-      const status = (await res.json()) as { configured: boolean; appSlug?: string };
-      if (!status.configured) return set({ status: "unconfigured" });
+      const status = (await res.json()) as { configured: boolean; appSlug?: string; desktop?: boolean };
+      if (!status.configured) return set({ status: "unconfigured", desktop: status.desktop === true });
       set({ appSlug: status.appSlug ?? null });
       if (!(await getAccessToken())) return set({ status: "signedOut" });
       set({ status: "signedIn", user: await getUser(githubApi()) });
