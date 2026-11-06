@@ -151,10 +151,14 @@ function PageEditor({ page }: { page: PageRecord }) {
     return () => setActivePage(null);
   }, [page.id, setActivePage]);
 
-  // A brand-new page starts with the cursor in the title.
+  // A brand-new page starts with the cursor in the title, once, when it opens. (Running again on
+  // later data changes could pull the cursor back out of the editor while someone types.)
+  const autofocused = useRef<string | null>(null);
   useEffect(() => {
+    if (autofocused.current === page.id) return;
+    autofocused.current = page.id;
     if (!page.title && (isDatabase || !page.markdown.trim())) titleRef.current?.focus();
-  }, [page.title, page.markdown, isDatabase]);
+  }, [page.id, page.title, page.markdown, isDatabase]);
 
   // Auto-grow the title textarea. Measured again whenever its width changes: a page that first
   // renders while hidden or still laying out (width near 0) would otherwise keep a huge height.

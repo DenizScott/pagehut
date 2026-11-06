@@ -210,12 +210,21 @@ export function Editor({ page, onReady, onEmptyChange, comments }: EditorProps) 
 
   useEffect(() => {
     editorRef.current = editor;
-    // view.focus() is synchronous; commands.focus() alone waits for an animation frame.
-    if (editor)
-      onReady?.(() => {
+    // view.focus() is synchronous (commands.focus() waits for an animation frame), so keys typed
+    // right after Enter in the title land here. Right after creation the view may not be in the
+    // page yet; then try again on the next frames.
+    if (editor) {
+      const focus = (tries = 120) => {
+        if (editor.isDestroyed) return;
+        if (!editor.view.dom.isConnected) {
+          if (tries > 0) requestAnimationFrame(() => focus(tries - 1));
+          return;
+        }
         editor.commands.setTextSelection(1);
         editor.view.focus();
-      });
+      };
+      onReady?.(() => focus());
+    }
   }, [editor, onReady]);
 
   return (
