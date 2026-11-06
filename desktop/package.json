@@ -1,0 +1,89 @@
+{
+  "name": "pagehut-desktop",
+  "productName": "PageHut",
+  "version": "0.1.0",
+  "description": "PageHut desktop app: the game design workspace in its own window.",
+  "author": "DenizScott and PageHut contributors",
+  "license": "MIT",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "44.9.3",
+    "electron-builder": "26.17.0"
+  },
+  "build": {
+    "appId": "app.pagehut.desktop",
+    "productName": "PageHut",
+    "copyright": "Copyright \u00a9 2026 DenizScott and PageHut contributors",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "offline.html",
+      "build/icon.png"
+    ],
+    "artifactName": "PageHut-Setup-${version}-${os}-${arch}.${ext}",
+    "publish": null,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PageHut",
+      "license": "../LICENSE"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.png",
+      "identity": "-"
+    },
+    "dmg": {
+      "artifactName": "PageHut-${version}-mac-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Office",
+      "icon": "build/icon.png",
+      "maintainer": "PageHut contributors"
+    },
+    "appImage": {
+      "artifactName": "PageHut-${version}-linux-${arch}.${ext}"
+    },
+    "deb": {
+      "artifactName": "PageHut-${version}-linux-${arch}.${ext}"
+    }
+  }
+}

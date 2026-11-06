@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'" />
+    <title>PageHut</title>
+    <style>
+      :root { --bg: #f6f4ee; --fg: #252b27; --muted: #505d54; --accent: #466d50; --accent-fg: #fff; }
+      @media (prefers-color-scheme: dark) { :root { --bg: #151b18; --fg: #f2f3ec; --muted: #c8d2c7; --accent: #b9d9b7; --accent-fg: #18291d; } }
+      html, body { height: 100%; margin: 0; }
+      body { display: grid; place-items: center; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
+      main { max-width: 26rem; padding: 2rem; text-align: center; }
+      h1 { font-size: 1.4rem; margin: 0 0 0.5rem; }
+      p { color: var(--muted); margin: 0 0 1.5rem; }
+      button { font: inherit; padding: 0.6rem 1.2rem; border: 0; border-radius: 0.5rem; background: var(--accent); color: var(--accent-fg); cursor: pointer; }
+      button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="title"></h1>
+      <p id="body"></p>
+      <button id="retry" type="button"></button>
+    </main>
+    <script>
+      const text = {
+        tr: ["İnternet bağlantısı yok", "PageHut'u açmak için internete bağlanman gerekiyor. Bağlantı gelince sayfa kendiliğinden açılır.", "Tekrar dene"],
+        de: ["Keine Internetverbindung", "PageHut braucht zum Öffnen eine Internetverbindung. Sobald sie da ist, öffnet sich die Seite von selbst.", "Erneut versuchen"],
+        en: ["No internet connection", "PageHut needs a connection to open. The page opens by itself as soon as you're back online.", "Try again"],
+      };
+      const lang = (navigator.language || "en").slice(0, 2);
+      const [title, body, retry] = text[lang] || text.en;
+      document.documentElement.lang = text[lang] ? lang : "en";
+      document.getElementById("title").textContent = title;
+      document.getElementById("body").textContent = body;
+      const button = document.getElementById("retry");
+      button.textContent = retry;
+      // Only ever go back to an https PageHut address passed by the app.
+      let target = "https://pagehut.vercel.app/";
+      try {
+        const u = new URL(new URLSearchParams(location.search).get("url"));
+        if (u.protocol === "https:" || u.protocol === "http:") target = u.toString();
+      } catch {}
+      const go = () => location.replace(target);
+      button.addEventListener("click", go);
+      window.addEventListener("online", go);
+      button.focus();
+    </script>
+  </body>
+</html>

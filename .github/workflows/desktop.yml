@@ -1,0 +1,54 @@
+name: Desktop installers
+
+# Builds the desktop app (desktop/) for Windows, macOS and Linux and attaches the installers to
+# the GitHub release that triggered it. Run it by publishing a release, or by hand for a tag.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to attach the installers to (e.g. v0.1.0)
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - run: npm ci
+      - name: Build installers (unsigned)
+        shell: bash
+        run: |
+          case "${{ runner.os }}" in
+            Windows) npx electron-builder --win --publish never ;;
+            macOS)   npx electron-builder --mac --publish never ;;
+            Linux)   npx electron-builder --linux --publish never ;;
+          esac
+      - name: Attach to the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          shopt -s nullglob
+          files=(dist/*.exe dist/*.dmg dist/*.AppImage dist/*.deb)
+          gh release upload "$TAG" "${files[@]}" --clobber --repo "${{ github.repository }}"
