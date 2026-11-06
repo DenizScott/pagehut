@@ -32,9 +32,11 @@ account and decision. Tick items off here as they are done.
       with the production callback URL.
 - [ ] Choose the license (MIT proposed) and add `LICENSE`.
 - [ ] Privacy note: documents are stored only in the browser or in the user's GitHub repo.
-- [ ] First deployed preview: import the repo on Vercel (Hobby) with your own account, following
-      `docs/DEPLOY.md`. Then run Lighthouse on the preview URL and check that accessibility is
-      at least 95.
+- [x] First deployment on Vercel (Hobby, no payment method): <https://pagehut.vercel.app>, project
+      `pagehut`, connected to the GitHub repo so every push to `main` deploys. Lighthouse on the
+      live site (2026-11-06): accessibility 100, best practices 100, SEO 100; performance 85–86
+      on mobile, 89–99 on desktop. GitHub sign-in is off there until a production GitHub App is
+      created and its four variables are added in Vercel.
 - [ ] Optional: build the Docker image once (`docker build -t pagehut .`). Docker was not
       available on the development machine, so the image itself is untested; the standalone
       server it runs was tested.
