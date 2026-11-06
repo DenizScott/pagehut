@@ -156,12 +156,24 @@ function PageEditor({ page }: { page: PageRecord }) {
     if (!page.title && (isDatabase || !page.markdown.trim())) titleRef.current?.focus();
   }, [page.title, page.markdown, isDatabase]);
 
-  // Auto-grow the title textarea.
+  // Auto-grow the title textarea. Measured again whenever its width changes: a page that first
+  // renders while hidden or still laying out (width near 0) would otherwise keep a huge height.
   useEffect(() => {
     const el = titleRef.current;
     if (!el) return;
-    el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
+    const fit = () => {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    };
+    fit();
+    let width = el.clientWidth;
+    const observer = new ResizeObserver(() => {
+      if (el.clientWidth === width) return; // our own height change; nothing to do
+      width = el.clientWidth;
+      fit();
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [title]);
 
   async function onDelete() {

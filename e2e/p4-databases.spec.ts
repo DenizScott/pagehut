@@ -257,6 +257,10 @@ test("timeline and calendar place rows by their dates", async ({ page }) => {
   await gallery.getByRole("button", { name: /Production schedule/ }).click();
   await gallery.getByRole("button", { name: "Use template" }).click();
 
+  // The one-line title stays one line high (it used to be measured before layout and stay huge).
+  await expect(page.getByRole("textbox", { name: "Page title" })).toHaveValue("Production schedule");
+  expect((await page.getByRole("textbox", { name: "Page title" }).boundingBox())!.height).toBeLessThan(120);
+
   // Timeline: one bar per milestone; each bar's name carries its dates.
   const timeline = db(page).getByRole("list", { name: "Timeline: Timeline" });
   await expect(timeline.getByRole("listitem")).toHaveCount(4);
