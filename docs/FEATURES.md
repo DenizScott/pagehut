@@ -17,6 +17,8 @@ plans (team, business and enterprise tiers).
   formula.
 - Views: **table, board, gallery, calendar, timeline, chart and form**, each with its own filters,
   sorts and shown properties.
+- Automations: rules such as "when Status becomes Done, set Finished to today" or "when a row is
+  added, set Owner to me". They run once, right after an edit; they never trigger each other.
 - Seven game templates: mechanics, scope tracker, production schedule, story beats, playtest log,
   balance table, mood board.
 
@@ -47,7 +49,7 @@ plans (team, business and enterprise tiers).
 | Admin controls, data residency | You own the repository and the deployment, so they are yours by design. |
 | Built-in AI writing assistant | **No, on purpose.** Every AI service costs money per use; PageHut stays free to run. |
 | Page view analytics | **No, on purpose.** It would mean tracking readers on a server; PageHut has none. |
-| Database automations | Not yet. Planned: simple rules such as "when Status becomes Done, set Date". |
+| Database automations | Yes: "when a row is added / a property changes / becomes a value, set a property" (to a value, today, me or empty). |
 | Calendar and timeline views | Yes: a month calendar and a timeline (start and end dates), plus a production schedule template. |
 
 ## Accessibility and languages

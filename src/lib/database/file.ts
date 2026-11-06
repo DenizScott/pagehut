@@ -1,5 +1,5 @@
 import { cellText, sortRows } from "./query";
-import { propertySchema, rowSchema, viewSchema, type DatabaseData } from "./types";
+import { automationSchema, propertySchema, rowSchema, viewSchema, type DatabaseData } from "./types";
 
 /**
  * Database file body (inside pages/<id>.md, after front matter with `type: "database"`):
@@ -43,6 +43,7 @@ export function serializeDatabase(data: DatabaseData): string {
     JSON.stringify(HEADER),
     ...data.properties.map((p) => JSON.stringify({ property: p })),
     ...data.views.map((v) => JSON.stringify({ view: v })),
+    ...(data.automations ?? []).map((a) => JSON.stringify({ automation: a })),
     ...[...data.rows].sort(byId).map((r) => JSON.stringify({ row: r })),
   ];
   const table = readableTable(data);
@@ -66,6 +67,7 @@ export function parseDatabase(body: string): { data: DatabaseData; skipped: numb
       if ("property" in item) data.properties.push(propertySchema.parse(item.property));
       else if ("view" in item) data.views.push(viewSchema.parse(item.view));
       else if ("row" in item) data.rows.push(rowSchema.parse(item.row));
+      else if ("automation" in item) (data.automations ??= []).push(automationSchema.parse(item.automation));
       else skipped++;
     } catch {
       skipped++;

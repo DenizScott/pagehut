@@ -102,10 +102,42 @@ export const rowSchema = z.object({
 });
 export type Row = z.infer<typeof rowSchema>;
 
+const cellValueSchema = z.union([z.string(), z.number(), z.boolean(), z.array(z.string())]);
+
+/**
+ * A rule that edits a row when something happens to it, e.g. "when Status becomes Done, set
+ * Finished to today". Rules run once per edit and never trigger each other.
+ */
+export const automationSchema = z.object({
+  id: z.string().min(1),
+  enabled: z.boolean().default(true),
+  trigger: z.discriminatedUnion("kind", [
+    z.object({ kind: z.literal("rowAdded") }),
+    z.object({ kind: z.literal("changed"), propertyId: z.string() }),
+    /** select: option id; multi-select: contains option id; checkbox: true/false */
+    z.object({ kind: z.literal("becomes"), propertyId: z.string(), value: z.union([z.string(), z.boolean()]) }),
+  ]),
+  actions: z
+    .array(
+      z.object({
+        propertyId: z.string(),
+        /** value: `value`; today: today's date; me: the signed-in GitHub user; clear: empty */
+        set: z.enum(["value", "today", "me", "clear"]),
+        value: cellValueSchema.optional(),
+      }),
+    )
+    .min(1),
+});
+export type Automation = z.infer<typeof automationSchema>;
+export type AutomationTrigger = Automation["trigger"];
+export type AutomationAction = Automation["actions"][number];
+
 export interface DatabaseData {
   properties: Property[];
   views: View[];
   rows: Row[];
+  /** Optional, so databases without automations keep the same shape and file. */
+  automations?: Automation[];
 }
 
 export const TITLE_PROPERTY_ID = "title";

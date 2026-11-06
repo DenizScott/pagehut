@@ -75,6 +75,10 @@ for (const theme of ["light", "dark"] as const) {
     await scan(page, "database timeline");
     await page.getByRole("region", { name: "Database" }).getByRole("tab", { name: "Calendar" }).click();
     await scan(page, "database calendar");
+    await page.getByRole("region", { name: "Database" }).getByRole("button", { name: "Automations" }).click();
+    await expect(page.getByRole("dialog", { name: "Automations" })).toBeVisible();
+    await scan(page, "automations dialog");
+    await page.keyboard.press("Escape");
   });
 }
 

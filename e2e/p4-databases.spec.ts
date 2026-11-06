@@ -281,3 +281,40 @@ test("timeline and calendar place rows by their dates", async ({ page }) => {
   await page.keyboard.press("Escape");
   await expect(db(page).getByRole("cell", { name: label })).toContainText("Art lock");
 });
+
+test("an automation fills in a date when the status changes", async ({ page }) => {
+  await page.goto("/en");
+  await page.waitForURL(/\/p\//);
+  await page.getByRole("button", { name: "Templates" }).click();
+  const gallery = page.getByRole("dialog", { name: "GDD templates" });
+  await gallery.getByRole("button", { name: /Production schedule/ }).click();
+  await gallery.getByRole("button", { name: "Use template" }).click();
+  await db(page).getByRole("tab", { name: "Table" }).click();
+
+  // When Status becomes Done, set End to today.
+  await db(page).getByRole("button", { name: "Automations" }).click();
+  const dialog = page.getByRole("dialog", { name: "Automations" });
+  await dialog.getByRole("combobox", { name: "Value that triggers it" }).selectOption({ label: "Done" });
+  await dialog.getByRole("combobox", { name: "Property to set" }).selectOption({ label: "End" });
+  await expect(dialog.getByRole("combobox", { name: "Value to set" })).toHaveValue("today");
+  await dialog.getByRole("button", { name: "Add automation" }).click();
+  await expect(dialog.getByRole("list", { name: "Automations of this database" })).toContainText("When Status becomes Done, set End to today");
+  await page.keyboard.press("Escape");
+  await expect(db(page).getByRole("button", { name: "1 automation" })).toBeVisible();
+
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  await expect(db(page).getByRole("button", { name: "End, Alpha" })).not.toHaveText(today);
+  await db(page).getByRole("button", { name: "Status, Alpha" }).click();
+  await page.getByRole("textbox", { name: "Search or create an option" }).fill("Done");
+  await page.getByRole("textbox", { name: "Search or create an option" }).press("Enter");
+  await page.keyboard.press("Escape");
+  await expect(db(page).getByRole("button", { name: "Status, Alpha" })).toHaveText("Done");
+  await expect(db(page).getByRole("button", { name: "End, Alpha" })).toHaveText(today);
+
+  // Paused rules don't run.
+  await db(page).getByRole("button", { name: "1 automation" }).click();
+  await page.getByRole("dialog", { name: "Automations" }).getByRole("checkbox").uncheck();
+  await page.keyboard.press("Escape");
+  await expect(db(page).getByRole("button", { name: "Automations" })).toBeVisible();
+});

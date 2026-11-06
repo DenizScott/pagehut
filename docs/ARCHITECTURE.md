@@ -80,7 +80,8 @@ assets/<id>-<name>    images and files (warn above 1 MB, refuse above 25 MB)
 ## Databases
 
 A database is a page with `kind: "database"`. It has typed properties, views (table, board,
-gallery, each with its own filters, sorts and hidden properties) and rows. Its file is
+gallery, calendar, timeline, chart and form, each with its own filters, sorts and hidden
+properties), rows and optional automations. Its file is
 `pages/<id>.md` like any page, with `type: "database"` in the front matter, so push, pull,
 conflicts and history work unchanged. The body has two parts:
 
@@ -103,6 +104,15 @@ conflicts and history work unchanged. The body has two parts:
 formulas that use it.
 
 Relations store row ids of another database page.
+
+### Automations
+
+`src/lib/database/automations.ts`. A rule is one trigger (row added, a property changes, a
+property becomes a value) and actions (set a value, today, the signed-in user, or clear). Rules
+run in `DatabaseView` right after a local edit (`setCell`, `addRow`), once, in the editor's
+browser; their changes are part of that edit, so they sync and merge like any other. Pulls never
+run them, and actions never trigger other rules, so there are no loops. Rules are stored in the
+database file as `{"automation": …}` lines and merge by id.
 
 ## Comments
 

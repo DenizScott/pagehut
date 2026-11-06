@@ -26,6 +26,9 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { useDebouncedSaver } from "@/lib/hooks/useDebouncedSaver";
 import * as ops from "@/lib/database/ops";
+import { runAutomations } from "@/lib/database/automations";
+import { todayIso } from "@/lib/database/dates";
+import { useGitHub } from "@/lib/github/session";
 import { cellText, chartGroupable, groupRows, isEmptyCell, rowTitle, titleProperty, viewRows, visibleProperties, type QueryContext } from "@/lib/database/query";
 import { filterOps, type CellValue, type DatabaseData, type Filter, type FilterOp, type PropertyType, type Row, type View, type ViewType } from "@/lib/database/types";
 import type { PageRecord } from "@/lib/model/schemas";
@@ -33,6 +36,7 @@ import { getAsset, listPages, saveDatabase } from "@/lib/storage/local-repo";
 import { useStatus } from "@/lib/stores/status";
 import { cn } from "@/lib/utils";
 import { Cell, OptionChip, type RelationSource } from "./Cell";
+import { AutomationsButton } from "./Automations";
 import { CalendarView, TimelineView } from "./DateViews";
 import { ChartView, FormView } from "./ExtraViews";
 import { PropertyMenu, typeIcon } from "./PropertyMenu";
@@ -68,6 +72,9 @@ export function DatabaseView({ page }: { page: PageRecord }) {
   const [viewId, setViewId] = useState(() => data.views[0]?.id ?? "");
   const [openRowId, setOpenRowId] = useState<string | null>(null);
   const saver = useDebouncedSaver((next: DatabaseData) => saveDatabase(page.id, next));
+  const me = useGitHub((s) => s.user?.login);
+  /** Runs the database's automations for one edited (or new, `before` undefined) row. */
+  const automate = (next: DatabaseData, rowId: string, before: Row | undefined) => runAutomations(next, rowId, before, { today: todayIso(), me }).data;
 
   // Latest data, so several edits from one event (create an option, then select it) all apply.
   const latest = useRef(data);
@@ -108,7 +115,10 @@ export function DatabaseView({ page }: { page: PageRecord }) {
     ctx,
     relations,
     set,
-    setCell: (rowId, propId, value) => set(ops.updateCell(latest.current, rowId, propId, value)),
+    setCell: (rowId, propId, value) => {
+      const before = latest.current.rows.find((r) => r.id === rowId);
+      set(automate(ops.updateCell(latest.current, rowId, propId, value), rowId, before));
+    },
     addOption: (propId, name) => {
       const r = ops.addOption(latest.current, propId, name);
       set(r.data);
@@ -123,7 +133,7 @@ export function DatabaseView({ page }: { page: PageRecord }) {
         if (f.op === "checked" && prop?.type === "checkbox") preset[prop.id] ??= true;
       }
       const r = ops.addRow(latest.current, preset);
-      set(r.data);
+      set(automate(r.data, r.row.id, undefined));
       if (view.type === "board" || view.type === "gallery" || view.type === "calendar" || view.type === "timeline") setOpenRowId(r.row.id);
     },
     openRow: setOpenRowId,
@@ -225,6 +235,7 @@ function Toolbar({ api, onSelectView }: { api: Api; onSelectView: (id: string) =
 
       <FilterPopover api={api} />
       <SortPopover api={api} />
+      <AutomationsButton api={api} />
       <ViewSettings api={api} onRename={startRename} onDeleted={() => onSelectView(data.views.find((v) => v.id !== view.id)?.id ?? "")} />
       <Button variant="primary" size="sm" onClick={() => api.addRow()}>
         <Plus /> {t("rows.new")}
