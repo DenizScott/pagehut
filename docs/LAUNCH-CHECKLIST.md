@@ -16,7 +16,10 @@ account and decision. Tick items off here as they are done.
 
 ## Legal
 
-- [ ] **Trademark search** for "PageHut" in the software classes (Nice class 9 and 42):
+- [ ] **Trademark search** for "PageHut" in the software classes (Nice class 9 and 42). A first
+      web search (2026-11-06) found no registered mark or app named exactly "PageHut"; similar
+      names exist (PageHound, PageCloud, PageProof). This is not a legal clearance: before a
+      commercial launch, search the official registers:
   - Türk Patent ve Marka Kurumu: <https://www.turkpatent.gov.tr> (marka araştırma)
   - EUIPO: <https://euipo.europa.eu/eSearch/>
   - Optionally WIPO Global Brand Database: <https://branddb.wipo.int>
