@@ -2,7 +2,9 @@
   "label": "Database",
   "new": "New database",
   "untitled": "Untitled",
-  "defaults": { "name": "Name" },
+  "defaults": {
+    "name": "Name"
+  },
   "types": {
     "title": "Title",
     "text": "Text",
@@ -61,7 +63,9 @@
     "cover": "Card image",
     "needUrl": "Add a Link property first",
     "boardNeedsGroup": "Choose a Select property to group by under Properties. The board shows one column per option.",
-    "noValue": "No {name}"
+    "noValue": "No {name}",
+    "chart": "Chart",
+    "form": "Form"
   },
   "filter": {
     "label": "Filter",
@@ -103,5 +107,28 @@
     "actions": "Actions for {name}",
     "duplicate": "Duplicate",
     "delete": "Delete row"
+  },
+  "chart": {
+    "groupBy": "Bars",
+    "value": "Value",
+    "agg": "As",
+    "count": "Number of rows",
+    "sum": "Sum",
+    "avg": "Average",
+    "all": "All rows",
+    "none": "No value",
+    "checked": "Checked",
+    "unchecked": "Not checked",
+    "needGroup": "Choose a Select, Multi-select or Checkbox property for the bars under Properties.",
+    "captionCount": "Number of rows by {group}",
+    "captionSum": "Sum of {value} by {group}",
+    "captionAvg": "Average {value} by {group}",
+    "rows": "{count, plural, one {# row} other {# rows}}"
+  },
+  "form": {
+    "label": "Form: {name}",
+    "hint": "Fill in the fields and send. Each send adds a row to this database.",
+    "submit": "Send",
+    "sent": "{count, plural, one {Sent. # entry added.} other {Sent. # entries added.}}"
   }
 }

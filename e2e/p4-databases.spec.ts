@@ -198,3 +198,53 @@ test("a game template creates a working database that syncs with teammates", asy
   expect(pushed).toContain("Session 3 (me)");
   await ctx.close();
 });
+
+test("chart and form views; the whole workspace prints as one document", async ({ page }) => {
+  await page.goto("/en");
+  await page.waitForURL(/\/p\//);
+  await page.getByRole("button", { name: "Templates" }).click();
+  const gallery = page.getByRole("dialog", { name: "GDD templates" });
+  await gallery.getByRole("button", { name: /Scope tracker/ }).click();
+  await gallery.getByRole("button", { name: "Use template" }).click();
+  await db(page).getByRole("tab", { name: "Table" }).click();
+  await expect(db(page).locator("tbody tr")).toHaveCount(4);
+
+  // Chart: bars by Priority, then the sum of the estimate.
+  await db(page).getByRole("button", { name: "Add a view" }).click();
+  await page.getByRole("menuitem", { name: "Chart" }).click();
+  const chart = db(page).getByRole("figure", { name: "Number of rows by Priority" });
+  await expect(chart).toBeVisible();
+  await expect(chart.getByRole("listitem").filter({ hasText: "Must" })).toBeVisible();
+  await db(page).getByRole("button", { name: "Properties" }).click();
+  await page.getByRole("combobox", { name: "Value" }).selectOption({ label: "Estimate (days)" });
+  await page.keyboard.press("Escape");
+  await expect(db(page).getByRole("figure", { name: "Sum of Estimate (days) by Priority" })).toBeVisible();
+
+  // Form: each send adds a row.
+  await db(page).getByRole("button", { name: "Add a view" }).click();
+  await page.getByRole("menuitem", { name: "Form" }).click();
+  const form = db(page).getByRole("form", { name: "Form: Form" });
+  await expect(form.getByRole("button", { name: "Send" })).toBeDisabled();
+  await form.getByRole("button", { name: "Feature" }).click();
+  await page.keyboard.type("Photo mode filters");
+  await page.keyboard.press("Enter");
+  await form.getByRole("button", { name: "Send" }).click();
+  await expect(form.getByRole("status")).toHaveText("Sent. 1 entry added.");
+  await db(page).getByRole("tab", { name: "Table" }).click();
+  await expect(db(page).locator("tbody tr")).toHaveCount(5);
+  await expect(db(page).locator("tbody")).toContainText("Photo mode filters");
+
+  // Print everything: one document, every page on its own sheet.
+  await expect(page.getByRole("status", { name: "Save status" })).toHaveAttribute("data-save-state", "saved");
+  await page.evaluate(() => {
+    window.print = () => {}; // no dialog in tests
+  });
+  await page.getByRole("button", { name: "Import and export" }).click();
+  await page.getByRole("menuitem", { name: "Print or save everything as PDF" }).click();
+  const doc = page.locator("iframe[srcdoc]");
+  await expect(doc).toHaveCount(1);
+  const srcdoc = await doc.getAttribute("srcdoc");
+  expect(srcdoc).toContain("Scope tracker");
+  expect(srcdoc).toContain("Photo mode filters");
+  expect(srcdoc).toContain("Welcome to PageHut");
+});

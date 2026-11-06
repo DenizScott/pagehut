@@ -63,7 +63,7 @@ export const sortSchema = z.object({
 });
 export type Sort = z.infer<typeof sortSchema>;
 
-export const viewTypes = ["table", "board", "gallery"] as const;
+export const viewTypes = ["table", "board", "gallery", "chart", "form"] as const;
 export type ViewType = (typeof viewTypes)[number];
 
 export const viewSchema = z.object({
@@ -78,6 +78,10 @@ export const viewSchema = z.object({
   groupBy: z.string().optional(),
   /** gallery: url property shown as the card image */
   coverProperty: z.string().optional(),
+  /** chart: number or formula property to add up; none = count rows */
+  chartValue: z.string().optional(),
+  /** chart: how bar values are computed */
+  chartAgg: z.enum(["count", "sum", "avg"]).optional(),
   /** table: column widths in px by property id */
   widths: z.record(z.string(), z.number()).optional(),
 });

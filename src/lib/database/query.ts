@@ -182,6 +182,76 @@ export function groupRows(data: DatabaseData, view: View, rows: Row[]): Group[] 
   return groups;
 }
 
+export interface ChartBar {
+  /** Option id, "true"/"false" for checkboxes, "" for rows without a value, "*" for all rows. */
+  key: string;
+  label: string;
+  color?: SelectOption["color"];
+  value: number;
+  rows: number;
+}
+
+/** Properties a chart can group by. */
+export const chartGroupable = (p: Property) => p.type === "select" || p.type === "multiSelect" || p.type === "checkbox";
+
+/**
+ * Chart view: one bar per option of the group-by property (select, multi-select or checkbox),
+ * valued by row count or by the sum/average of a number or formula property. Rows with several
+ * options count toward each of them. `labels` names the bars that have no option.
+ */
+export function chartData(data: DatabaseData, view: View, rows: Row[], labels: { none: string; all: string; checked: string; unchecked: string }): ChartBar[] {
+  const group = data.properties.find((p) => p.id === view.groupBy && chartGroupable(p));
+  const valueProp = data.properties.find((p) => p.id === view.chartValue && (p.type === "number" || p.type === "formula"));
+  const agg = valueProp ? (view.chartAgg === "avg" ? "avg" : view.chartAgg === "count" ? "count" : "sum") : "count";
+
+  type Acc = ChartBar & { total: number; counted: number };
+  const bars: Acc[] = [];
+  const byKey = new Map<string, Acc>();
+  const bar = (key: string, label: string, color?: SelectOption["color"]) => {
+    const b: Acc = { key, label, color, value: 0, rows: 0, total: 0, counted: 0 };
+    bars.push(b);
+    byKey.set(key, b);
+    return b;
+  };
+  if (!group) bar("*", labels.all);
+  else if (group.type === "checkbox") {
+    bar("true", labels.checked);
+    bar("false", labels.unchecked);
+  } else {
+    for (const o of group.options ?? []) bar(o.id, o.name, o.color);
+    bar("", labels.none);
+  }
+
+  for (const row of rows) {
+    let keys: string[];
+    if (!group) keys = ["*"];
+    else if (group.type === "checkbox") keys = [row.cells[group.id] === true ? "true" : "false"];
+    else {
+      keys = asList(row.cells[group.id]).filter((k) => byKey.has(k) && k !== "");
+      if (!keys.length) keys = [""];
+    }
+    const n = valueProp ? numberValue(data, row, valueProp) : undefined;
+    for (const k of keys) {
+      const b = byKey.get(k)!;
+      b.rows++;
+      if (n !== undefined && Number.isFinite(n)) {
+        b.total += n;
+        b.counted++;
+      }
+    }
+  }
+
+  return bars
+    .filter((b) => !(b.key === "" && b.rows === 0))
+    .map(({ key, label, color, rows: count, total, counted }) => ({
+      key,
+      label,
+      ...(color ? { color } : {}),
+      rows: count,
+      value: agg === "count" ? count : agg === "avg" ? (counted ? Math.round((total / counted) * 100) / 100 : 0) : Math.round(total * 100) / 100,
+    }));
+}
+
 export const visibleProperties = (data: DatabaseData, view: View): Property[] =>
   data.properties.filter((p) => p.type === "title" || !view.hidden.includes(p.id));
 

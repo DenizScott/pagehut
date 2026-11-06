@@ -71,6 +71,7 @@
     "exportWorkspace": "Arbeitsbereich exportieren",
     "exportZip": "Als ZIP exportieren (Markdown-Dateien)",
     "exportJson": "Als JSON exportieren (vollständige Sicherung)",
+    "exportWorkspacePdf": "Alles drucken oder als PDF speichern",
     "exportMarkdown": "Seite als Markdown exportieren",
     "exportPdf": "Drucken oder als PDF speichern",
     "imported": "{count, plural, one {# Seite importiert} other {# Seiten importiert}}",

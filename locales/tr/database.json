@@ -2,7 +2,9 @@
   "label": "Veritabanı",
   "new": "Yeni veritabanı",
   "untitled": "Adsız",
-  "defaults": { "name": "Ad" },
+  "defaults": {
+    "name": "Ad"
+  },
   "types": {
     "title": "Başlık",
     "text": "Metin",
@@ -61,7 +63,9 @@
     "cover": "Kart görseli",
     "needUrl": "Önce bir Bağlantı özelliği ekle",
     "boardNeedsGroup": "Özellikler menüsünden gruplanacak bir Seçim özelliği seç. Pano her seçenek için bir sütun gösterir.",
-    "noValue": "{name} yok"
+    "noValue": "{name} yok",
+    "chart": "Grafik",
+    "form": "Form"
   },
   "filter": {
     "label": "Filtre",
@@ -103,5 +107,28 @@
     "actions": "{name} için işlemler",
     "duplicate": "Çoğalt",
     "delete": "Satırı sil"
+  },
+  "chart": {
+    "groupBy": "Çubuklar",
+    "value": "Değer",
+    "agg": "Hesap",
+    "count": "Satır sayısı",
+    "sum": "Toplam",
+    "avg": "Ortalama",
+    "all": "Tüm satırlar",
+    "none": "Değer yok",
+    "checked": "İşaretli",
+    "unchecked": "İşaretsiz",
+    "needGroup": "Çubuklar için Özellikler menüsünden bir Seçim, Çoklu seçim ya da Onay kutusu özelliği seç.",
+    "captionCount": "Satır sayısı ({group})",
+    "captionSum": "{value} toplamı ({group})",
+    "captionAvg": "Ortalama {value} ({group})",
+    "rows": "{count, plural, one {# satır} other {# satır}}"
+  },
+  "form": {
+    "label": "Form: {name}",
+    "hint": "Alanları doldurup gönder. Her gönderim bu veritabanına bir satır ekler.",
+    "submit": "Gönder",
+    "sent": "{count, plural, one {Gönderildi. # kayıt eklendi.} other {Gönderildi. # kayıt eklendi.}}"
   }
 }

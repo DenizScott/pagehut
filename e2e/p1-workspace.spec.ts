@@ -36,8 +36,10 @@ test("subpages, [[page links]] and backlinks", async ({ page }) => {
   await expect(page.getByRole("navigation", { name: "Page path" })).toContainText("Levels");
 
   const title = page.getByRole("textbox", { name: "Page title" });
+  await expect(title).toHaveValue("");
   await title.fill("Forest");
   await title.press("Enter");
+  await expect(page.locator(".ProseMirror:visible")).toBeFocused();
   await page.keyboard.type("See [[Lev");
   await expect(page.getByRole("listbox", { name: "Link to page" }).getByRole("option").first()).toContainText("Levels");
   await page.keyboard.press("Enter");
@@ -52,8 +54,10 @@ test("subpages, [[page links]] and backlinks", async ({ page }) => {
 test("Ctrl+K search finds text inside pages", async ({ page }) => {
   await newPageFromSidebar(page);
   const title = page.getByRole("textbox", { name: "Page title" });
+  await expect(title).toHaveValue("");
   await title.fill("Bestiary");
   await title.press("Enter");
+  await expect(page.locator(".ProseMirror:visible")).toBeFocused();
   await page.keyboard.type("The frost wyrm guards the northern pass.");
   await expect(page.getByRole("status", { name: "Save status" })).toHaveAttribute("data-save-state", "saved");
 

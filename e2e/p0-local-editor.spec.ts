@@ -38,6 +38,7 @@ test("write with slash menu, autosave, reload keeps everything", async ({ page }
   await expect(title).toBeFocused();
   await title.pressSequentially("Savaş Sistemi");
   await title.press("Enter");
+  await expect(page.locator(".ProseMirror:visible")).toBeFocused();
 
   await page.keyboard.type("/başlık");
   const menu = page.getByRole("listbox", { name: "Blok ekle" });

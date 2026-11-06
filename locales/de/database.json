@@ -2,7 +2,9 @@
   "label": "Datenbank",
   "new": "Neue Datenbank",
   "untitled": "Ohne Titel",
-  "defaults": { "name": "Name" },
+  "defaults": {
+    "name": "Name"
+  },
   "types": {
     "title": "Titel",
     "text": "Text",
@@ -61,7 +63,9 @@
     "cover": "Kartenbild",
     "needUrl": "Zuerst eine Link-Eigenschaft anlegen",
     "boardNeedsGroup": "Wähle unter Eigenschaften eine Auswahl-Eigenschaft zum Gruppieren. Das Board zeigt eine Spalte pro Option.",
-    "noValue": "Ohne {name}"
+    "noValue": "Ohne {name}",
+    "chart": "Diagramm",
+    "form": "Formular"
   },
   "filter": {
     "label": "Filter",
@@ -103,5 +107,28 @@
     "actions": "Aktionen für {name}",
     "duplicate": "Duplizieren",
     "delete": "Zeile löschen"
+  },
+  "chart": {
+    "groupBy": "Balken",
+    "value": "Wert",
+    "agg": "Als",
+    "count": "Anzahl Zeilen",
+    "sum": "Summe",
+    "avg": "Durchschnitt",
+    "all": "Alle Zeilen",
+    "none": "Kein Wert",
+    "checked": "Angehakt",
+    "unchecked": "Nicht angehakt",
+    "needGroup": "Wähle unter Eigenschaften eine Auswahl-, Mehrfachauswahl- oder Checkbox-Eigenschaft für die Balken.",
+    "captionCount": "Anzahl Zeilen nach {group}",
+    "captionSum": "Summe von {value} nach {group}",
+    "captionAvg": "Durchschnitt von {value} nach {group}",
+    "rows": "{count, plural, one {# Zeile} other {# Zeilen}}"
+  },
+  "form": {
+    "label": "Formular: {name}",
+    "hint": "Fülle die Felder aus und sende. Jede Sendung fügt dieser Datenbank eine Zeile hinzu.",
+    "submit": "Senden",
+    "sent": "{count, plural, one {Gesendet. # Eintrag hinzugefügt.} other {Gesendet. # Einträge hinzugefügt.}}"
   }
 }

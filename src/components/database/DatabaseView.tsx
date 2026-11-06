@@ -3,6 +3,8 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   ArrowUpDown,
+  ChartBar,
+  ClipboardList,
   Columns3,
   Eye,
   Filter as FilterIcon,
@@ -22,18 +24,19 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { useDebouncedSaver } from "@/lib/hooks/useDebouncedSaver";
 import * as ops from "@/lib/database/ops";
-import { cellText, groupRows, isEmptyCell, rowTitle, titleProperty, viewRows, visibleProperties, type QueryContext } from "@/lib/database/query";
+import { cellText, chartGroupable, groupRows, isEmptyCell, rowTitle, titleProperty, viewRows, visibleProperties, type QueryContext } from "@/lib/database/query";
 import { filterOps, type CellValue, type DatabaseData, type Filter, type FilterOp, type PropertyType, type Row, type View, type ViewType } from "@/lib/database/types";
 import type { PageRecord } from "@/lib/model/schemas";
 import { getAsset, listPages, saveDatabase } from "@/lib/storage/local-repo";
 import { useStatus } from "@/lib/stores/status";
 import { cn } from "@/lib/utils";
 import { Cell, OptionChip, type RelationSource } from "./Cell";
+import { ChartView, FormView } from "./ExtraViews";
 import { PropertyMenu, typeIcon } from "./PropertyMenu";
 
-const viewIcon: Record<ViewType, typeof Table2> = { table: Table2, board: Columns3, gallery: GalleryHorizontalEnd };
+const viewIcon: Record<ViewType, typeof Table2> = { table: Table2, board: Columns3, gallery: GalleryHorizontalEnd, chart: ChartBar, form: ClipboardList };
 
-interface Api {
+export interface Api {
   data: DatabaseData;
   view: View;
   rows: Row[];
@@ -110,7 +113,7 @@ export function DatabaseView({ page }: { page: PageRecord }) {
       }
       const r = ops.addRow(latest.current, preset);
       set(r.data);
-      if (view.type !== "table") setOpenRowId(r.row.id);
+      if (view.type === "board" || view.type === "gallery") setOpenRowId(r.row.id);
     },
     openRow: setOpenRowId,
   };
@@ -123,6 +126,8 @@ export function DatabaseView({ page }: { page: PageRecord }) {
       {view.type === "table" && <TableView api={api} />}
       {view.type === "board" && <BoardView api={api} />}
       {view.type === "gallery" && <GalleryView api={api} />}
+      {view.type === "chart" && <ChartView api={api} />}
+      {view.type === "form" && <FormView api={api} />}
       {openRow && <RowDialog api={api} row={openRow} onClose={() => setOpenRowId(null)} />}
     </section>
   );
@@ -193,7 +198,7 @@ function Toolbar({ api, onSelectView }: { api: Api; onSelectView: (id: string) =
             <Plus className="size-4" />
           </MenuTrigger>
           <MenuContent align="start">
-            {(["table", "board", "gallery"] as const).map((type) => {
+            {(["table", "board", "gallery", "chart", "form"] as const).map((type) => {
               const Icon = viewIcon[type];
               return (
                 <MenuItem key={type} onSelect={() => addView(type)}>
@@ -410,6 +415,7 @@ function ViewSettings({ api, onRename, onDeleted }: { api: Api; onRename: () => 
               </select>
             </label>
           )}
+          {view.type === "chart" && <ChartSettings api={api} />}
           {view.type === "gallery" && (
             <label className="mb-2 flex items-center gap-2">
               <span className="shrink-0 text-fg-muted">{t("views.cover")}</span>
@@ -761,6 +767,55 @@ function GalleryView({ api }: { api: Api }) {
         </button>
       </li>
     </ul>
+  );
+}
+
+/* ---------------- Chart settings ---------------- */
+
+function ChartSettings({ api }: { api: Api }) {
+  const t = useTranslations("database");
+  const { data, view, set } = api;
+  const groups = data.properties.filter(chartGroupable);
+  const numbers = data.properties.filter((p) => p.type === "number" || p.type === "formula");
+  const select = "h-7 min-w-0 flex-1 rounded-md border border-border-control bg-canvas px-1";
+  return (
+    <div className="mb-2 space-y-2">
+      <label className="flex items-center gap-2">
+        <span className="w-20 shrink-0 text-fg-muted">{t("chart.groupBy")}</span>
+        <select value={view.groupBy ?? ""} onChange={(e) => set(ops.updateView(data, view.id, { groupBy: e.target.value || undefined }))} className={select}>
+          <option value="">{t("chart.all")}</option>
+          {groups.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex items-center gap-2">
+        <span className="w-20 shrink-0 text-fg-muted">{t("chart.value")}</span>
+        <select
+          value={view.chartValue ?? ""}
+          onChange={(e) => set(ops.updateView(data, view.id, { chartValue: e.target.value || undefined, chartAgg: e.target.value ? (view.chartAgg === "avg" ? "avg" : "sum") : "count" }))}
+          className={select}
+        >
+          <option value="">{t("chart.count")}</option>
+          {numbers.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      {view.chartValue && (
+        <label className="flex items-center gap-2">
+          <span className="w-20 shrink-0 text-fg-muted">{t("chart.agg")}</span>
+          <select value={view.chartAgg === "avg" ? "avg" : "sum"} onChange={(e) => set(ops.updateView(data, view.id, { chartAgg: e.target.value as "sum" | "avg" }))} className={select}>
+            <option value="sum">{t("chart.sum")}</option>
+            <option value="avg">{t("chart.avg")}</option>
+          </select>
+        </label>
+      )}
+    </div>
   );
 }
 

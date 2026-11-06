@@ -168,7 +168,12 @@ export function addOption(data: DatabaseData, propertyId: string, name: string, 
 }
 
 export function addView(data: DatabaseData, name: string, type: ViewType): { data: DatabaseData; view: View } {
-  const groupBy = type === "board" ? data.properties.find((p) => p.type === "select")?.id : undefined;
+  const groupBy =
+    type === "board"
+      ? data.properties.find((p) => p.type === "select")?.id
+      : type === "chart"
+        ? data.properties.find((p) => p.type === "select" || p.type === "multiSelect" || p.type === "checkbox")?.id
+        : undefined;
   const coverProperty = type === "gallery" ? data.properties.find((p) => p.type === "url")?.id : undefined;
   const view: View = { id: shortId(), name, type, filters: [], sorts: [], hidden: [], ...(groupBy ? { groupBy } : {}), ...(coverProperty ? { coverProperty } : {}) };
   return { data: { ...data, views: [...data.views, view] }, view };

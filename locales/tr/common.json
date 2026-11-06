@@ -71,6 +71,7 @@
     "exportWorkspace": "Çalışma alanını dışa aktar",
     "exportZip": "ZIP olarak dışa aktar (Markdown dosyaları)",
     "exportJson": "JSON olarak dışa aktar (tam yedek)",
+    "exportWorkspacePdf": "Tümünü yazdır veya PDF olarak kaydet",
     "exportMarkdown": "Sayfayı Markdown olarak dışa aktar",
     "exportPdf": "Yazdır ya da PDF olarak kaydet",
     "imported": "{count, plural, one {# sayfa içe aktarıldı} other {# sayfa içe aktarıldı}}",

@@ -1,11 +1,11 @@
 "use client";
 
 import { useLiveQuery } from "dexie-react-hooks";
-import { AtSign, Download, LayoutTemplate, MoreHorizontal, Plus, Search, Table2, Trash2, Upload, X } from "lucide-react";
+import { AtSign, Download, LayoutTemplate, MoreHorizontal, Plus, Printer, Search, Table2, Trash2, Upload, X } from "lucide-react";
 import { useMentions } from "@/components/comments/MentionsDialog";
 import { useGitHub } from "@/lib/github/session";
 import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { useRouter } from "@/i18n/navigation";
@@ -25,6 +25,7 @@ const isMac = () => typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(n
 export function Sidebar() {
   const t = useTranslations("common");
   const tdb = useTranslations("database");
+  const locale = useLocale();
   const router = useRouter();
   const params = useParams<{ pageId?: string }>();
   const workspace = useWorkspace((s) => s.workspace);
@@ -116,6 +117,14 @@ export function Sidebar() {
               </MenuItem>
               <MenuItem onSelect={() => workspace && void exportWorkspaceJson(workspace)}>
                 <Download /> {t("transfer.exportJson")}
+              </MenuItem>
+              <MenuItem
+                onSelect={() =>
+                  workspace &&
+                  void import("@/lib/transfer/print-workspace").then((m) => m.printWorkspace(workspace, { locale, untitled: t("shell.untitled") }))
+                }
+              >
+                <Printer /> {t("transfer.exportWorkspacePdf")}
               </MenuItem>
             </MenuContent>
           </Menu>

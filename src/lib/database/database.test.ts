@@ -6,7 +6,7 @@ import { parseDatabase, serializeDatabase } from "./file";
 import { evaluateFormula, FormulaError } from "./formula";
 import { mergeDatabase } from "./merge";
 import * as ops from "./ops";
-import { cellText, groupRows, viewRows } from "./query";
+import { cellText, chartData, groupRows, viewRows } from "./query";
 import type { DatabaseData, View } from "./types";
 
 const base = (): DatabaseData => ({
@@ -73,6 +73,15 @@ describe("query", () => {
       ["To do", ["Bow | long"]],
       ["Done", ["Sword"]],
     ]);
+  });
+  it("charts row counts, sums and averages by select, multi-select and checkbox", () => {
+    const labels = { none: "None", all: "All", checked: "Yes", unchecked: "No" };
+    const bars = (patch: Partial<View>) => chartData(data, view({ type: "chart", ...patch }), data.rows, labels).map((b) => [b.label, b.value]);
+    expect(bars({ groupBy: "status" })).toEqual([["To do", 1], ["Done", 1], ["None", 1]]);
+    expect(bars({ groupBy: "status", chartValue: "dmg", chartAgg: "sum" })).toEqual([["To do", 6], ["Done", 10], ["None", 8]]);
+    expect(bars({ groupBy: "ok", chartValue: "dps", chartAgg: "avg" })).toEqual([["Yes", 15], ["No", 6]]); // formulas read empty cells as 0
+    expect(bars({ groupBy: "tags" })).toEqual([["Melee", 1], ["Ranged", 0], ["None", 2]]);
+    expect(bars({})).toEqual([["All", 3]]);
   });
 });
 

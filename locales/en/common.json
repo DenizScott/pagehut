@@ -71,6 +71,7 @@
     "exportWorkspace": "Export workspace",
     "exportZip": "Export as ZIP (Markdown files)",
     "exportJson": "Export as JSON (full backup)",
+    "exportWorkspacePdf": "Print or save everything as PDF",
     "exportMarkdown": "Export page as Markdown",
     "exportPdf": "Print or save as PDF",
     "imported": "{count, plural, one {# page imported} other {# pages imported}}",

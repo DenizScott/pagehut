@@ -62,6 +62,11 @@ for (const theme of ["light", "dark"] as const) {
     await scan(page, "database table");
     await db.getByRole("tab", { name: "By status" }).click();
     await scan(page, "database board");
+    for (const type of ["Chart", "Form"]) {
+      await db.getByRole("button", { name: "Add a view" }).click();
+      await page.getByRole("menuitem", { name: type }).click();
+      await scan(page, `database ${type.toLowerCase()}`);
+    }
 
     await useTemplate(page, "Mood board");
     await scan(page, "database gallery");

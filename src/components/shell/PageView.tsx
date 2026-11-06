@@ -91,6 +91,8 @@ function PageEditor({ page }: { page: PageRecord }) {
   const [isEmpty, setIsEmpty] = useState(!isDatabase && !page.markdown.trim());
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const focusEditor = useRef<(() => void) | null>(null);
+  // Enter in the title before the editor is ready (a new page, a slow device): focus it on ready.
+  const focusPending = useRef(false);
   const titleSaver = useDebouncedSaver((value: string) => savePageTitle(page.id, value));
   const pages = useLiveQuery(() => listPages(page.workspaceId), [page.workspaceId]);
   const ancestors = pages ? ancestorsOf(pages, page.id) : [];
@@ -272,7 +274,8 @@ function PageEditor({ page }: { page: PageRecord }) {
             onKeyDown={(e) => {
               if (e.key === "Enter" || (e.key === "ArrowDown" && e.currentTarget.selectionStart === title.length)) {
                 e.preventDefault();
-                focusEditor.current?.();
+                if (focusEditor.current) focusEditor.current();
+                else focusPending.current = true;
               }
             }}
             className="lk-page-title mb-4 w-full resize-none overflow-hidden bg-transparent text-fg outline-none placeholder:text-fg-subtle focus-visible:outline-none"
@@ -292,7 +295,13 @@ function PageEditor({ page }: { page: PageRecord }) {
           ) : (
             <Editor
               page={page}
-              onReady={(focus) => (focusEditor.current = focus)}
+              onReady={(focus) => {
+                focusEditor.current = focus;
+                if (focusPending.current) {
+                  focusPending.current = false;
+                  focus();
+                }
+              }}
               onEmptyChange={setIsEmpty}
               comments={{
                 anchors,

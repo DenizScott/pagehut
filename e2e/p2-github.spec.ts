@@ -26,8 +26,12 @@ async function newPage(page: Page, title: string, body: string) {
   await page.getByRole("button", { name: "New page" }).first().click();
   await page.waitForURL((u) => u.toString() !== before && u.pathname.includes("/p/"));
   const t = page.getByRole("textbox", { name: "Page title" });
+  // The new page starts with the cursor in its (empty) title; wait for it before typing.
+  await expect(t).toBeFocused();
+  await expect(t).toHaveValue("");
   await t.fill(title);
   await t.press("Enter");
+  await expect(page.locator(".ProseMirror:visible")).toBeFocused();
   await page.keyboard.type(body);
   await expect(page.getByRole("status", { name: "Save status" })).toHaveAttribute("data-save-state", "saved");
 }
@@ -58,6 +62,8 @@ test("connect, push, merge a teammate's edit, and open on a second device", asyn
   await page.goto("/en");
   await page.waitForURL(/\/p\//);
   await newPage(page, "Combat", "Every fight is a puzzle.");
+  // Saving is debounced; text typed a moment ago is sent with the next sync instead.
+  await expect(page.getByRole("status", { name: "Save status" })).toHaveAttribute("data-save-state", "saved");
 
   await page.getByRole("button", { name: /Local mode/ }).click();
   const dialog = page.getByRole("dialog", { name: "Save this workspace to GitHub" });
