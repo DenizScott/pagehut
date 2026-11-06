@@ -1,0 +1,57 @@
+name: Desktop smoke test
+
+# Builds the desktop app on Windows, macOS and Linux (unpacked, no installer) and runs
+# desktop/scripts/smoke.mjs against it: the real app starts, the bundled server answers, the editor
+# loads without console errors, templates are there, and text survives a restart.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ["desktop/**", "src/**", ".github/workflows/desktop-smoke.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+        env:
+          PAGEHUT_STANDALONE: "1"
+          NEXT_TELEMETRY_DISABLED: "1"
+      - run: npm ci
+        working-directory: desktop
+      - run: node scripts/prepare-server.mjs
+        working-directory: desktop
+        env:
+          PAGEHUT_GITHUB_CLIENT_ID: ${{ vars.PAGEHUT_GITHUB_CLIENT_ID }}
+          PAGEHUT_GITHUB_APP_SLUG: ${{ vars.PAGEHUT_GITHUB_APP_SLUG }}
+      - run: npx electron-builder --dir --publish never
+        working-directory: desktop
+      - name: Smoke test (Linux, virtual display)
+        if: runner.os == 'Linux'
+        working-directory: desktop
+        run: xvfb-run --auto-servernum node scripts/smoke.mjs
+      - name: Smoke test
+        if: runner.os != 'Linux'
+        working-directory: desktop
+        run: node scripts/smoke.mjs
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-${{ matrix.os }}
+          path: |
+            desktop/dist/smoke-failure.png
+          retention-days: 7
