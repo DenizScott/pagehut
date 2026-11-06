@@ -1,6 +1,7 @@
 "use client";
 
 import { ExternalLink, Lock, Search } from "lucide-react";
+import { BRAND } from "@/config/brand";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -151,8 +152,8 @@ function RepoPicker({ mode }: { mode: "connect" | "open" }) {
   const [filter, setFilter] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  /** Folder inside the repository for the workspace (connect only). "GDD" keeps game repos tidy. */
-  const [folder, setFolder] = useState("GDD");
+  /** Folder inside the repository for the workspace (connect only), so it can share a repo with other files. */
+  const [folder, setFolder] = useState<string>(BRAND.name);
   const cleanFolder = folder.trim().replace(/^\/+|\/+$/g, "");
   const [error, setError] = useState<string | null>(null);
   /** Offered when the other action fits the chosen repo (open <-> save). */

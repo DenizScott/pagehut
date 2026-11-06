@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: BRAND.name,
     short_name: BRAND.name,
-    description: "A free, open-source workspace for game design documents.",
+    description: "A free, open-source workspace for writing, planning and organizing.",
     id: `/${BRAND.slug}`,
     start_url: "/",
     display: "standalone",

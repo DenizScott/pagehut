@@ -1,13 +1,18 @@
 import { de } from "./de";
 import { en } from "./en";
+import { generalDe, generalEn, generalTr } from "./general";
 import { tr } from "./tr";
 import { templateCategory, templateIcon, templateIds, type TemplateCategory, type TemplateId, type TemplateSet } from "./types";
 
 /**
- * GDD templates, written per language (not machine translated). A locale without its own set
+ * Page templates, written per language (not machine translated). A locale without its own set
  * falls back to English. To add a language, copy en.ts, translate it, and register it here.
  */
-const sets: Record<string, TemplateSet> = { en, tr, de };
+const sets: Record<string, TemplateSet> = {
+  en: { ...generalEn, ...en },
+  tr: { ...generalTr, ...tr },
+  de: { ...generalDe, ...de },
+};
 
 export interface Template {
   id: TemplateId;
@@ -19,7 +24,7 @@ export interface Template {
 }
 
 export function getTemplates(locale: string): Template[] {
-  const set = sets[locale] ?? en;
+  const set = sets[locale] ?? sets.en;
   return templateIds.map((id) => ({ id, icon: templateIcon[id], category: templateCategory[id], ...set[id] }));
 }
 

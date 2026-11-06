@@ -1,6 +1,6 @@
-import type { TemplateSet } from "./types";
+import type { GameTemplateSet } from "./types";
 
-export const de: TemplateSet = {
+export const de: GameTemplateSet = {
   "one-page-gdd": {
     title: "One-Page-GDD",
     description: "Das ganze Spiel auf einer Seite: Pitch, Design-Pillars, Core Loop, Umfang.",

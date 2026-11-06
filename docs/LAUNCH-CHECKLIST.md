@@ -27,7 +27,7 @@ account and decision. Tick items off here as they are done.
 - [ ] **Possible confusion with an existing project.** A small, unrelated project named *PageHut*
       already exists on GitHub (a self-hosted static-site hosting tool). Before launch, look at it,
       decide whether the overlap matters, and consider a distinguishing tagline
-      (for example "PageHut for game design documents").
+      (for example "PageHut: free writing and planning workspace").
 
 ## Before the first public deploy
 

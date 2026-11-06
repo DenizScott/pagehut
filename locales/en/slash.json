@@ -49,7 +49,7 @@
     },
     "quote": {
       "title": "Quote",
-      "description": "Quotation or player feedback",
+      "description": "Quote or feedback",
       "keywords": "blockquote citation"
     },
     "callout": {

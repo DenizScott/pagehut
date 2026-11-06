@@ -1,8 +1,8 @@
 {
   "app": {
     "name": "PageHut",
-    "tagline": "Game-Design-Arbeitsbereich",
-    "description": "Ein kostenloser Open-Source-Arbeitsbereich für Game-Design-Dokumente."
+    "tagline": "Kostenloser Arbeitsbereich zum Schreiben und Planen",
+    "description": "Ein kostenloser Open-Source-Arbeitsbereich zum Schreiben, Planen und Ordnen: Skripte, Notizen, Projekte und Design-Dokumente."
   },
   "a11y": {
     "skipToContent": "Zum Inhalt springen",
@@ -23,7 +23,7 @@
     "loading": "Arbeitsbereich wird geladen …",
     "notFound": "Diese Seite gibt es in diesem Arbeitsbereich nicht.",
     "backHome": "Zur ersten Seite",
-    "workspaceName": "Mein Spiel",
+    "workspaceName": "Mein Arbeitsbereich",
     "search": "Suchen",
     "templates": "Vorlagen",
     "trash": "Papierkorb"
@@ -51,7 +51,7 @@
   },
   "welcome": {
     "title": "Willkommen bei {appName}",
-    "body": "{appName} ist ein kostenloser Arbeitsbereich für **Game-Design-Dokumente**.\n\n:::callout idea\nTippe irgendwo `/`, um Überschriften, To-dos, Aufklapper, Hinweisboxen, Tabellen und mehr einzufügen.\n:::\n\n## Probier es aus\n\n- [ ] Schreib den Ein-Satz-Pitch deines Spiels\n- [ ] Lege drei Design-Pillars fest\n- [ ] Beschreibe den Core Loop\n\n:::toggle Wo wird meine Arbeit gespeichert?\nIm lokalen Modus bleibt alles in diesem Browser (IndexedDB). Später kannst du ein GitHub-Repository verbinden, damit dein Team am selben GDD arbeitet.\n:::\n"
+    "body": "{appName} ist ein kostenloser Arbeitsbereich für alles, was du schreibst und planst: Videoskripte, Blogartikel, Notizen, Projekte, Game-Design-Dokumente und mehr.\n\n:::callout idea\nTippe irgendwo `/`, um Überschriften, To-dos, Aufklapper, Hinweisboxen, Tabellen und mehr einzufügen.\n:::\n\n## Probier es aus\n\n- [ ] Starte eine Seite mit einer Vorlage (Vorlagen in der Seitenleiste)\n- [ ] Verknüpfe zwei Seiten, indem du `[[` tippst\n- [ ] Plane etwas in einer Datenbank: Aufgaben, einen Content-Kalender, eine Leseliste\n\n:::toggle Wo wird meine Arbeit gespeichert?\nIm lokalen Modus bleibt alles auf diesem Gerät. Später kannst du ein GitHub-Repository verbinden, damit dein Team an denselben Seiten arbeitet.\n:::\n"
   },
   "tree": {
     "expand": "Aufklappen",
@@ -94,23 +94,23 @@
     "deletedAt": "Gelöscht {time}"
   },
   "pillars": {
-    "title": "Design-Pillars",
-    "description": "Bis zu sechs Prinzipien, an denen jedes Feature gemessen wird. Sie stehen über jeder Seite.",
-    "empty": "Design-Pillars hinzufügen",
-    "edit": "Design-Pillars bearbeiten",
-    "add": "Pillar hinzufügen",
-    "remove": "Pillar entfernen",
+    "title": "Leitprinzipien",
+    "description": "Bis zu sechs Prinzipien, an denen deine Arbeit gemessen wird: der Ton eines Kanals, die Ziele eines Projekts, die Design-Pillars eines Spiels. Sie stehen über jeder Seite.",
+    "empty": "Leitprinzipien hinzufügen",
+    "edit": "Leitprinzipien bearbeiten",
+    "add": "Prinzip hinzufügen",
+    "remove": "Prinzip entfernen",
     "moveUp": "Nach oben",
     "moveDown": "Nach unten",
-    "titleLabel": "Name von Pillar {n}",
-    "titlePlaceholder": "z. B. Jeder Kampf ist ein Rätsel",
-    "descriptionLabel": "Beschreibung von Pillar {n}",
+    "titleLabel": "Name von Prinzip {n}",
+    "titlePlaceholder": "z. B. Jedes Video vermittelt genau eine Sache",
+    "descriptionLabel": "Beschreibung von Prinzip {n}",
     "descriptionPlaceholder": "Was es bedeutet und was es ausschließt",
     "save": "Speichern",
     "cancel": "Abbrechen"
   },
   "templates": {
-    "title": "GDD-Vorlagen",
+    "title": "Vorlagen",
     "description": "Starte eine Seite mit einer bewährten Struktur. Alles lässt sich danach ändern.",
     "use": "Vorlage verwenden",
     "preview": "Vorlagenvorschau",
@@ -118,11 +118,13 @@
     "startWith": "Mit einer Vorlage beginnen",
     "applyHere": "Neue Seite aus Vorlage",
     "categories": {
-      "plan": "Planung und Pitch",
-      "design": "Game Design",
-      "story": "Story und Art",
-      "production": "Produktion",
-      "databases": "Datenbanken"
+      "content": "Inhalte und Schreiben",
+      "work": "Arbeit und Planung",
+      "databases": "Datenbanken",
+      "plan": "Spiel: Planung und Pitch",
+      "design": "Spiel: Design",
+      "story": "Spiel: Story und Art",
+      "production": "Spiel: Produktion"
     },
     "properties": "Eigenschaften"
   },
@@ -181,9 +183,9 @@
     "saveHereInstead": "Stattdessen diesen Arbeitsbereich in diesem Repository speichern",
     "openHereInstead": "Stattdessen den Arbeitsbereich aus diesem Repository öffnen",
     "folderLabel": "Ordner im Repository:",
-    "folderHint": "Empfohlen für Spiele-Repos: PageHut ändert nur diesen Ordner, nie dein Unity/Unreal-Projekt. Leer lassen für das Repository-Stammverzeichnis.",
+    "folderHint": "PageHut ändert nur diesen Ordner, daher kann sich das Repository Code oder andere Dateien teilen (in einem Unity/Unreal-Projekt außerhalb von Assets/). Leer lassen für das Repository-Stammverzeichnis.",
     "repoRoot": "Stammverzeichnis",
-    "autoMoved": "Dein GDD in {repo} liegt jetzt im Ordner GDD/. Sonst hat sich im Repository nichts geändert.",
+    "autoMoved": "Dein Arbeitsbereich in {repo} liegt jetzt im Ordner GDD/, neben deinem Spielprojekt. Sonst hat sich im Repository nichts geändert.",
     "deviceHint": "GitHub hat sich in deinem Browser geöffnet. Gib dort diesen Code ein und erlaube PageHut den Zugriff. Dieses Fenster macht von selbst weiter.",
     "deviceCodeLabel": "Code für GitHub",
     "deviceCopy": "Code kopieren",
@@ -229,13 +231,13 @@
     "description": "Ein Commit verschiebt die Dateien des Arbeitsbereichs. Sonst ändert sich nichts im Repository.",
     "current": "Jetzt:",
     "newFolder": "Neuer Ordner:",
-    "hint": "Nutze einen Ordner außerhalb von Assets/ (z. B. GDD), damit Unity ihn ignoriert.",
+    "hint": "Jeder Ordner geht. In einem Unity-Projekt einen außerhalb von Assets/ nehmen, damit Unity ihn ignoriert.",
     "action": "Verschieben",
     "cancel": "Abbrechen",
     "done": "Arbeitsbereich nach {folder} verschoben",
     "taken": "In diesem Ordner gibt es bereits einen Arbeitsbereich.",
     "remoteChanged": "Jemand hat die Dateien des Arbeitsbereichs auf GitHub geändert. Erst synchronisieren (kommt mit P3), dann erneut versuchen.",
-    "invalid": "Bitte einen einfachen Ordnernamen wie GDD oder docs/gdd verwenden."
+    "invalid": "Bitte einen einfachen Ordnernamen wie PageHut oder docs/notizen verwenden."
   },
   "conflict": {
     "message": "Diese Seite wurde auch auf GitHub geändert, an derselben Stelle wie bei dir. Nichts ist verloren: Dein Text ist im Editor, die andere Fassung liegt bereit.",

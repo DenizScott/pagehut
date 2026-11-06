@@ -90,8 +90,9 @@ function SearchBody({ onDone }: { onDone: () => void }) {
       <p className="px-4 pt-2 text-xs text-fg-subtle" aria-live="polite">
         {query.trim() ? t("search.count", { count: results.length }) : t("search.recent")}
       </p>
+      {/* A listbox may only contain options, so the empty state sits outside it. */}
+      {results.length === 0 && query.trim() && <p className="px-4 py-6 text-center text-sm text-fg-muted">{t("search.noResults")}</p>}
       <ul id={listId} role="listbox" aria-label={t("search.results")} className="min-h-0 overflow-y-auto p-2">
-        {results.length === 0 && query.trim() && <li className="px-2 py-6 text-center text-sm text-fg-muted">{t("search.noResults")}</li>}
         {results.map((r, i) => (
           <li
             key={r.id}

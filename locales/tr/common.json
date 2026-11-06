@@ -1,8 +1,8 @@
 {
   "app": {
     "name": "PageHut",
-    "tagline": "Oyun tasarım çalışma alanı",
-    "description": "Oyun tasarım dokümanları için ücretsiz ve açık kaynak çalışma alanı."
+    "tagline": "Ücretsiz yazı ve planlama alanı",
+    "description": "Yazmak, planlamak ve düzenlemek için ücretsiz, açık kaynak çalışma alanı: senaryolar, notlar, projeler ve tasarım belgeleri."
   },
   "a11y": {
     "skipToContent": "İçeriğe geç",
@@ -23,7 +23,7 @@
     "loading": "Çalışma alanı yükleniyor…",
     "notFound": "Bu sayfa bu çalışma alanında yok.",
     "backHome": "İlk sayfaya git",
-    "workspaceName": "Oyunum",
+    "workspaceName": "Çalışma alanım",
     "search": "Ara",
     "templates": "Şablonlar",
     "trash": "Çöp kutusu"
@@ -51,7 +51,7 @@
   },
   "welcome": {
     "title": "{appName} uygulamasına hoş geldin",
-    "body": "{appName}, **oyun tasarım dokümanları** (GDD) için ücretsiz bir çalışma alanı.\n\n:::callout idea\nBaşlık, yapılacaklar, açılır blok, bilgi kutusu, tablo ve daha fazlasını eklemek için herhangi bir yere `/` yaz.\n:::\n\n## Dene\n\n- [ ] Oyununun tek cümlelik tanıtımını (pitch) yaz\n- [ ] Üç tasarım ilkesi (design pillar) belirle\n- [ ] Çekirdek döngüyü (core loop) anlat\n\n:::toggle Çalışmalarım nerede saklanıyor?\nYerel modda her şey bu tarayıcıda (IndexedDB) kalır. Daha sonra bir GitHub deposu bağlayarak ekibinle aynı GDD üzerinde çalışabilirsin.\n:::\n"
+    "body": "{appName}, yazdığın ve planladığın her şey için ücretsiz bir çalışma alanı: video senaryoları, blog yazıları, notlar, projeler, oyun tasarım belgeleri ve daha fazlası.\n\n:::callout idea\nBaşlık, yapılacaklar, açılır blok, bilgi kutusu, tablo ve daha fazlasını eklemek için herhangi bir yere `/` yaz.\n:::\n\n## Dene\n\n- [ ] Bir şablondan sayfa başlat (kenar çubuğunda Şablonlar)\n- [ ] `[[` yazarak iki sayfayı birbirine bağla\n- [ ] Bir veritabanında plan yap: görevler, içerik takvimi, okuma listesi\n\n:::toggle Çalışmalarım nerede saklanıyor?\nYerel modda her şey bu cihazda kalır. Daha sonra bir GitHub deposu bağlayarak ekibinle aynı sayfalar üzerinde çalışabilirsin.\n:::\n"
   },
   "tree": {
     "expand": "Genişlet",
@@ -94,23 +94,23 @@
     "deletedAt": "{time} silindi"
   },
   "pillars": {
-    "title": "Tasarım ilkeleri",
-    "description": "Her özelliğin ölçüldüğü en fazla altı ilke. Her sayfanın üstünde görünürler.",
-    "empty": "Tasarım ilkelerini ekle",
-    "edit": "Tasarım ilkelerini düzenle",
+    "title": "İlkeler",
+    "description": "İşinin ölçüldüğü en fazla altı ilke: bir kanalın üslubu, bir projenin hedefleri, bir oyunun tasarım ilkeleri. Her sayfanın üstünde görünürler.",
+    "empty": "İlkelerini ekle",
+    "edit": "İlkeleri düzenle",
     "add": "İlke ekle",
     "remove": "İlkeyi kaldır",
     "moveUp": "Yukarı taşı",
     "moveDown": "Aşağı taşı",
     "titleLabel": "{n}. ilkenin adı",
-    "titlePlaceholder": "ör. Her dövüş bir bulmacadır",
+    "titlePlaceholder": "ör. Her video tek bir şey öğretir",
     "descriptionLabel": "{n}. ilkenin açıklaması",
     "descriptionPlaceholder": "Ne anlama geliyor, neyi dışarıda bırakıyor?",
     "save": "Kaydet",
     "cancel": "Vazgeç"
   },
   "templates": {
-    "title": "GDD şablonları",
+    "title": "Şablonlar",
     "description": "Sayfaya denenmiş bir yapıyla başla. Sonradan her şeyi değiştirebilirsin.",
     "use": "Şablonu kullan",
     "preview": "Şablon önizlemesi",
@@ -118,11 +118,13 @@
     "startWith": "Bir şablonla başla",
     "applyHere": "Şablondan yeni sayfa",
     "categories": {
-      "plan": "Plan ve sunum",
-      "design": "Oyun tasarımı",
-      "story": "Hikâye ve sanat",
-      "production": "Üretim",
-      "databases": "Veritabanları"
+      "content": "İçerik ve yazı",
+      "work": "İş ve planlama",
+      "databases": "Veritabanları",
+      "plan": "Oyun: plan ve sunum",
+      "design": "Oyun: tasarım",
+      "story": "Oyun: hikâye ve sanat",
+      "production": "Oyun: üretim"
     },
     "properties": "Özellikler"
   },
@@ -181,9 +183,9 @@
     "saveHereInstead": "Bunun yerine bu çalışma alanını bu depoya kaydet",
     "openHereInstead": "Bunun yerine bu depodaki çalışma alanını aç",
     "folderLabel": "Depodaki klasör:",
-    "folderHint": "Oyun depoları için önerilir: PageHut yalnızca bu klasöre dokunur, Unity/Unreal projene asla dokunmaz. Deponun köküne koymak için boş bırak.",
+    "folderHint": "PageHut yalnızca bu klasöre dokunur; böylece depo kodla ya da başka dosyalarla paylaşılabilir (Unity/Unreal projesinde Assets/ dışında tut). Deponun köküne koymak için boş bırak.",
     "repoRoot": "deponun kökü",
-    "autoMoved": "{repo} deposundaki GDD artık GDD/ klasöründe. Depodaki başka hiçbir şey değişmedi.",
+    "autoMoved": "{repo} deposundaki çalışma alanın artık oyun projenin yanında, GDD/ klasöründe. Depodaki başka hiçbir şey değişmedi.",
     "deviceHint": "GitHub tarayıcında açıldı. Bu kodu orada gir ve PageHut'a izin ver. Bu pencere kendiliğinden devam eder.",
     "deviceCodeLabel": "GitHub için kod",
     "deviceCopy": "Kodu kopyala",
@@ -229,13 +231,13 @@
     "description": "Çalışma alanı dosyaları tek bir commit ile taşınır. Depodaki başka hiçbir şey değişmez.",
     "current": "Şu an:",
     "newFolder": "Yeni klasör:",
-    "hint": "Unity’nin görmezden gelmesi için Assets/ dışında bir klasör kullan (ör. GDD).",
+    "hint": "Herhangi bir klasör olur. Unity projesinde, Unity'nin görmezden gelmesi için Assets/ dışında bir klasör kullan.",
     "action": "Taşı",
     "cancel": "Vazgeç",
     "done": "Çalışma alanı {folder} klasörüne taşındı",
     "taken": "Bu klasörde zaten bir çalışma alanı var.",
     "remoteChanged": "Biri GitHub’da çalışma alanı dosyalarını değiştirmiş. Önce eşitle (P3 ile geliyor), sonra tekrar dene.",
-    "invalid": "Lütfen GDD ya da docs/gdd gibi basit bir klasör adı kullan."
+    "invalid": "Lütfen PageHut ya da docs/notlar gibi basit bir klasör adı kullan."
   },
   "conflict": {
     "message": "Bu sayfa GitHub'da da, senin düzenlediğin yerde değişmiş. Hiçbir şey kaybolmadı: senin metnin editörde, onunki kenarda bekliyor.",

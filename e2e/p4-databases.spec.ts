@@ -155,7 +155,7 @@ test("a game template creates a working database that syncs with teammates", asy
 
   // Template gallery → Playtest log.
   await page.getByRole("button", { name: "Templates" }).click();
-  const gallery = page.getByRole("dialog", { name: "GDD templates" });
+  const gallery = page.getByRole("dialog", { name: "Templates" });
   await gallery.getByRole("button", { name: /Playtest log/ }).click();
   await expect(gallery.getByRole("complementary")).toContainText("Fun (1–5)");
   await gallery.getByRole("button", { name: "Use template" }).click();
@@ -173,7 +173,7 @@ test("a game template creates a working database that syncs with teammates", asy
   await dialog.getByRole("button", { name: "Save to repository" }).click();
   await expect(page.getByText("Workspace saved to team/game")).toBeVisible();
   const dbId = page.url().split("/p/")[1];
-  const path = `GDD/pages/${dbId}.md`;
+  const path = `PageHut/pages/${dbId}.md`;
   expect(gh.files("team/game")[path]).toContain("| Session | Date | Build |");
 
   // A teammate adds a session on GitHub (another PageHut, same file format)…
@@ -203,7 +203,7 @@ test("chart and form views; the whole workspace prints as one document", async (
   await page.goto("/en");
   await page.waitForURL(/\/p\//);
   await page.getByRole("button", { name: "Templates" }).click();
-  const gallery = page.getByRole("dialog", { name: "GDD templates" });
+  const gallery = page.getByRole("dialog", { name: "Templates" });
   await gallery.getByRole("button", { name: /Scope tracker/ }).click();
   await gallery.getByRole("button", { name: "Use template" }).click();
   await db(page).getByRole("tab", { name: "Table" }).click();
@@ -253,7 +253,7 @@ test("timeline and calendar place rows by their dates", async ({ page }) => {
   await page.goto("/en");
   await page.waitForURL(/\/p\//);
   await page.getByRole("button", { name: "Templates" }).click();
-  const gallery = page.getByRole("dialog", { name: "GDD templates" });
+  const gallery = page.getByRole("dialog", { name: "Templates" });
   await gallery.getByRole("button", { name: /Production schedule/ }).click();
   await gallery.getByRole("button", { name: "Use template" }).click();
 
@@ -286,7 +286,7 @@ test("an automation fills in a date when the status changes", async ({ page }) =
   await page.goto("/en");
   await page.waitForURL(/\/p\//);
   await page.getByRole("button", { name: "Templates" }).click();
-  const gallery = page.getByRole("dialog", { name: "GDD templates" });
+  const gallery = page.getByRole("dialog", { name: "Templates" });
   await gallery.getByRole("button", { name: /Production schedule/ }).click();
   await gallery.getByRole("button", { name: "Use template" }).click();
   await db(page).getByRole("tab", { name: "Table" }).click();

@@ -1,5 +1,9 @@
 # ChatGPT için tasarım istemi (moodboard + logo)
 
+> **Not (2026-11-07):** Bu brief, PageHut yalnızca oyun tasarım belgelerine odaklıyken yazıldı.
+> Ürün artık her türlü yazı ve planlama için genel bir çalışma alanı; oyun tasarımı kullanım
+> alanlarından biri. Tasarım dili aynı kaldı.
+
 Aşağıdaki çizginin altındaki metnin tamamını ChatGPT'ye yapıştır. `[FİKRİM]` kısmına ChatGPT'nin
 bulduğu tasarım fikrini ya da kendi notlarını yaz.
 

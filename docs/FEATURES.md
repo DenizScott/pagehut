@@ -9,7 +9,9 @@ plans (team, business and enterprise tiers).
 - Block editor: headings, lists, to-dos, toggles, callouts, quotes, code, tables, images, dividers.
 - `/` menu with localized keywords, Markdown shortcuts, a formatting toolbar, drag handles.
 - Nested pages, page links with backlinks (showing the line each link is on), Ctrl/Cmd+K search.
-- 14 game design templates in Turkish, English and German, and a Design Pillars strip.
+- 20 page templates in Turkish, English and German: content and writing (video script, blog post,
+  newsletter), work and planning (meeting notes, project plan, weekly plan) and game design (14).
+- A principles strip above every page.
 
 ## Databases
 
@@ -19,8 +21,8 @@ plans (team, business and enterprise tiers).
   sorts and shown properties.
 - Automations: rules such as "when Status becomes Done, set Finished to today" or "when a row is
   added, set Owner to me". They run once, right after an edit; they never trigger each other.
-- Seven game templates: mechanics, scope tracker, production schedule, story beats, playtest log,
-  balance table, mood board.
+- Nine templates: content calendar and task tracker, and for game teams mechanics, scope tracker,
+  production schedule, story beats, playtest log, balance table and mood board.
 
 ## Working together
 

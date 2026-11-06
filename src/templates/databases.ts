@@ -6,7 +6,8 @@ import type { DatabaseData, OptionColor, Property, Row, View } from "@/lib/datab
  * Each build() returns fresh ids, so a template can be used many times in one workspace.
  */
 
-export const databaseTemplateIds = ["mechanics", "scope", "story-beats", "playtests", "schedule", "balance", "moodboard"] as const;
+/** General ones first (content calendar, tasks), then the game design ones. */
+export const databaseTemplateIds = ["content-calendar", "tasks", "mechanics", "scope", "story-beats", "playtests", "schedule", "balance", "moodboard"] as const;
 export type DatabaseTemplateId = (typeof databaseTemplateIds)[number];
 
 export interface DatabaseTemplate {
@@ -44,6 +45,8 @@ interface Strings {
   playtests: { title: string; description: string; name: string; date: string; build: string; tester: string; fun: string; issue: string; fixed: string; open: string; samples: [string, string]; issues: [string, string] };
   balance: { title: string; description: string; name: string; cost: string; damage: string; health: string; speed: string; dps: string; value: string; samples: [string, string, string] };
   moodboard: { title: string; description: string; name: string; image: string; tags: string; tagNames: [string, string, string, string, string]; notes: string; samples: [string, string, string] };
+  contentCalendar: { title: string; description: string; name: string; status: string; statuses: [string, string, string, string, string, string]; platform: string; publish: string; link: string; notes: string; pipeline: string; calendar: string; samples: [string, string, string, string] };
+  tasks: { title: string; description: string; name: string; status: string; statuses: [string, string, string]; priority: string; priorities: [string, string, string]; due: string; doneOn: string; assignee: string; notes: string; calendar: string; samples: [string, string, string, string] };
   schedule: { title: string; description: string; name: string; start: string; end: string; status: string; statuses: [string, string, string]; owner: string; timeline: string; calendar: string; samples: [string, string, string, string] };
 }
 
@@ -117,6 +120,35 @@ const en: Strings = {
     dps: "DPS",
     value: "Value per cost",
     samples: ["Archer", "Knight", "Catapult"],
+  },
+  contentCalendar: {
+    title: "Content calendar",
+    description: "Videos, posts and newsletters from idea to published, on a board and a calendar.",
+    name: "Title",
+    status: "Status",
+    statuses: ["Idea", "Scripting", "Filming", "Editing", "Scheduled", "Published"],
+    platform: "Platform",
+    publish: "Publish date",
+    link: "Link",
+    notes: "Notes",
+    pipeline: "Pipeline",
+    calendar: "Calendar",
+    samples: ["5 tips for beginners", "Behind the scenes", "Q&A with viewers", "Monthly newsletter"],
+  },
+  tasks: {
+    title: "Task tracker",
+    description: "Tasks with status, priority and due dates. Done tasks get today's date automatically.",
+    name: "Task",
+    status: "Status",
+    statuses: ["To do", "Doing", "Done"],
+    priority: "Priority",
+    priorities: ["High", "Medium", "Low"],
+    due: "Due",
+    doneOn: "Done on",
+    assignee: "Assignee",
+    notes: "Notes",
+    calendar: "Calendar",
+    samples: ["Write the script", "Record the voice-over", "Design the thumbnail", "Reply to comments"],
   },
   schedule: {
     title: "Production schedule",
@@ -214,6 +246,35 @@ const tr: Strings = {
     value: "Maliyet başına değer",
     samples: ["Okçu", "Şövalye", "Mancınık"],
   },
+  contentCalendar: {
+    title: "İçerik takvimi",
+    description: "Videolar, gönderiler ve bültenler fikirden yayına; pano ve takvim olarak.",
+    name: "Başlık",
+    status: "Durum",
+    statuses: ["Fikir", "Senaryo", "Çekim", "Kurgu", "Zamanlandı", "Yayında"],
+    platform: "Platform",
+    publish: "Yayın tarihi",
+    link: "Bağlantı",
+    notes: "Notlar",
+    pipeline: "Süreç",
+    calendar: "Takvim",
+    samples: ["Yeni başlayanlara 5 ipucu", "Kamera arkası", "İzleyici soruları", "Aylık bülten"],
+  },
+  tasks: {
+    title: "Görev takibi",
+    description: "Durumu, önceliği ve son tarihi olan görevler. Biten görevlere bugünün tarihi kendiliğinden yazılır.",
+    name: "Görev",
+    status: "Durum",
+    statuses: ["Yapılacak", "Sürüyor", "Bitti"],
+    priority: "Öncelik",
+    priorities: ["Yüksek", "Orta", "Düşük"],
+    due: "Son tarih",
+    doneOn: "Bitiş tarihi",
+    assignee: "Sorumlu",
+    notes: "Notlar",
+    calendar: "Takvim",
+    samples: ["Senaryoyu yaz", "Seslendirmeyi kaydet", "Küçük resmi tasarla", "Yorumlara yanıt ver"],
+  },
   schedule: {
     title: "Üretim takvimi",
     description: "Başlangıç ve bitiş tarihli kilometre taşları ve işler; zaman çizelgesi ve takvim olarak.",
@@ -310,6 +371,35 @@ const de: Strings = {
     value: "Wert pro Kosten",
     samples: ["Bogenschütze", "Ritter", "Katapult"],
   },
+  contentCalendar: {
+    title: "Content-Kalender",
+    description: "Videos, Beiträge und Newsletter von der Idee bis zur Veröffentlichung, als Board und Kalender.",
+    name: "Titel",
+    status: "Status",
+    statuses: ["Idee", "Skript", "Dreh", "Schnitt", "Geplant", "Veröffentlicht"],
+    platform: "Plattform",
+    publish: "Veröffentlichung",
+    link: "Link",
+    notes: "Notizen",
+    pipeline: "Ablauf",
+    calendar: "Kalender",
+    samples: ["5 Tipps für Einsteiger", "Hinter den Kulissen", "Fragen der Zuschauer", "Monats-Newsletter"],
+  },
+  tasks: {
+    title: "Aufgaben",
+    description: "Aufgaben mit Status, Priorität und Termin. Erledigte Aufgaben bekommen automatisch das heutige Datum.",
+    name: "Aufgabe",
+    status: "Status",
+    statuses: ["Offen", "In Arbeit", "Erledigt"],
+    priority: "Priorität",
+    priorities: ["Hoch", "Mittel", "Niedrig"],
+    due: "Fällig",
+    doneOn: "Erledigt am",
+    assignee: "Zuständig",
+    notes: "Notizen",
+    calendar: "Kalender",
+    samples: ["Skript schreiben", "Sprachaufnahme machen", "Thumbnail gestalten", "Kommentare beantworten"],
+  },
   schedule: {
     title: "Produktionsplan",
     description: "Meilensteine und Aufgaben mit Start- und Enddatum, als Zeitleiste und Kalender.",
@@ -345,8 +435,67 @@ export function getDatabaseTemplates(locale: string): DatabaseTemplate[] {
   const pt = s.playtests;
   const b = s.balance;
   const sch = s.schedule;
+  const cc = s.contentCalendar;
+  const tk = s.tasks;
   const mb = s.moodboard;
   return [
+    {
+      id: "content-calendar",
+      icon: "🎬",
+      title: cc.title,
+      description: cc.description,
+      build: () => ({
+        properties: [
+          prop("title", cc.name, "title"),
+          sel("status", cc.status, [["idea", cc.statuses[0], "gray"], ["script", cc.statuses[1], "amber"], ["film", cc.statuses[2], "blue"], ["edit", cc.statuses[3], "purple"], ["scheduled", cc.statuses[4], "teal"], ["published", cc.statuses[5], "moss"]]),
+          sel("platform", cc.platform, [["youtube", "YouTube", "red"], ["instagram", "Instagram", "purple"], ["tiktok", "TikTok", "gray"], ["blog", "Blog", "blue"], ["newsletter", "Newsletter", "amber"]], true),
+          prop("publish", cc.publish, "date"),
+          prop("link", cc.link, "url"),
+          prop("notes", cc.notes, "text"),
+        ],
+        views: [
+          view("pipeline", cc.pipeline, "board", { groupBy: "status" }),
+          view("calendar", cc.calendar, "calendar", { dateProperty: "publish" }),
+          view("table", s.table, "table", { sorts: [{ propertyId: "publish", dir: "asc" }] }),
+        ],
+        rows: rows([
+          { title: cc.samples[0], status: "script", platform: ["youtube"], publish: fromToday(5) },
+          { title: cc.samples[1], status: "idea", platform: ["youtube", "instagram"], publish: fromToday(12) },
+          { title: cc.samples[2], status: "edit", platform: ["youtube"], publish: fromToday(2) },
+          { title: cc.samples[3], status: "scheduled", platform: ["newsletter"], publish: fromToday(9) },
+        ]),
+      }),
+    },
+    {
+      id: "tasks",
+      icon: "✅",
+      title: tk.title,
+      description: tk.description,
+      build: () => ({
+        properties: [
+          prop("title", tk.name, "title"),
+          sel("status", tk.status, [["todo", tk.statuses[0], "gray"], ["doing", tk.statuses[1], "blue"], ["done", tk.statuses[2], "moss"]]),
+          sel("priority", tk.priority, [["high", tk.priorities[0], "red"], ["medium", tk.priorities[1], "amber"], ["low", tk.priorities[2], "gray"]]),
+          prop("due", tk.due, "date"),
+          prop("doneOn", tk.doneOn, "date"),
+          prop("assignee", tk.assignee, "person"),
+          prop("notes", tk.notes, "text"),
+        ],
+        views: [
+          view("board", s.board, "board", { groupBy: "status" }),
+          view("table", s.table, "table", { sorts: [{ propertyId: "due", dir: "asc" }] }),
+          view("calendar", tk.calendar, "calendar", { dateProperty: "due" }),
+        ],
+        rows: rows([
+          { title: tk.samples[0], status: "doing", priority: "high", due: fromToday(1) },
+          { title: tk.samples[1], status: "todo", priority: "high", due: fromToday(3) },
+          { title: tk.samples[2], status: "todo", priority: "medium", due: fromToday(4) },
+          { title: tk.samples[3], status: "todo", priority: "low", due: fromToday(7) },
+        ]),
+        // When a task becomes Done, "Done on" gets today's date.
+        automations: [{ id: "done-date", enabled: true, trigger: { kind: "becomes", propertyId: "status", value: "done" }, actions: [{ propertyId: "doneOn", set: "today" }] }],
+      }),
+    },
     {
       id: "mechanics",
       icon: "⚙️",

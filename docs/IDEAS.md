@@ -1,7 +1,17 @@
 # Ideas
 
-Feature ideas for game teams that go beyond a general-purpose wiki. They are not scheduled; promising ones move
-into a phase plan. Add yours at the bottom.
+Feature ideas. They are not scheduled; promising ones move into a phase plan. Add yours at the
+bottom.
+
+## For creators and writers
+
+- **Script reading time.** A video script shows its estimated speaking time per section and in
+  total, so a 10-minute video stays 10 minutes.
+- **Publishing checklist per platform.** YouTube, blog and newsletter checklists that attach to a
+  content calendar row and tick off as you go.
+- **Word goals.** A daily or per-page word target with a quiet progress bar.
+
+## For game teams
 
 ## Story and world
 

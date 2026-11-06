@@ -1,4 +1,8 @@
-export const templateIds = [
+export const generalTemplateIds = ["video-script", "blog-post", "newsletter", "meeting-notes", "project-plan", "weekly-plan"] as const;
+export type GeneralTemplateId = (typeof generalTemplateIds)[number];
+
+/** Game design templates (GDDs and their parts). */
+export const gameTemplateIds = [
   "one-page-gdd",
   "full-gdd",
   "vertical-slice",
@@ -14,12 +18,22 @@ export const templateIds = [
   "playtest-report",
   "post-mortem",
 ] as const;
+export type GameTemplateId = (typeof gameTemplateIds)[number];
 
+/** All page templates, general ones first. */
+export const templateIds = [...generalTemplateIds, ...gameTemplateIds] as const;
 export type TemplateId = (typeof templateIds)[number];
 
-export type TemplateCategory = "plan" | "design" | "story" | "production";
+/** content and work are general; plan, design, story and production are game design. */
+export type TemplateCategory = "content" | "work" | "plan" | "design" | "story" | "production";
 
 export const templateCategory: Record<TemplateId, TemplateCategory> = {
+  "video-script": "content",
+  "blog-post": "content",
+  newsletter: "content",
+  "meeting-notes": "work",
+  "project-plan": "work",
+  "weekly-plan": "work",
   "one-page-gdd": "plan",
   "full-gdd": "plan",
   "vertical-slice": "plan",
@@ -37,6 +51,12 @@ export const templateCategory: Record<TemplateId, TemplateCategory> = {
 };
 
 export const templateIcon: Record<TemplateId, string> = {
+  "video-script": "🎬",
+  "blog-post": "✍️",
+  newsletter: "📰",
+  "meeting-notes": "🗒️",
+  "project-plan": "🎯",
+  "weekly-plan": "🗓️",
   "one-page-gdd": "📄",
   "full-gdd": "📚",
   "vertical-slice": "🧪",
@@ -61,3 +81,5 @@ export interface TemplateContent {
 }
 
 export type TemplateSet = Record<TemplateId, TemplateContent>;
+/** What en.ts / tr.ts / de.ts hold: the game design templates. */
+export type GameTemplateSet = Record<GameTemplateId, TemplateContent>;

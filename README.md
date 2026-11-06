@@ -1,14 +1,16 @@
 # PageHut
 
-A free, open-source workspace for **game design documents** (GDDs). It's built for
-students, indie teams, small studios and university classes.
+A free, open-source workspace for everything you write and plan: **video scripts, blog posts,
+notes, projects, content calendars, task lists, game design documents** and more. Use it alone or
+with a team; it costs nothing and needs no account.
 
 - **Free to use and free to host.** No paid service is required anywhere.
 - **Local-first.** Everything works offline in your browser (IndexedDB) with no sign-up.
 - **Your files stay yours.** Team workspaces live in a GitHub repository you own, as readable
   Markdown and JSON.
-- **Made for games.** GDD templates, design pillars, and databases for mechanics, scope, story
-  beats, playtests and balancing ([docs/FEATURES.md](docs/FEATURES.md)).
+- **Ready to start.** Templates for creators (video script, blog post, newsletter), everyday
+  work (meeting notes, project plan, weekly plan) and game design, plus databases such as a content
+  calendar and a task tracker ([docs/FEATURES.md](docs/FEATURES.md)).
 - **Localized.** Turkish, English and German at launch, with RTL support ready.
 
 ## Download
@@ -46,9 +48,9 @@ github.com, and the app syncs with your repository like the web version at
 - Block editor with a `/` menu, Markdown shortcuts, a formatting toolbar and drag handles. Blocks include callouts, toggles, tables, to-dos, code and images.
 - Nested page tree with drag and drop, plus keyboard move commands and a trash you can restore from.
 - `[[page links]]` with backlinks, and **Ctrl/Cmd+K** search across every page.
-- Design pillars strip shown above every page.
-- 14 GDD templates in Turkish, English and German: one-page GDD, full GDD, vertical slice, pitch deck, level design, mechanic spec, economy, UI/UX flow, story bible, character sheet, art bible, technical design, playtest report and post-mortem.
-- **Databases:** typed properties (text, number, select, multi-select, checkbox, date, link, person, relation, formula), table, board, gallery, **calendar**, **timeline**, **chart** and **form** views, filters, sorts and **automations**. Seven game templates: mechanics, scope tracker (MoSCoW), production schedule, story beats, playtest log, balance table with formulas and mood board. Teammates' edits merge by row and cell.
+- A principles strip shown above every page (a channel's voice, a project's goals, a game's design pillars).
+- 20 page templates in Turkish, English and German. **Content and writing:** video script, blog post, newsletter. **Work and planning:** meeting notes, project plan, weekly plan. **Game design:** one-page GDD, full GDD, vertical slice, pitch deck, level design, mechanic spec, economy, UI/UX flow, story bible, character sheet, art bible, technical design, playtest report and post-mortem.
+- **Databases:** typed properties (text, number, select, multi-select, checkbox, date, link, person, relation, formula), table, board, gallery, **calendar**, **timeline**, **chart** and **form** views, filters, sorts and **automations**. Nine templates: content calendar, task tracker (fills in the done date by itself), and for game teams mechanics, scope tracker (MoSCoW), production schedule, story beats, playtest log, balance table with formulas and mood board. Teammates' edits merge by row and cell.
 - **Comments:** comment on selected text or on the whole page, reply, resolve and @mention teammates (suggested from the repository's collaborators). Comments stay on their text through edits and syncs, and a Mentions inbox lists open comments that mention you. They are stored in `comments/<page>.json`, next to the page.
 - Export a page as Markdown or PDF (through the browser print dialog), or the whole workspace as ZIP (repo layout), JSON or **one PDF** with every page.
 - Import Markdown files, ZIPs (folders become parent pages), JSON backups or a **Markdown & CSV folder export** from another workspace app: the page tree, links between pages, images and callouts come along, and CSV tables become databases.
@@ -122,7 +124,7 @@ Details, GitHub sign-in on your own domain, and a Cloudflare outline:
 - [docs/SYNC.md](docs/SYNC.md): GitHub sync, merge and conflicts
 - [docs/DEPLOY.md](docs/DEPLOY.md): Vercel, Docker, Node.js and Cloudflare
 - [docs/FEATURES.md](docs/FEATURES.md): every feature, including the ones hosted tools charge for
-- [docs/IDEAS.md](docs/IDEAS.md): feature ideas for game teams
+- [docs/IDEAS.md](docs/IDEAS.md): feature ideas
 - [docs/LAUNCH-CHECKLIST.md](docs/LAUNCH-CHECKLIST.md): names and handles to register by hand
 - [CONTRIBUTING.md](CONTRIBUTING.md): code and translation contributions
 

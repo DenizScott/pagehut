@@ -1,6 +1,7 @@
 "use client";
 
 import { FolderInput } from "lucide-react";
+import { BRAND } from "@/config/brand";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,7 @@ import { useStatus } from "@/lib/stores/status";
 import { useUI } from "@/lib/stores/ui";
 import { useWorkspace } from "@/lib/stores/workspace";
 
-/** Moves a GitHub workspace to another folder of its repository (e.g. root → GDD/) in one commit. */
+/** Moves a GitHub workspace to another folder of its repository (e.g. root → PageHut/) in one commit. */
 export function MoveFolderDialog() {
   const t = useTranslations("common.moveFolder");
   const open = useUI((s) => s.dialog === "moveFolder");
@@ -36,7 +37,7 @@ function MoveForm({ onDone }: { onDone: () => void }) {
   const setWorkspace = useWorkspace((s) => s.setWorkspace);
   const toast = useStatus((s) => s.toast);
   const current = workspace?.repo?.dir ?? "";
-  const [folder, setFolder] = useState(current || "GDD");
+  const [folder, setFolder] = useState<string>(current || BRAND.name);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

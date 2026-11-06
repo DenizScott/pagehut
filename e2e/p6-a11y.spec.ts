@@ -29,7 +29,7 @@ async function openApp(page: Page, theme: "light" | "dark") {
 
 async function useTemplate(page: Page, name: string) {
   await page.getByRole("button", { name: "Templates" }).click();
-  const gallery = page.getByRole("dialog", { name: "GDD templates" });
+  const gallery = page.getByRole("dialog", { name: "Templates" });
   await gallery.getByRole("button", { name: new RegExp(name) }).click();
   await gallery.getByRole("button", { name: "Use template" }).click();
   await expect(page.getByRole("textbox", { name: "Page title" })).toHaveValue(name);
@@ -48,7 +48,7 @@ for (const theme of ["light", "dark"] as const) {
     await page.keyboard.press("Escape");
 
     await page.getByRole("button", { name: "Templates" }).click();
-    await expect(page.getByRole("dialog", { name: "GDD templates" })).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "Templates" })).toBeVisible();
     await scan(page, "templates");
     await page.keyboard.press("Escape");
 

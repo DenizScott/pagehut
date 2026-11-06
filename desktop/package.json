@@ -1,8 +1,8 @@
 {
   "name": "pagehut-desktop",
   "productName": "PageHut",
-  "version": "0.3.0",
-  "description": "PageHut desktop app: the game design workspace, running entirely on your computer.",
+  "version": "0.4.0",
+  "description": "PageHut desktop app: a free writing and planning workspace, running entirely on your computer.",
   "author": "DenizScott and PageHut contributors",
   "homepage": "https://pagehut.vercel.app",
   "desktopName": "pagehut.desktop",
@@ -24,7 +24,7 @@
   "build": {
     "appId": "app.pagehut.desktop",
     "productName": "PageHut",
-    "copyright": "Copyright \u00a9 2026 DenizScott and PageHut contributors",
+    "copyright": "Copyright © 2026 DenizScott and PageHut contributors",
     "directories": {
       "output": "dist",
       "buildResources": "build"

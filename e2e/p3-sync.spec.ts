@@ -16,7 +16,7 @@ async function fakeSignedIn(context: BrowserContext, gh: FakeGitHub) {
   });
 }
 
-/** Opens the app, connects the starter workspace to team/game in GDD/, returns the welcome page file path. */
+/** Opens the app, connects the starter workspace to team/game in PageHut/, returns the welcome page file path. */
 async function connected(page: Page, gh: FakeGitHub) {
   gh.addRepo("team", "game", { files: { "Assets/Scripts/Player.cs": "class Player {}", "ProjectSettings/ProjectVersion.txt": "6000.0" } });
   await page.goto("/en");
@@ -27,7 +27,7 @@ async function connected(page: Page, gh: FakeGitHub) {
   await dialog.getByRole("button", { name: "Save to repository" }).click();
   await expect(page.getByText("Workspace saved to team/game")).toBeVisible();
   const pageId = page.url().split("/p/")[1];
-  return `GDD/pages/${pageId}.md`;
+  return `PageHut/pages/${pageId}.md`;
 }
 
 const syncButton = (page: Page) => page.locator("[data-sync-state]:visible");

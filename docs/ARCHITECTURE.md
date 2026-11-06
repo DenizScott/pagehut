@@ -42,7 +42,7 @@ Next.js 16 notes for contributors:
 | `src/lib/editor/` | Editor schema (extensions) shared by the UI and the Markdown converters |
 | `src/lib/markdown/` | Canonical Markdown serializer and parser |
 | `src/components/editor/` | Tiptap UI: slash menu, bubble toolbar, drag handle, image view |
-| `src/components/shell/` | App shell, sidebar, page tree, page view, dialogs (search, templates, trash, pillars) |
+| `src/components/shell/` | App shell, sidebar, page tree, page view, dialogs (search, templates, trash, principles) |
 | `src/lib/tree.ts` | Pure page-tree helpers: build, move, keyboard moves, ancestors |
 | `src/lib/search.ts` | MiniSearch index over titles and plain text (Turkish-aware) |
 | `src/lib/transfer/` | Front matter, ZIP/JSON bundles, import with id remapping, downloads |
@@ -55,7 +55,7 @@ Next.js 16 notes for contributors:
 | `src/components/database/` | Database UI: views, cells, property menu, row dialog |
 | `src/lib/comments/`, `src/components/comments/` | Comment threads, text-quote anchors, merge; comments panel and mentions inbox |
 | `src/lib/structured-merge.ts` | Three-way merge of JSON data by id and field (databases, comments) |
-| `src/templates/` | GDD templates, one file per language (`en.ts`, `tr.ts`, `de.ts`), and database templates (`databases.ts`) |
+| `src/templates/` | Page templates: general ones (`general.ts`) and game design ones, one file per language (`en.ts`, `tr.ts`, `de.ts`); database templates (`databases.ts`) |
 
 ## Data model
 

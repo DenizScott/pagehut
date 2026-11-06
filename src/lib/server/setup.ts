@@ -57,7 +57,7 @@ export function manifestFor(origin: string) {
   return {
     name: `${BRAND.name} ${randomToken(3).replace(/[-_]/g, "x")}`,
     url: origin,
-    description: `${BRAND.name}: game design documents stored in your own GitHub repositories.`,
+    description: `${BRAND.name}: pages and databases stored in your own GitHub repositories.`,
     public: true,
     redirect_url: `${origin}/api/setup/github/callback`,
     callback_urls: [`${origin}/api/auth/callback`],

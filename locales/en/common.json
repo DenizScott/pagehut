@@ -1,8 +1,8 @@
 {
   "app": {
     "name": "PageHut",
-    "tagline": "Game design workspace",
-    "description": "A free, open-source workspace for game design documents."
+    "tagline": "Free writing and planning workspace",
+    "description": "A free, open-source workspace for writing, planning and organizing: scripts, notes, projects and design documents."
   },
   "a11y": {
     "skipToContent": "Skip to content",
@@ -23,7 +23,7 @@
     "loading": "Loading workspace…",
     "notFound": "This page doesn't exist in this workspace.",
     "backHome": "Go to first page",
-    "workspaceName": "My game",
+    "workspaceName": "My workspace",
     "search": "Search",
     "templates": "Templates",
     "trash": "Trash"
@@ -51,7 +51,7 @@
   },
   "welcome": {
     "title": "Welcome to {appName}",
-    "body": "{appName} is a free workspace for **game design documents**.\n\n:::callout idea\nType `/` anywhere to insert headings, to-dos, toggles, callouts, tables and more.\n:::\n\n## Try it\n\n- [ ] Write your game's one-sentence pitch\n- [ ] List three design pillars\n- [ ] Describe the core loop\n\n:::toggle Where is my work stored?\nIn local mode everything stays in this browser (IndexedDB). Later you can connect a GitHub repository so your team can work on the same GDD.\n:::\n"
+    "body": "{appName} is a free workspace for everything you write and plan: video scripts, blog posts, notes, projects, game design documents and more.\n\n:::callout idea\nType `/` anywhere to insert headings, to-dos, toggles, callouts, tables and more.\n:::\n\n## Try it\n\n- [ ] Start a page from a template (Templates in the sidebar)\n- [ ] Link two pages by typing `[[`\n- [ ] Plan something in a database: tasks, a content calendar, a reading list\n\n:::toggle Where is my work stored?\nIn local mode everything stays on this device. Later you can connect a GitHub repository so your team works on the same pages.\n:::\n"
   },
   "tree": {
     "expand": "Expand",
@@ -94,23 +94,23 @@
     "deletedAt": "Deleted {time}"
   },
   "pillars": {
-    "title": "Design pillars",
-    "description": "Up to six principles every feature is measured against. They're shown above every page.",
-    "empty": "Add your design pillars",
-    "edit": "Edit design pillars",
-    "add": "Add pillar",
-    "remove": "Remove pillar",
+    "title": "Principles",
+    "description": "Up to six principles your work is measured against: a channel's voice, a project's goals, a game's design pillars. They're shown above every page.",
+    "empty": "Add your principles",
+    "edit": "Edit principles",
+    "add": "Add principle",
+    "remove": "Remove principle",
     "moveUp": "Move up",
     "moveDown": "Move down",
-    "titleLabel": "Pillar {n} name",
-    "titlePlaceholder": "e.g. Every fight is a puzzle",
-    "descriptionLabel": "Pillar {n} description",
+    "titleLabel": "Principle {n} name",
+    "titlePlaceholder": "e.g. Every video teaches one thing",
+    "descriptionLabel": "Principle {n} description",
     "descriptionPlaceholder": "What it means, and what it rules out",
     "save": "Save",
     "cancel": "Cancel"
   },
   "templates": {
-    "title": "GDD templates",
+    "title": "Templates",
     "description": "Start a page from a proven structure. You can change everything afterwards.",
     "use": "Use template",
     "preview": "Template preview",
@@ -118,11 +118,13 @@
     "startWith": "Start with a template",
     "applyHere": "New page from template",
     "categories": {
-      "plan": "Plan and pitch",
-      "design": "Game design",
-      "story": "Story and art",
-      "production": "Production",
-      "databases": "Databases"
+      "content": "Content and writing",
+      "work": "Work and planning",
+      "databases": "Databases",
+      "plan": "Game: plan and pitch",
+      "design": "Game: design",
+      "story": "Game: story and art",
+      "production": "Game: production"
     },
     "properties": "Properties"
   },
@@ -181,9 +183,9 @@
     "saveHereInstead": "Save this workspace to this repository instead",
     "openHereInstead": "Open the workspace from this repository instead",
     "folderLabel": "Folder in the repository:",
-    "folderHint": "Recommended for game repos: PageHut only touches this folder, never your Unity/Unreal project. Leave empty to use the repository root.",
+    "folderHint": "PageHut only touches this folder, so it can share a repository with code or other files (in a Unity/Unreal project, keep it outside Assets/). Leave empty to use the repository root.",
     "repoRoot": "repository root",
-    "autoMoved": "Your GDD in {repo} now lives in the GDD/ folder. Nothing else in the repository changed.",
+    "autoMoved": "Your workspace in {repo} now lives in the GDD/ folder, next to your game project. Nothing else in the repository changed.",
     "deviceHint": "GitHub has opened in your browser. Enter this code there and approve PageHut. This window carries on by itself.",
     "deviceCodeLabel": "Code for GitHub",
     "deviceCopy": "Copy code",
@@ -229,13 +231,13 @@
     "description": "One commit moves the workspace files. Nothing else in the repository changes.",
     "current": "Now:",
     "newFolder": "New folder:",
-    "hint": "Use a folder outside Assets/ (e.g. GDD) so Unity ignores it.",
+    "hint": "Any folder works. In a Unity project, use one outside Assets/ so Unity ignores it.",
     "action": "Move",
     "cancel": "Cancel",
     "done": "Workspace moved to {folder}",
     "taken": "That folder already contains a workspace.",
     "remoteChanged": "Someone changed the workspace files on GitHub. Sync first (comes with P3), then try again.",
-    "invalid": "Please use a simple folder name like GDD or docs/gdd."
+    "invalid": "Please use a simple folder name like PageHut or docs/notes."
   },
   "conflict": {
     "message": "This page was also changed on GitHub, in the same place you edited. Nothing is lost: your text is in the editor, theirs is kept aside.",

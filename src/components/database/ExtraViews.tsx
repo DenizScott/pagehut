@@ -72,7 +72,7 @@ export function ChartView({ api }: { api: Api }) {
 }
 
 /**
- * Form view: one field per shown property; submitting adds a row. Useful for playtest sign-ups,
+ * Form view: one field per shown property; submitting adds a row. Useful for sign-ups, requests,
  * bug reports or feedback collected on a shared screen.
  */
 export function FormView({ api }: { api: Api }) {

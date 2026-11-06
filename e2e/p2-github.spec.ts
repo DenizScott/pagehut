@@ -69,14 +69,14 @@ test("connect, push, merge a teammate's edit, and open on a second device", asyn
   const dialog = page.getByRole("dialog", { name: "Save this workspace to GitHub" });
   await expect(dialog).toContainText("Signed in as octo-designer");
   await dialog.getByRole("radio", { name: "team/gdd" }).click();
-  await expect(dialog.getByRole("textbox", { name: "Folder in the repository:" })).toHaveValue("GDD");
+  await expect(dialog.getByRole("textbox", { name: "Folder in the repository:" })).toHaveValue("PageHut");
   await dialog.getByRole("button", { name: "Save to repository" }).click();
   await expect(page.getByText("Workspace saved to team/gdd")).toBeVisible();
-  await expect(page.getByRole("link", { name: /team\/gdd\/GDD/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /team\/gdd\/PageHut/ })).toBeVisible();
 
   let files = gh.files("team/gdd");
-  expect(Object.keys(files)).toContain("GDD/workspace.json");
-  const combatFile = Object.entries(files).find(([p, t]) => p.startsWith("GDD/pages/") && t.includes('title: "Combat"'));
+  expect(Object.keys(files)).toContain("PageHut/workspace.json");
+  const combatFile = Object.entries(files).find(([p, t]) => p.startsWith("PageHut/pages/") && t.includes('title: "Combat"'));
   expect(combatFile?.[1]).toContain("Every fight is a puzzle.");
 
   // Edit, then push with the sync button.
@@ -163,12 +163,12 @@ test("opening a repo without a workspace offers to save into it instead", async 
 
   const saveDialog = page.getByRole("dialog", { name: "Save this workspace to GitHub" });
   await expect(saveDialog.getByRole("radio", { name: "team/game-code" })).toHaveAttribute("aria-checked", "true");
-  await expect(saveDialog).toContainText("never your Unity/Unreal project");
-  await expect(saveDialog).toContainText("in GDD/");
+  await expect(saveDialog).toContainText("PageHut only touches this folder");
+  await expect(saveDialog).toContainText("in PageHut/");
   await saveDialog.getByRole("button", { name: "Save to repository" }).click();
   await expect(page.getByText("Workspace saved to team/game-code")).toBeVisible();
   expect(gh.files("team/game-code")["README.md"]).toBe("# Code");
-  expect(gh.files("team/game-code")["GDD/workspace.json"]).toBeDefined();
+  expect(gh.files("team/game-code")["PageHut/workspace.json"]).toBeDefined();
   await ctx.close();
 });
 

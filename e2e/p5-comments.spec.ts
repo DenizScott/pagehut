@@ -97,7 +97,7 @@ test("mention a teammate, sync comments, and see mentions in the inbox", async (
   const sync = page.locator("[data-sync-state]:visible");
   await sync.click();
   await expect(sync).toHaveAttribute("data-sync-state", "synced");
-  const path = `GDD/comments/${pageId}.json`;
+  const path = `PageHut/comments/${pageId}.json`;
   expect(gh.files("team/game")[path]).toContain("@team please review the pitch");
 
   // A teammate replies on GitHub and mentions me in a new thread.

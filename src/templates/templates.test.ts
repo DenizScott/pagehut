@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { databaseTemplateIds, getDatabaseTemplates } from "./databases";
-import { propertySchema, viewSchema } from "@/lib/database/types";
+import { automationSchema, propertySchema, viewSchema } from "@/lib/database/types";
 import { cellText } from "@/lib/database/query";
 import { docToMarkdown } from "@/lib/markdown/serialize";
 import { markdownToDoc } from "@/lib/markdown/parse";
 import { getTemplates, templateIds, templateLocales } from "./index";
 
-describe("GDD templates", () => {
-  it("ships all 14 templates in every launch language", () => {
-    expect(templateIds).toHaveLength(14);
+describe("page templates", () => {
+  it("ships all 20 templates (6 general, 14 game design) in every launch language", () => {
+    expect(templateIds).toHaveLength(20);
     for (const locale of ["tr", "en", "de"]) {
       expect(templateLocales).toContain(locale);
       const list = getTemplates(locale);
@@ -56,6 +56,10 @@ describe("database templates", () => {
         if (v.groupBy) expect(props.get(v.groupBy)?.type).toBe("select");
         for (const d of [v.dateProperty, v.endProperty]) if (d) expect(props.get(d)?.type).toBe("date");
         for (const ref of [...v.filters.map((f) => f.propertyId), ...v.sorts.map((s) => s.propertyId), ...v.hidden]) expect(props.has(ref)).toBe(true);
+      }
+      for (const a of data.automations ?? []) {
+        expect(automationSchema.safeParse(a).success, `${tpl.id} automation`).toBe(true);
+        for (const ref of [a.trigger.kind === "rowAdded" ? null : a.trigger.propertyId, ...a.actions.map((x) => x.propertyId)]) if (ref) expect(props.has(ref)).toBe(true);
       }
       for (const row of data.rows) {
         for (const [pid, value] of Object.entries(row.cells)) {

@@ -1,6 +1,6 @@
-import type { TemplateSet } from "./types";
+import type { GameTemplateSet } from "./types";
 
-export const tr: TemplateSet = {
+export const tr: GameTemplateSet = {
   "one-page-gdd": {
     title: "Tek sayfalık GDD",
     description: "Oyunun tamamı tek sayfada: tanıtım, tasarım ilkeleri, çekirdek döngü, kapsam.",

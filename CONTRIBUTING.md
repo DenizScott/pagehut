@@ -1,6 +1,6 @@
 # Contributing to PageHut
 
-Thanks for helping. PageHut is a free tool for game designers, so contributions that keep it fast,
+Thanks for helping. PageHut is a free writing and planning tool for everyone, so contributions that keep it fast,
 accessible and free to host matter most.
 
 ## Setup
@@ -52,7 +52,8 @@ Translation files are plain JSON in `locales/<lang>/`. English (`en`) is the ref
 3. Translate the values; keep the keys and `{placeholders}` unchanged.
 4. Run `pnpm i18n:check`. CI fails on missing keys, extra keys or mismatched placeholders.
 
-Game-design terms should read the way designers in your language actually talk. Don't translate
+Terms should read the way people in your language actually talk; for the game design templates,
+use the words game designers use. Don't translate
 word by word. Examples for Turkish:
 
 | English | Turkish |

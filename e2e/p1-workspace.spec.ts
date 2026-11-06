@@ -17,7 +17,7 @@ test.beforeEach(async ({ page }) => {
 test("template gallery fills an empty page", async ({ page }) => {
   await newPageFromSidebar(page);
   await page.getByRole("button", { name: "Start with a template" }).click();
-  const dialog = page.getByRole("dialog", { name: "GDD templates" });
+  const dialog = page.getByRole("dialog", { name: "Templates" });
   await dialog.locator('[data-template="mechanic-spec"]').click();
   await dialog.getByRole("button", { name: "Use template" }).click();
   await expect(dialog).toBeHidden();
@@ -69,15 +69,15 @@ test("Ctrl+K search finds text inside pages", async ({ page }) => {
   await expect(first).toContainText("frost wyrm");
 });
 
-test("design pillars appear above every page", async ({ page }) => {
-  await page.getByRole("button", { name: "Edit design pillars" }).click();
-  const dialog = page.getByRole("dialog", { name: "Design pillars" });
-  await dialog.getByRole("button", { name: "Add pillar" }).click();
-  await dialog.getByRole("textbox", { name: "Pillar 1 name" }).fill("Every fight is a puzzle");
+test("principles appear above every page", async ({ page }) => {
+  await page.getByRole("button", { name: "Edit principles" }).click();
+  const dialog = page.getByRole("dialog", { name: "Principles" });
+  await dialog.getByRole("button", { name: "Add principle" }).click();
+  await dialog.getByRole("textbox", { name: "Principle 1 name" }).fill("Every video teaches one thing");
   await dialog.getByRole("button", { name: "Save" }).click();
-  await expect(page.getByRole("region", { name: "Design pillars" })).toContainText("Every fight is a puzzle");
+  await expect(page.getByRole("region", { name: "Principles" })).toContainText("Every video teaches one thing");
   await newPageFromSidebar(page);
-  await expect(page.getByRole("region", { name: "Design pillars" })).toContainText("Every fight is a puzzle");
+  await expect(page.getByRole("region", { name: "Principles" })).toContainText("Every video teaches one thing");
 });
 
 test("trash and restore a page with its subpage", async ({ page }) => {
@@ -143,4 +143,21 @@ test("drag a page onto another to nest it", async ({ page }) => {
 
   await expect(page.getByRole("navigation", { name: "Page path" })).toContainText("Act One");
   await expect(tree.getByRole("button", { name: "Collapse" })).toBeVisible();
+});
+
+test("general templates: a video script page and a content calendar database", async ({ page }) => {
+  await page.getByRole("button", { name: "Templates" }).click();
+  const gallery = page.getByRole("dialog", { name: "Templates" });
+  await expect(gallery.getByRole("heading", { name: "Content and writing" })).toBeVisible();
+  await gallery.getByRole("button", { name: /Video script/ }).click();
+  await gallery.getByRole("button", { name: "Use template" }).click();
+  await expect(page.getByRole("textbox", { name: "Page title" })).toHaveValue("Video script");
+  await expect(page.locator(".ProseMirror:visible").getByRole("heading", { name: "Hook (first 15 seconds)" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Templates" }).click();
+  await gallery.getByRole("button", { name: /Content calendar/ }).click();
+  await gallery.getByRole("button", { name: "Use template" }).click();
+  const db = page.getByRole("region", { name: "Database" });
+  await expect(db.getByRole("tab", { name: "Pipeline", selected: true })).toBeVisible();
+  await expect(db.getByRole("region", { name: "Scripting" })).toContainText("5 tips for beginners");
 });

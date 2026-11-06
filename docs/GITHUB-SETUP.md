@@ -66,7 +66,7 @@ Changing `SESSION_SECRET` signs everyone out. It never affects documents.
 
 ## 4. Install the app on a repository
 
-1. Create a repository for your GDD on GitHub. It can be empty, public or private.
+1. Create a repository for your workspace on GitHub. It can be empty, public or private.
 2. Open `https://github.com/apps/<slug>/installations/new`.
 3. Choose **Only select repositories** and pick that repository.
 

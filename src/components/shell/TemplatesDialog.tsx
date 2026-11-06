@@ -12,12 +12,12 @@ import { cn } from "@/lib/utils";
 import { getTemplates, type Template, type TemplateCategory } from "@/templates";
 import { getDatabaseTemplates, type DatabaseTemplate } from "@/templates/databases";
 
-const categories: (TemplateCategory | "databases")[] = ["plan", "design", "story", "production", "databases"];
+const categories: (TemplateCategory | "databases")[] = ["content", "work", "databases", "plan", "design", "story", "production"];
 
 /** A page template (Markdown) or a database template (properties, views, sample rows). */
 type Item = ({ kind: "page" } & Template) | ({ kind: "database"; category: "databases" } & DatabaseTemplate);
 
-/** Localized GDD template gallery. Fills the current page if it's empty, otherwise creates a new page. */
+/** Localized template gallery. Fills the current page if it's empty, otherwise creates a new page. */
 export function TemplatesDialog() {
   const t = useTranslations("common.templates");
   const open = useUI((s) => s.dialog === "templates");

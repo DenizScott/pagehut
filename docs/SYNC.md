@@ -1,11 +1,11 @@
 # GitHub sync and conflicts
 
-Status: **P3 implemented**: sign-in, connect/open, a workspace in a folder of a game repository,
+Status: **P3 implemented**: sign-in, connect/open, a workspace in a folder of any repository,
 automatic two-way sync, three-way merge, conflict resolution, page history.
 
 ## How syncing works today
 
-- **Where.** A workspace lives in one folder of a repository (`repo.dir`, default `GDD`). PageHut
+- **Where.** A workspace lives in one folder of a repository (`repo.dir`, default `PageHut`; game repositories from before folder support move to `GDD`). PageHut
   only reads and writes inside that folder, plus `README.md` when it initializes an empty
   repository.
 - **When.** Automatically while the tab is visible:

@@ -56,7 +56,7 @@ function workspaceJsonText(ws: WorkspaceRecord, pages: PageRecord[]): string {
 }
 
 const readme = (name: string) =>
-  `# ${name}\n\nGame design documents written with ${BRAND.name}. Pages are Markdown files in \`pages/\`; the page tree is in \`workspace.json\`.\n`;
+  `# ${name}\n\nPages written with ${BRAND.name}. Pages are Markdown files in \`pages/\`; the page tree is in \`workspace.json\`.\n`;
 
 /**
  * Blob shas of what we last synced. Computed from the synced content when not stored (git ids are
