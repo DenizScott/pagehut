@@ -67,7 +67,7 @@
   "transfer": {
     "menu": "İçe ve dışa aktar",
     "import": "İçe aktar",
-    "importFiles": "Markdown, ZIP, JSON veya Markdown & CSV dışa aktarımı içe aktar…",
+    "importFiles": "Markdown, CSV, ZIP veya JSON içe aktar…",
     "exportWorkspace": "Çalışma alanını dışa aktar",
     "exportZip": "ZIP olarak dışa aktar (Markdown dosyaları)",
     "exportJson": "JSON olarak dışa aktar (tam yedek)",

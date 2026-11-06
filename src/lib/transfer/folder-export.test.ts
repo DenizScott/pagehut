@@ -21,11 +21,11 @@ function idFolderExport(): Uint8Array {
     [`${GD}/Weapons ${id(3)}/Sword ${id(4)}.md`]: strToU8("# Sword\n\nDamage: 10\n\nA basic sword.\n"),
     [`${GD}/concept.png`]: new Uint8Array([137, 80, 78, 71]),
   });
-  // Large exports come in a ZIP of ZIPs.
+  // Large exports come as a ZIP of ZIPs.
   return zipSync({ "Export-1234-Part-1.zip": inner });
 }
 
-describe("folder import", () => {
+describe("Markdown & CSV folder import", () => {
   it("reads CSV with quotes, commas, newlines and a BOM", () => {
     expect(parseCsv('﻿a,b\n"x, y","he said ""hi""\nok"\n')).toEqual([["a", "b"], ["x, y", 'he said "hi"\nok']]);
     expect(stripExportId(`Combat ${id(2)}`)).toBe("Combat");

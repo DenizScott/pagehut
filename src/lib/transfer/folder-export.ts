@@ -6,10 +6,11 @@ import { optionColors, type DatabaseData, type Property, type Row } from "@/lib/
 import type { BundleAsset, BundlePage, WorkspaceBundle } from "./bundle";
 
 /**
- * "Markdown & CSV" folder export → workspace bundle (best effort).
+ * Folder exports with ids in file names ("Markdown & CSV" exports of other workspace apps) →
+ * workspace bundle (best effort).
  *
  *  - "Page <32-hex id>.md" files with a "Page <id>/" folder of subpages become a page tree; the
- *    Export ids are dropped from titles.
+ *    ids are dropped from titles.
  *  - Links between exported pages become [[page:…]] links; images in the export become assets.
  *  - "<aside>" callouts become callouts.
  *  - "Table <id>.csv" (or "<id>_all.csv") becomes a database with inferred property types; its

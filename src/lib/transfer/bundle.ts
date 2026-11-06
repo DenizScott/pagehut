@@ -120,7 +120,7 @@ export function titleFromMarkdown(markdown: string, fileName: string): { title: 
 export function bundleFromZip(data: Uint8Array, fallbackName: string): WorkspaceBundle {
   const entries = unzipAll(data);
   const names = Object.keys(entries);
-  // A other workspace apps export (files named "Page <32-hex id>.md"): see folder-export.ts.
+  // A folder export with ids in file names ("Page <32-hex id>.md"): see folder-export.ts.
   if (!names.some((n) => /(^|\/)workspace\.json$/.test(n)) && isIdFolderExport(names)) return bundleFromIdFolders(entries, fallbackName.replace(/\.zip$/i, ""));
   const assets: BundleAsset[] = names
     .filter((n) => /^(?:[^/]+\/)?assets\//.test(n))

@@ -124,11 +124,11 @@ a page's text, so it never conflicts with someone typing.
   inbox lists open threads that mention the signed-in user.
 - **Known limit.** Comments are not part of ZIP or JSON exports yet. They travel through GitHub.
 
-## folder import
+## Importing Markdown & CSV folder exports
 
-`lib/transfer/folder-export.ts` reads a "Markdown & CSV" folder export, including ZIPs nested inside ZIPs:
+`lib/transfer/folder-export.ts` reads "Markdown & CSV" folder exports whose file names carry ids, including ZIPs nested inside ZIPs:
 
-- Export ids are dropped from titles, and page folders become the page tree.
+- The ids are dropped from titles, and page folders become the page tree.
 - Relative links between exported pages become `[[page:…]]` links.
 - Images become assets, and `<aside>` callouts become callouts.
 - A CSV becomes a database. `_all.csv` is preferred, and property types are inferred: number,

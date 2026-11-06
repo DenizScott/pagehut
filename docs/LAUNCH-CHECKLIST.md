@@ -30,7 +30,9 @@ account and decision. Tick items off here as they are done.
 
 - [ ] GitHub App for sign-in: follow `docs/GITHUB-SETUP.md`. Use a separate app for production,
       with the production callback URL.
-- [ ] Choose the license (MIT proposed) and add `LICENSE`.
+- [x] License: MIT (`LICENSE`). Chosen because the project is meant to be free for students and
+      teams to use, change and self-host, and every dependency is under a compatible permissive
+      license.
 - [ ] Privacy note: documents are stored only in the browser or in the user's GitHub repo.
 - [x] First deployment on Vercel (Hobby, no payment method): <https://pagehut.vercel.app>, project
       `pagehut`, connected to the GitHub repo so every push to `main` deploys. Lighthouse on the

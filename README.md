@@ -1,6 +1,6 @@
 # PageHut
 
-A free, open-source, block-based workspace for **game design documents** (GDDs). It's built for
+A free, open-source workspace for **game design documents** (GDDs). It's built for
 students, indie teams, small studios and university classes.
 
 - **Free to use and free to host.** No paid service is required anywhere.
@@ -24,7 +24,7 @@ students, indie teams, small studios and university classes.
 - **Databases:** typed properties (text, number, select, multi-select, checkbox, date, link, person, relation, formula), table, board and gallery views, filters and sorts. Six game templates: mechanics, scope tracker (MoSCoW), story beats, playtest log, balance table with formulas and mood board. Teammates' edits merge by row and cell.
 - **Comments:** comment on selected text or on the whole page, reply, resolve and @mention teammates (suggested from the repository's collaborators). Comments stay on their text through edits and syncs, and a Mentions inbox lists open comments that mention you. They are stored in `comments/<page>.json`, next to the page.
 - Export a page as Markdown or PDF (through the browser print dialog), or the whole workspace as ZIP (repo layout) or JSON.
-- Import Markdown files, ZIPs (folders become parent pages), JSON backups or a **Markdown & CSV folder export** (Markdown & CSV): the page tree, links between pages, images and callouts come along, and CSV tables become databases.
+- Import Markdown files, ZIPs (folders become parent pages), JSON backups or a **Markdown & CSV folder export** from another workspace app: the page tree, links between pages, images and callouts come along, and CSV tables become databases.
 - **GitHub:** sign in, save a workspace to a repository (one readable Markdown file per page), push changes as one commit, open a workspace from a repository on another device, and share by adding collaborators. Automatic two-way sync with three-way merge; overlapping edits show a compare / keep mine / keep theirs choice, and every page has a restorable history. Nothing is ever force-pushed. A workspace can live in a `GDD/` folder inside a Unity or Unreal repository.
 
 ## GitHub sign-in (optional)
@@ -78,11 +78,11 @@ Details, GitHub sign-in on your own domain, and a Cloudflare outline:
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how the app is put together
 - [docs/SYNC.md](docs/SYNC.md): GitHub sync, merge and conflicts
 - [docs/DEPLOY.md](docs/DEPLOY.md): Vercel, Docker, Node.js and Cloudflare
-- [docs/FEATURES.md](docs/FEATURES.md): every feature
+- [docs/FEATURES.md](docs/FEATURES.md): every feature, including the ones hosted tools charge for
 - [docs/IDEAS.md](docs/IDEAS.md): feature ideas for game teams
 - [docs/LAUNCH-CHECKLIST.md](docs/LAUNCH-CHECKLIST.md): names and handles to register by hand
 - [CONTRIBUTING.md](CONTRIBUTING.md): code and translation contributions
 
 ## License
 
-To be decided before the first public release (MIT proposed).
+[MIT](LICENSE). Use it, change it, host it, teach with it; keep the copyright notice.

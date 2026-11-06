@@ -2,7 +2,7 @@ import { strToU8, zipSync } from "fflate";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { FakeGitHub } from "../src/lib/github/fake-github";
 
-/** Comments, @mentions, the mentions inbox and folder import through the real UI. */
+/** Comments, @mentions, the mentions inbox and Markdown & CSV folder import through the real UI. */
 
 const editor = (page: Page) => page.locator(".ProseMirror:visible");
 const panel = (page: Page) => page.getByRole("complementary", { name: "Comments" });

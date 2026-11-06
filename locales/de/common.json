@@ -67,7 +67,7 @@
   "transfer": {
     "menu": "Import und Export",
     "import": "Importieren",
-    "importFiles": "Markdown, ZIP, JSON oder Markdown- & CSV-Export importieren…",
+    "importFiles": "Markdown, CSV, ZIP oder JSON importieren…",
     "exportWorkspace": "Arbeitsbereich exportieren",
     "exportZip": "Als ZIP exportieren (Markdown-Dateien)",
     "exportJson": "Als JSON exportieren (vollständige Sicherung)",
