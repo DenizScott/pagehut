@@ -31,12 +31,17 @@ saved there. On Debian or Ubuntu you can also use the
 The installers aren't code-signed yet (a signing certificate costs money every year), so the
 system asks once on first start:
 
-- **Windows:** "Windows protected your PC" → **More info** → **Run anyway**.
+- **Windows (browser download):** Edge or Chrome may say the file "isn't commonly downloaded" and offer
+  **Delete**. Open the arrow next to **Delete** → **Keep** → **Keep anyway**. This is SmartScreen's
+  reputation check for new, unsigned files, not a virus warning.
+- **Windows (first start):** "Windows protected your PC" → **More info** → **Run anyway**.
 - **macOS:** right-click PageHut in Applications → **Open** → **Open**.
 
 **Türkçe:** Yukarıdaki düğmeden işletim sistemine uygun dosyayı indir, kur ve aç. Komut
 çalıştırmana ya da siteye girmene gerek yok; uygulama tamamen bilgisayarında, internetsiz çalışır.
-Windows ilk açılışta uyarırsa **Ek bilgi → Yine de çalıştır**'ı seç. Ekibinle çalışmak için
+Tarayıcı indirirken "yaygın olarak indirilen bir dosya değil" deyip **Sil** önerirse, **Sil**'in yanındaki
+oka bas → **Koru** → **Yine de koru**. Windows ilk açılışta uyarırsa **Ek bilgi → Yine de çalıştır**'ı seç.
+Bunlar imzasız yeni dosyalar için yapılan itibar kontrolü, virüs uyarısı değil. Ekibinle çalışmak için
 uygulamada **GitHub ile giriş yap**'a bas, çıkan kısa kodu GitHub'da gir; 8 saat açık kalır.
 
 To work with your team, sign in with GitHub from the app: it shows a short code, you enter it on

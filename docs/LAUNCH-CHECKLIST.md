@@ -29,6 +29,15 @@ account and decision. Tick items off here as they are done.
       decide whether the overlap matters, and consider a distinguishing tagline
       (for example "PageHut: free writing and planning workspace").
 
+## Windows download warning (SmartScreen)
+
+- [ ] Edge/Chrome show "PageHut-Setup-win-x64.exe isn't commonly downloaded" (Publisher: Unknown) and
+      offer **Delete**, and Windows warns again on first start. Reported 2026-11-07. Cause: the
+      installer is unsigned and new, so it has no SmartScreen reputation yet. Workaround for users is
+      in the README (Delete ▸ Keep ▸ Keep anyway). Lasting fix, free for open-source projects: apply
+      to **SignPath Foundation** (https://signpath.org) for code signing and sign the Windows build in
+      `.github/workflows/desktop.yml`; reputation then builds with downloads.
+
 ## Before the first public deploy
 
 - [ ] GitHub App for sign-in: follow `docs/GITHUB-SETUP.md`. Use a separate app for production,
