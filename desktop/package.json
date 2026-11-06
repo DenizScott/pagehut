@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "description": "PageHut desktop app: the game design workspace in its own window.",
   "author": "DenizScott and PageHut contributors",
+  "homepage": "https://pagehut.vercel.app",
+  "desktopName": "pagehut.desktop",
   "license": "MIT",
   "private": true,
   "main": "main.js",
@@ -77,7 +79,8 @@
       ],
       "category": "Office",
       "icon": "build/icon.png",
-      "maintainer": "PageHut contributors"
+      "maintainer": "PageHut contributors",
+      "syncDesktopName": true
     },
     "appImage": {
       "artifactName": "PageHut-${version}-linux-${arch}.${ext}"

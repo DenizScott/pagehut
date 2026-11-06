@@ -10,6 +10,9 @@ on:
       tag:
         description: Release tag to attach the installers to (e.g. v0.1.0)
         required: true
+      ref:
+        description: Branch or commit to build (defaults to the tag)
+        required: false
 
 permissions:
   contents: write
@@ -28,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.release.tag_name || inputs.tag }}
+          ref: ${{ github.event.release.tag_name || inputs.ref || inputs.tag }}
       - uses: actions/setup-node@v7
         with:
           node-version: 22
