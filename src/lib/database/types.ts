@@ -63,7 +63,7 @@ export const sortSchema = z.object({
 });
 export type Sort = z.infer<typeof sortSchema>;
 
-export const viewTypes = ["table", "board", "gallery", "chart", "form"] as const;
+export const viewTypes = ["table", "board", "gallery", "calendar", "timeline", "chart", "form"] as const;
 export type ViewType = (typeof viewTypes)[number];
 
 export const viewSchema = z.object({
@@ -82,6 +82,10 @@ export const viewSchema = z.object({
   chartValue: z.string().optional(),
   /** chart: how bar values are computed */
   chartAgg: z.enum(["count", "sum", "avg"]).optional(),
+  /** calendar: the date a row is shown on; timeline: its start date */
+  dateProperty: z.string().optional(),
+  /** timeline: end date (optional; a row without one is a single day) */
+  endProperty: z.string().optional(),
   /** table: column widths in px by property id */
   widths: z.record(z.string(), z.number()).optional(),
 });

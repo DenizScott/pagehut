@@ -54,6 +54,8 @@
     "table": "Tabelle",
     "board": "Board",
     "gallery": "Galerie",
+    "calendar": "Kalender",
+    "timeline": "Zeitleiste",
     "rename": "Ansicht umbenennen",
     "delete": "Ansicht löschen",
     "properties": "Eigenschaften",
@@ -130,5 +132,24 @@
     "hint": "Fülle die Felder aus und sende. Jede Sendung fügt dieser Datenbank eine Zeile hinzu.",
     "submit": "Senden",
     "sent": "{count, plural, one {Gesendet. # Eintrag hinzugefügt.} other {Gesendet. # Einträge hinzugefügt.}}"
+  },
+  "calendar": {
+    "date": "Datum",
+    "today": "Heute",
+    "previous": "Vorheriger Monat",
+    "next": "Nächster Monat",
+    "addOn": "Zeile am {date} hinzufügen",
+    "needDate": "Füge eine Datums-Eigenschaft hinzu und wähle sie unter Eigenschaften. Zeilen erscheinen an ihrem Datum.",
+    "needDateShort": "Zuerst eine Datums-Eigenschaft hinzufügen"
+  },
+  "timeline": {
+    "label": "Zeitleiste: {name}",
+    "start": "Beginn",
+    "end": "Ende",
+    "noEnd": "Keins (ein Tag)",
+    "range": "{start} bis {end}",
+    "addToday": "Neu, ab heute",
+    "undated": "{count, plural, one {# Zeile hat kein Startdatum:} other {# Zeilen haben kein Startdatum:}}",
+    "needDate": "Füge eine Datums-Eigenschaft für den Beginn (und eine für das Ende) hinzu und wähle sie unter Eigenschaften."
   }
 }

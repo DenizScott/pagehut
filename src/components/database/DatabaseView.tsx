@@ -3,7 +3,9 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   ArrowUpDown,
+  CalendarDays,
   ChartBar,
+  ChartGantt,
   ClipboardList,
   Columns3,
   Eye,
@@ -31,10 +33,19 @@ import { getAsset, listPages, saveDatabase } from "@/lib/storage/local-repo";
 import { useStatus } from "@/lib/stores/status";
 import { cn } from "@/lib/utils";
 import { Cell, OptionChip, type RelationSource } from "./Cell";
+import { CalendarView, TimelineView } from "./DateViews";
 import { ChartView, FormView } from "./ExtraViews";
 import { PropertyMenu, typeIcon } from "./PropertyMenu";
 
-const viewIcon: Record<ViewType, typeof Table2> = { table: Table2, board: Columns3, gallery: GalleryHorizontalEnd, chart: ChartBar, form: ClipboardList };
+const viewIcon: Record<ViewType, typeof Table2> = {
+  table: Table2,
+  board: Columns3,
+  gallery: GalleryHorizontalEnd,
+  calendar: CalendarDays,
+  timeline: ChartGantt,
+  chart: ChartBar,
+  form: ClipboardList,
+};
 
 export interface Api {
   data: DatabaseData;
@@ -113,7 +124,7 @@ export function DatabaseView({ page }: { page: PageRecord }) {
       }
       const r = ops.addRow(latest.current, preset);
       set(r.data);
-      if (view.type === "board" || view.type === "gallery") setOpenRowId(r.row.id);
+      if (view.type === "board" || view.type === "gallery" || view.type === "calendar" || view.type === "timeline") setOpenRowId(r.row.id);
     },
     openRow: setOpenRowId,
   };
@@ -126,6 +137,8 @@ export function DatabaseView({ page }: { page: PageRecord }) {
       {view.type === "table" && <TableView api={api} />}
       {view.type === "board" && <BoardView api={api} />}
       {view.type === "gallery" && <GalleryView api={api} />}
+      {view.type === "calendar" && <CalendarView api={api} />}
+      {view.type === "timeline" && <TimelineView api={api} />}
       {view.type === "chart" && <ChartView api={api} />}
       {view.type === "form" && <FormView api={api} />}
       {openRow && <RowDialog api={api} row={openRow} onClose={() => setOpenRowId(null)} />}
@@ -198,7 +211,7 @@ function Toolbar({ api, onSelectView }: { api: Api; onSelectView: (id: string) =
             <Plus className="size-4" />
           </MenuTrigger>
           <MenuContent align="start">
-            {(["table", "board", "gallery", "chart", "form"] as const).map((type) => {
+            {(["table", "board", "gallery", "calendar", "timeline", "chart", "form"] as const).map((type) => {
               const Icon = viewIcon[type];
               return (
                 <MenuItem key={type} onSelect={() => addView(type)}>
@@ -416,6 +429,7 @@ function ViewSettings({ api, onRename, onDeleted }: { api: Api; onRename: () => 
             </label>
           )}
           {view.type === "chart" && <ChartSettings api={api} />}
+          {(view.type === "calendar" || view.type === "timeline") && <DateSettings api={api} />}
           {view.type === "gallery" && (
             <label className="mb-2 flex items-center gap-2">
               <span className="shrink-0 text-fg-muted">{t("views.cover")}</span>
@@ -767,6 +781,34 @@ function GalleryView({ api }: { api: Api }) {
         </button>
       </li>
     </ul>
+  );
+}
+
+/* ---------------- Calendar and timeline settings ---------------- */
+
+function DateSettings({ api }: { api: Api }) {
+  const t = useTranslations("database");
+  const { data, view, set } = api;
+  const dates = data.properties.filter((p) => p.type === "date");
+  const select = "h-7 min-w-0 flex-1 rounded-md border border-border-control bg-canvas px-1";
+  const field = (key: "dateProperty" | "endProperty", label: string, emptyLabel: string) => (
+    <label className="flex items-center gap-2">
+      <span className="w-20 shrink-0 text-fg-muted">{label}</span>
+      <select value={view[key] ?? ""} onChange={(e) => set(ops.updateView(data, view.id, { [key]: e.target.value || undefined }))} className={select}>
+        <option value="">{emptyLabel}</option>
+        {dates.map((p) => (
+          <option key={p.id} value={p.id}>
+            {p.name}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+  return (
+    <div className="mb-2 space-y-2">
+      {field("dateProperty", view.type === "timeline" ? t("timeline.start") : t("calendar.date"), dates.length ? "—" : t("calendar.needDateShort"))}
+      {view.type === "timeline" && field("endProperty", t("timeline.end"), t("timeline.noEnd"))}
+    </div>
   );
 }
 

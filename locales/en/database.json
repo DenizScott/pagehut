@@ -54,6 +54,8 @@
     "table": "Table",
     "board": "Board",
     "gallery": "Gallery",
+    "calendar": "Calendar",
+    "timeline": "Timeline",
     "rename": "Rename view",
     "delete": "Delete view",
     "properties": "Properties",
@@ -130,5 +132,24 @@
     "hint": "Fill in the fields and send. Each send adds a row to this database.",
     "submit": "Send",
     "sent": "{count, plural, one {Sent. # entry added.} other {Sent. # entries added.}}"
+  },
+  "calendar": {
+    "date": "Date",
+    "today": "Today",
+    "previous": "Previous month",
+    "next": "Next month",
+    "addOn": "Add a row on {date}",
+    "needDate": "Add a Date property, then choose it under Properties. Rows appear on their date.",
+    "needDateShort": "Add a Date property first"
+  },
+  "timeline": {
+    "label": "Timeline: {name}",
+    "start": "Start",
+    "end": "End",
+    "noEnd": "None (one day)",
+    "range": "{start} to {end}",
+    "addToday": "New, starting today",
+    "undated": "{count, plural, one {# row has no start date:} other {# rows have no start date:}}",
+    "needDate": "Add a Date property for the start (and one for the end), then choose them under Properties."
   }
 }

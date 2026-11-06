@@ -54,6 +54,7 @@ describe("database templates", () => {
       for (const v of data.views) {
         expect(viewSchema.safeParse(v).success).toBe(true);
         if (v.groupBy) expect(props.get(v.groupBy)?.type).toBe("select");
+        for (const d of [v.dateProperty, v.endProperty]) if (d) expect(props.get(d)?.type).toBe("date");
         for (const ref of [...v.filters.map((f) => f.propertyId), ...v.sorts.map((s) => s.propertyId), ...v.hidden]) expect(props.has(ref)).toBe(true);
       }
       for (const row of data.rows) {

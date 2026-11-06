@@ -175,7 +175,21 @@ export function addView(data: DatabaseData, name: string, type: ViewType): { dat
         ? data.properties.find((p) => p.type === "select" || p.type === "multiSelect" || p.type === "checkbox")?.id
         : undefined;
   const coverProperty = type === "gallery" ? data.properties.find((p) => p.type === "url")?.id : undefined;
-  const view: View = { id: shortId(), name, type, filters: [], sorts: [], hidden: [], ...(groupBy ? { groupBy } : {}), ...(coverProperty ? { coverProperty } : {}) };
+  const dates = data.properties.filter((p) => p.type === "date").map((p) => p.id);
+  const dateProperty = type === "calendar" || type === "timeline" ? dates[0] : undefined;
+  const endProperty = type === "timeline" ? dates[1] : undefined;
+  const view: View = {
+    id: shortId(),
+    name,
+    type,
+    filters: [],
+    sorts: [],
+    hidden: [],
+    ...(groupBy ? { groupBy } : {}),
+    ...(coverProperty ? { coverProperty } : {}),
+    ...(dateProperty ? { dateProperty } : {}),
+    ...(endProperty ? { endProperty } : {}),
+  };
   return { data: { ...data, views: [...data.views, view] }, view };
 }
 

@@ -15,9 +15,10 @@ plans (team, business and enterprise tiers).
 
 - Property types: text, number, select, multi-select, checkbox, date, link, person, relation,
   formula.
-- Views: **table, board, gallery, chart and form**, each with its own filters, sorts and shown
-  properties.
-- Six game templates: mechanics, scope tracker, story beats, playtest log, balance table, mood board.
+- Views: **table, board, gallery, calendar, timeline, chart and form**, each with its own filters,
+  sorts and shown properties.
+- Seven game templates: mechanics, scope tracker, production schedule, story beats, playtest log,
+  balance table, mood board.
 
 ## Working together
 
@@ -47,7 +48,7 @@ plans (team, business and enterprise tiers).
 | Built-in AI writing assistant | **No, on purpose.** Every AI service costs money per use; PageHut stays free to run. |
 | Page view analytics | **No, on purpose.** It would mean tracking readers on a server; PageHut has none. |
 | Database automations | Not yet. Planned: simple rules such as "when Status becomes Done, set Date". |
-| Calendar and timeline views | Not yet. Planned next for milestones and production schedules. |
+| Calendar and timeline views | Yes: a month calendar and a timeline (start and end dates), plus a production schedule template. |
 
 ## Accessibility and languages
 

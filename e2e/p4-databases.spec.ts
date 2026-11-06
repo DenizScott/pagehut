@@ -248,3 +248,32 @@ test("chart and form views; the whole workspace prints as one document", async (
   expect(srcdoc).toContain("Photo mode filters");
   expect(srcdoc).toContain("Welcome to PageHut");
 });
+
+test("timeline and calendar place rows by their dates", async ({ page }) => {
+  await page.goto("/en");
+  await page.waitForURL(/\/p\//);
+  await page.getByRole("button", { name: "Templates" }).click();
+  const gallery = page.getByRole("dialog", { name: "GDD templates" });
+  await gallery.getByRole("button", { name: /Production schedule/ }).click();
+  await gallery.getByRole("button", { name: "Use template" }).click();
+
+  // Timeline: one bar per milestone; each bar's name carries its dates.
+  const timeline = db(page).getByRole("list", { name: "Timeline: Timeline" });
+  await expect(timeline.getByRole("listitem")).toHaveCount(4);
+  await timeline.getByRole("button", { name: /^Prototype, .+ to .+/ }).click();
+  await expect(page.getByRole("dialog", { name: "Prototype" })).toBeVisible();
+  await page.keyboard.press("Escape");
+
+  // Calendar (by end date): add a row today from its day cell.
+  await db(page).getByRole("tab", { name: "Calendar" }).click();
+  const now = new Date();
+  const iso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const label = new Intl.DateTimeFormat("en", { dateStyle: "full", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+  await db(page).getByRole("button", { name: `Add a row on ${label}` }).click();
+  const row = page.getByRole("dialog", { name: "Untitled" });
+  await row.getByRole("button", { name: "Milestone" }).click();
+  await page.keyboard.type("Art lock");
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("Escape");
+  await expect(db(page).getByRole("cell", { name: label })).toContainText("Art lock");
+});

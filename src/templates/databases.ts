@@ -6,7 +6,7 @@ import type { DatabaseData, OptionColor, Property, Row, View } from "@/lib/datab
  * Each build() returns fresh ids, so a template can be used many times in one workspace.
  */
 
-export const databaseTemplateIds = ["mechanics", "scope", "story-beats", "playtests", "balance", "moodboard"] as const;
+export const databaseTemplateIds = ["mechanics", "scope", "story-beats", "playtests", "schedule", "balance", "moodboard"] as const;
 export type DatabaseTemplateId = (typeof databaseTemplateIds)[number];
 
 export interface DatabaseTemplate {
@@ -27,6 +27,12 @@ const sel = (id: string, name: string, options: Opt[], multi = false): Property 
 const prop = (id: string, name: string, type: Property["type"], extra: Partial<Property> = {}): Property => ({ id, name, type, ...extra });
 const view = (id: string, name: string, type: View["type"], extra: Partial<View> = {}): View => ({ id, name, type, filters: [], sorts: [], hidden: [], ...extra });
 const rows = (cells: Row["cells"][]): Row[] => cells.map((c, i) => ({ id: ulid(), order: i + 1, cells: c }));
+/** "YYYY-MM-DD", `days` from today in the viewer's calendar, so sample schedules start near now. */
+const fromToday = (days: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
 
 interface Strings {
   table: string;
@@ -38,6 +44,7 @@ interface Strings {
   playtests: { title: string; description: string; name: string; date: string; build: string; tester: string; fun: string; issue: string; fixed: string; open: string; samples: [string, string]; issues: [string, string] };
   balance: { title: string; description: string; name: string; cost: string; damage: string; health: string; speed: string; dps: string; value: string; samples: [string, string, string] };
   moodboard: { title: string; description: string; name: string; image: string; tags: string; tagNames: [string, string, string, string, string]; notes: string; samples: [string, string, string] };
+  schedule: { title: string; description: string; name: string; start: string; end: string; status: string; statuses: [string, string, string]; owner: string; timeline: string; calendar: string; samples: [string, string, string, string] };
 }
 
 const en: Strings = {
@@ -110,6 +117,19 @@ const en: Strings = {
     dps: "DPS",
     value: "Value per cost",
     samples: ["Archer", "Knight", "Catapult"],
+  },
+  schedule: {
+    title: "Production schedule",
+    description: "Milestones and tasks with start and end dates, as a timeline and a calendar.",
+    name: "Milestone",
+    start: "Start",
+    end: "End",
+    status: "Status",
+    statuses: ["Planned", "In progress", "Done"],
+    owner: "Owner",
+    timeline: "Timeline",
+    calendar: "Calendar",
+    samples: ["Prototype", "Vertical slice", "Playtest #1", "Alpha"],
   },
   moodboard: {
     title: "Mood board",
@@ -194,6 +214,19 @@ const tr: Strings = {
     value: "Maliyet başına değer",
     samples: ["Okçu", "Şövalye", "Mancınık"],
   },
+  schedule: {
+    title: "Üretim takvimi",
+    description: "Başlangıç ve bitiş tarihli kilometre taşları ve işler; zaman çizelgesi ve takvim olarak.",
+    name: "Kilometre taşı",
+    start: "Başlangıç",
+    end: "Bitiş",
+    status: "Durum",
+    statuses: ["Planlandı", "Sürüyor", "Bitti"],
+    owner: "Sorumlu",
+    timeline: "Zaman çizelgesi",
+    calendar: "Takvim",
+    samples: ["Prototip", "Dikey kesit", "Oyun testi #1", "Alfa"],
+  },
   moodboard: {
     title: "Moodboard",
     description: "Görsel referanslar galeri olarak; etiketler ve notlarla.",
@@ -277,6 +310,19 @@ const de: Strings = {
     value: "Wert pro Kosten",
     samples: ["Bogenschütze", "Ritter", "Katapult"],
   },
+  schedule: {
+    title: "Produktionsplan",
+    description: "Meilensteine und Aufgaben mit Start- und Enddatum, als Zeitleiste und Kalender.",
+    name: "Meilenstein",
+    start: "Beginn",
+    end: "Ende",
+    status: "Status",
+    statuses: ["Geplant", "In Arbeit", "Fertig"],
+    owner: "Verantwortlich",
+    timeline: "Zeitleiste",
+    calendar: "Kalender",
+    samples: ["Prototyp", "Vertical Slice", "Playtest #1", "Alpha"],
+  },
   moodboard: {
     title: "Moodboard",
     description: "Visuelle Referenzen als Galerie, mit Tags und Notizen.",
@@ -298,6 +344,7 @@ export function getDatabaseTemplates(locale: string): DatabaseTemplate[] {
   const st = s.story;
   const pt = s.playtests;
   const b = s.balance;
+  const sch = s.schedule;
   const mb = s.moodboard;
   return [
     {
@@ -392,6 +439,32 @@ export function getDatabaseTemplates(locale: string): DatabaseTemplate[] {
         rows: rows([
           { title: pt.samples[0], date: "2026-01-10", build: "0.1.0", fun: 3, issue: pt.issues[0], fixed: true },
           { title: pt.samples[1], date: "2026-01-17", build: "0.1.1", fun: 4, issue: pt.issues[1] },
+        ]),
+      }),
+    },
+    {
+      id: "schedule",
+      icon: "🗓️",
+      title: sch.title,
+      description: sch.description,
+      build: () => ({
+        properties: [
+          prop("title", sch.name, "title"),
+          prop("start", sch.start, "date"),
+          prop("end", sch.end, "date"),
+          sel("status", sch.status, [["planned", sch.statuses[0], "gray"], ["doing", sch.statuses[1], "blue"], ["done", sch.statuses[2], "moss"]]),
+          prop("owner", sch.owner, "person"),
+        ],
+        views: [
+          view("timeline", sch.timeline, "timeline", { dateProperty: "start", endProperty: "end", sorts: [{ propertyId: "start", dir: "asc" }] }),
+          view("calendar", sch.calendar, "calendar", { dateProperty: "end" }),
+          view("table", s.table, "table", { sorts: [{ propertyId: "start", dir: "asc" }] }),
+        ],
+        rows: rows([
+          { title: sch.samples[0], start: fromToday(-7), end: fromToday(7), status: "doing" },
+          { title: sch.samples[1], start: fromToday(8), end: fromToday(35), status: "planned" },
+          { title: sch.samples[2], start: fromToday(21), end: fromToday(21), status: "planned" },
+          { title: sch.samples[3], start: fromToday(36), end: fromToday(63), status: "planned" },
         ]),
       }),
     },

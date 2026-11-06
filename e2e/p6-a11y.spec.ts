@@ -70,6 +70,11 @@ for (const theme of ["light", "dark"] as const) {
 
     await useTemplate(page, "Mood board");
     await scan(page, "database gallery");
+
+    await useTemplate(page, "Production schedule");
+    await scan(page, "database timeline");
+    await page.getByRole("region", { name: "Database" }).getByRole("tab", { name: "Calendar" }).click();
+    await scan(page, "database calendar");
   });
 }
 

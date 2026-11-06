@@ -54,6 +54,8 @@
     "table": "Tablo",
     "board": "Pano",
     "gallery": "Galeri",
+    "calendar": "Takvim",
+    "timeline": "Zaman çizelgesi",
     "rename": "Görünümü yeniden adlandır",
     "delete": "Görünümü sil",
     "properties": "Özellikler",
@@ -130,5 +132,24 @@
     "hint": "Alanları doldurup gönder. Her gönderim bu veritabanına bir satır ekler.",
     "submit": "Gönder",
     "sent": "{count, plural, one {Gönderildi. # kayıt eklendi.} other {Gönderildi. # kayıt eklendi.}}"
+  },
+  "calendar": {
+    "date": "Tarih",
+    "today": "Bugün",
+    "previous": "Önceki ay",
+    "next": "Sonraki ay",
+    "addOn": "Bu güne satır ekle: {date}",
+    "needDate": "Bir Tarih özelliği ekle, sonra Özellikler menüsünden seç. Satırlar kendi tarihlerinde görünür.",
+    "needDateShort": "Önce bir Tarih özelliği ekle"
+  },
+  "timeline": {
+    "label": "Zaman çizelgesi: {name}",
+    "start": "Başlangıç",
+    "end": "Bitiş",
+    "noEnd": "Yok (tek gün)",
+    "range": "{start} – {end}",
+    "addToday": "Yeni, bugün başlıyor",
+    "undated": "{count, plural, one {# satırın başlangıç tarihi yok:} other {# satırın başlangıç tarihi yok:}}",
+    "needDate": "Başlangıç için bir Tarih özelliği (ve istersen bitiş için bir tane daha) ekle, sonra Özellikler menüsünden seç."
   }
 }
