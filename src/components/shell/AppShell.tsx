@@ -19,6 +19,7 @@ import { Sidebar } from "./Sidebar";
 import { TemplatesDialog } from "./TemplatesDialog";
 import { Toasts } from "./Toasts";
 import { TrashDialog } from "./TrashDialog";
+import { MentionsDialog } from "@/components/comments/MentionsDialog";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const t = useTranslations("common");
@@ -146,6 +147,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <GitHubDialog />
         <ShareDialog />
         <MoveFolderDialog />
+        <MentionsDialog />
       </Suspense>
     </div>
   );

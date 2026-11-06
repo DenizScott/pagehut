@@ -1,4 +1,5 @@
-import { strFromU8, strToU8, unzipSync, zipSync, type Zippable } from "fflate";
+import { strFromU8, strToU8, zipSync, type Zippable } from "fflate";
+import { bundleFromIdFolders, isIdFolderExport, unzipAll } from "./folder-export";
 import { BRAND } from "@/config/brand";
 import { SCHEMA_VERSION, type PageKind, type Pillar, type WorkspaceFile } from "@/lib/model/schemas";
 import { parseFrontMatter, stringifyFrontMatter } from "./frontmatter";
@@ -117,8 +118,10 @@ export function titleFromMarkdown(markdown: string, fileName: string): { title: 
  * folders become parent pages. Images under assets/ come along.
  */
 export function bundleFromZip(data: Uint8Array, fallbackName: string): WorkspaceBundle {
-  const entries = unzipSync(data);
-  const names = Object.keys(entries).filter((n) => !n.endsWith("/") && !n.startsWith("__MACOSX/"));
+  const entries = unzipAll(data);
+  const names = Object.keys(entries);
+  // A other workspace apps export (files named "Page <32-hex id>.md"): see folder-export.ts.
+  if (!names.some((n) => /(^|\/)workspace\.json$/.test(n)) && isIdFolderExport(names)) return bundleFromIdFolders(entries, fallbackName.replace(/\.zip$/i, ""));
   const assets: BundleAsset[] = names
     .filter((n) => /^(?:[^/]+\/)?assets\//.test(n))
     .map((n) => ({ path: n.replace(/^[^/]+\/(?=assets\/)/, ""), mime: MIME[n.split(".").pop()!.toLowerCase()] ?? "application/octet-stream", data: entries[n] }));

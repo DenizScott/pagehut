@@ -67,7 +67,7 @@
   "transfer": {
     "menu": "Import und Export",
     "import": "Importieren",
-    "importFiles": "Markdown, ZIP oder JSON importieren …",
+    "importFiles": "Markdown, ZIP, JSON oder Markdown- & CSV-Export importieren…",
     "exportWorkspace": "Arbeitsbereich exportieren",
     "exportZip": "Als ZIP exportieren (Markdown-Dateien)",
     "exportJson": "Als JSON exportieren (vollständige Sicherung)",
@@ -238,5 +238,41 @@
     "current": "aktuell",
     "restore": "Diese Fassung wiederherstellen",
     "lastEdited": "{author} · {time}"
+  },
+  "comments": {
+    "title": "Kommentare",
+    "toggle": "{count, plural, one {# offener Kommentar} other {# offene Kommentare}}",
+    "close": "Kommentare schließen",
+    "add": "Kommentieren",
+    "addShort": "Kommentar",
+    "newThread": "Neuer Kommentar",
+    "placeholder": "Kommentar schreiben. Mit @ erwähnst du jemanden.",
+    "pagePlaceholder": "Diese Seite kommentieren…",
+    "submit": "Senden",
+    "submitReply": "Antworten",
+    "reply": "Antworten…",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "empty": "Keine offenen Kommentare. Text markieren und Kommentieren wählen, oder unten schreiben.",
+    "showResolved": "{count, plural, one {# erledigten zeigen} other {# erledigte zeigen}}",
+    "resolve": "Als erledigt markieren",
+    "reopen": "Wieder öffnen",
+    "detached": "Der kommentierte Text wurde geändert oder gelöscht.",
+    "threadOn": "Kommentar zu „{text}“",
+    "pageThread": "Seitenkommentar",
+    "you": "Du",
+    "localAuthor": "Lokal",
+    "edited": "bearbeitet",
+    "actions": "Kommentaraktionen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "people": "Personen zum Erwähnen"
+  },
+  "mentions": {
+    "title": "Erwähnungen",
+    "description": "Offene Kommentare in diesem Workspace, die dich erwähnen.",
+    "empty": "Niemand hat dich in einem offenen Kommentar erwähnt.",
+    "signedOut": "Melde dich mit GitHub an, um Kommentare zu sehen, die dich erwähnen.",
+    "count": "{count, plural, one {# Erwähnung} other {# Erwähnungen}}"
   }
 }

@@ -1,10 +1,15 @@
 "use client";
 
 import { useLiveQuery } from "dexie-react-hooks";
-import { ChevronRight, FileDown, History, LayoutTemplate, Menu as MenuIcon, MoreHorizontal, Printer, Trash2 } from "lucide-react";
+import { ChevronRight, FileDown, History, LayoutTemplate, Menu as MenuIcon, MessageSquare, MoreHorizontal, Printer, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { CommentsPanel } from "@/components/comments/CommentsPanel";
+import type { Anchor } from "@/lib/comments/types";
+import { getThreads } from "@/lib/storage/comments";
+import { githubApi, useGitHub } from "@/lib/github/session";
+import { listCollaborators } from "@/lib/github/repo";
 import { Editor } from "@/components/editor/Editor";
 import { DatabaseView } from "@/components/database/DatabaseView";
 import { Button } from "@/components/ui/button";
@@ -89,6 +94,50 @@ function PageEditor({ page }: { page: PageRecord }) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const setActivePage = useStatus((s) => s.setActivePage);
 
+  // ---- comments ----
+  const tc = useTranslations("common.comments");
+  // A thread opened from the mentions inbox shows right away.
+  const [initialThread] = useState(() => {
+    const target = useUI.getState().threadToOpen;
+    return target?.pageId === page.id ? target.threadId : null;
+  });
+  const [commentsOpen, setCommentsOpen] = useState(!!initialThread);
+  const [activeThread, setActiveThread] = useState<string | null>(initialThread);
+  useEffect(() => {
+    if (initialThread) useUI.getState().focusThread(null);
+    // Also when this page is already open (the page doesn't remount).
+    return useUI.subscribe((s) => {
+      if (s.threadToOpen?.pageId !== page.id) return;
+      setCommentsOpen(true);
+      setActiveThread(s.threadToOpen.threadId);
+      s.focusThread(null);
+    });
+  }, [initialThread, page.id]);
+  const [draft, setDraft] = useState<Anchor | null>(null);
+  const [found, setFound] = useState<string[] | null>(null);
+  const threads = useLiveQuery(() => getThreads(page.id), [page.id]);
+  const me = useGitHub((s) => s.user?.login) ?? "";
+  const signedIn = useGitHub((s) => s.status === "signedIn");
+  const [collaborators, setCollaborators] = useState<string[]>([]);
+  useEffect(() => {
+    if (!repo || !signedIn || !commentsOpen) return;
+    let cancelled = false;
+    void listCollaborators(githubApi(), repo).then((list) => !cancelled && setCollaborators(list));
+    return () => {
+      cancelled = true;
+    };
+  }, [repo, signedIn, commentsOpen]);
+  const people = useMemo(
+    () => [...new Set([...collaborators, ...(threads ?? []).flatMap((th) => th.comments.map((c) => c.author))])].filter((l) => l && l !== me).sort(),
+    [collaborators, threads, me],
+  );
+  const openThreads = (threads ?? []).filter((th) => !th.resolved);
+  const anchors = useMemo(
+    () => (threads ?? []).filter((th) => th.anchor && !th.resolved).map((th) => ({ id: th.id, anchor: th.anchor! })),
+    [threads],
+  );
+  const detached = useMemo(() => (found ? new Set(anchors.map((a) => a.id).filter((id) => !found.includes(id))) : null), [anchors, found]);
+
   // Background sync leaves the page being typed in alone (see canTouchPage).
   useEffect(() => {
     setActivePage(page.id);
@@ -144,6 +193,17 @@ function PageEditor({ page }: { page: PageRecord }) {
             </li>
           </ol>
         </nav>
+        <button
+          type="button"
+          onClick={() => setCommentsOpen((o) => !o)}
+          aria-pressed={commentsOpen}
+          aria-label={(openThreads.length ? tc("toggle", { count: openThreads.length }) : tc("title"))}
+          title={(openThreads.length ? tc("toggle", { count: openThreads.length }) : tc("title"))}
+          className={cn("flex h-7 items-center gap-1 rounded-md px-1.5 text-xs text-fg-muted hover:bg-surface-hover hover:text-fg", commentsOpen && "bg-surface-active text-fg")}
+        >
+          <MessageSquare className="size-4" aria-hidden="true" />
+          {openThreads.length > 0 && <span className="tabular-nums">{openThreads.length}</span>}
+        </button>
         {repo && page.base && <LastEditor repo={repo} pageId={page.id} headSha={workspace?.headSha} />}
         <SaveStatus />
         <SyncButton />
@@ -189,6 +249,7 @@ function PageEditor({ page }: { page: PageRecord }) {
         />
       )}
 
+      <div className="flex min-h-0 flex-1">
       <div className="min-h-0 flex-1 overflow-y-auto">
         <article className={cn("mx-auto w-full px-6 pt-10 md:pt-14", isDatabase ? "max-w-[1040px] pb-16 md:px-10" : "max-w-3xl md:px-16")}>
           <textarea
@@ -224,10 +285,46 @@ function PageEditor({ page }: { page: PageRecord }) {
           {isDatabase ? (
             <DatabaseView page={page} />
           ) : (
-            <Editor page={page} onReady={(focus) => (focusEditor.current = focus)} onEmptyChange={setIsEmpty} />
+            <Editor
+              page={page}
+              onReady={(focus) => (focusEditor.current = focus)}
+              onEmptyChange={setIsEmpty}
+              comments={{
+                anchors,
+                active: activeThread,
+                onOpen: (id) => {
+                  setCommentsOpen(true);
+                  setActiveThread(id);
+                },
+                onResolved: setFound,
+                onNew: (anchor) => {
+                  setDraft(anchor);
+                  setCommentsOpen(true);
+                },
+              }}
+            />
           )}
           <Backlinks pageId={page.id} workspaceId={page.workspaceId} />
         </article>
+      </div>
+      {commentsOpen && (
+        <CommentsPanel
+          pageId={page.id}
+          workspaceId={page.workspaceId}
+          threads={threads ?? []}
+          me={me}
+          people={people}
+          active={activeThread}
+          onActivate={setActiveThread}
+          draft={draft}
+          onDraftDone={() => setDraft(null)}
+          detached={isDatabase ? null : detached}
+          onClose={() => {
+            setCommentsOpen(false);
+            setActiveThread(null);
+          }}
+        />
+      )}
       </div>
     </>
   );

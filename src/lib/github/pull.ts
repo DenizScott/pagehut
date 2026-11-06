@@ -3,6 +3,7 @@ import { workspaceFileSchema, type AssetRecord, type PageRecord, type WorkspaceF
 import { getDB } from "@/lib/storage/db";
 import { RemoteChangedError, utf8, type GitHubApi } from "./api";
 import { getHead, inRepo, readBlob, readTree, type RepoRef } from "./repo";
+import { pullComments } from "./comments-sync";
 import { basePageSha, baseWorkspaceSha, pageFileText, pagePath, pushWorkspace, WORKSPACE_FILE, type PushResult } from "./sync";
 
 /**
@@ -32,6 +33,8 @@ export interface PullResult {
   merged: string[];
   conflicts: string[];
   deferred: string[];
+  /** Pages whose comments changed. */
+  comments: string[];
 }
 
 interface Remote {
@@ -40,7 +43,7 @@ interface Remote {
   files: Map<string, string>; // path -> sha
 }
 
-const emptyResult = (): PullResult => ({ pulled: false, updated: [], added: [], removed: [], merged: [], conflicts: [], deferred: [] });
+const emptyResult = (): PullResult => ({ pulled: false, updated: [], added: [], removed: [], merged: [], conflicts: [], deferred: [], comments: [] });
 
 const pageFromFile = (text: string, fallbackTitle: string) => pageContentFromFile(text, fallbackTitle);
 
@@ -202,7 +205,13 @@ export async function pullWorkspace(api: GitHubApi, workspaceId: string, opts: P
     wsPatch.workspaceFileSha = remoteWsSha;
   }
 
-  await db.transaction("rw", [db.workspaces, db.pages, db.assets], async () => {
+  // ---- comments (never deferred: they don't touch the editor) ----
+  const comments = await pullComments(workspaceId, ws.repo, remote.files, read, now);
+  result.comments = comments.changed;
+
+  await db.transaction("rw", [db.workspaces, db.pages, db.assets, db.comments], async () => {
+    if (comments.records.length) await db.comments.bulkPut(comments.records);
+    if (comments.removed.length) await db.comments.bulkDelete(comments.removed);
     for (const [id, patch] of pageUpdates) await db.pages.update(id, { ...patch, updatedAt: now });
     if (newPages.length) await db.pages.bulkPut(newPages);
     if (assets.length) await db.assets.bulkPut(assets);

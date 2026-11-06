@@ -67,7 +67,7 @@
   "transfer": {
     "menu": "İçe ve dışa aktar",
     "import": "İçe aktar",
-    "importFiles": "Markdown, ZIP ya da JSON içe aktar…",
+    "importFiles": "Markdown, ZIP, JSON veya Markdown & CSV dışa aktarımı içe aktar…",
     "exportWorkspace": "Çalışma alanını dışa aktar",
     "exportZip": "ZIP olarak dışa aktar (Markdown dosyaları)",
     "exportJson": "JSON olarak dışa aktar (tam yedek)",
@@ -238,5 +238,41 @@
     "current": "güncel",
     "restore": "Bu sürümü geri yükle",
     "lastEdited": "{author} · {time}"
+  },
+  "comments": {
+    "title": "Yorumlar",
+    "toggle": "{count, plural, other {# açık yorum}}",
+    "close": "Yorumları kapat",
+    "add": "Yorum",
+    "addShort": "Yorum",
+    "newThread": "Yeni yorum",
+    "placeholder": "Yorum yaz. Birinden bahsetmek için @ yaz.",
+    "pagePlaceholder": "Bu sayfaya yorum yaz…",
+    "submit": "Gönder",
+    "submitReply": "Yanıtla",
+    "reply": "Yanıtla…",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "empty": "Açık yorum yok. Metin seçip Yorum'a bas ya da aşağıya yaz.",
+    "showResolved": "{count, plural, other {Çözülen # yorumu göster}}",
+    "resolve": "Çözüldü olarak işaretle",
+    "reopen": "Yeniden aç",
+    "detached": "Bu yorumun yapıldığı metin değişmiş ya da silinmiş.",
+    "threadOn": "“{text}” üzerine yorum",
+    "pageThread": "Sayfa yorumu",
+    "you": "Sen",
+    "localAuthor": "Yerel",
+    "edited": "düzenlendi",
+    "actions": "Yorum işlemleri",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "people": "Bahsedilebilecek kişiler"
+  },
+  "mentions": {
+    "title": "Bahsetmeler",
+    "description": "Bu çalışma alanında senden bahseden açık yorumlar.",
+    "empty": "Açık bir yorumda senden bahsedilmemiş.",
+    "signedOut": "Senden bahseden yorumları görmek için GitHub ile giriş yap.",
+    "count": "{count, plural, other {# bahsetme}}"
   }
 }

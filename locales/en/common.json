@@ -67,7 +67,7 @@
   "transfer": {
     "menu": "Import and export",
     "import": "Import",
-    "importFiles": "Import Markdown, ZIP or JSON…",
+    "importFiles": "Import Markdown, ZIP, JSON or a Markdown & CSV folder export…",
     "exportWorkspace": "Export workspace",
     "exportZip": "Export as ZIP (Markdown files)",
     "exportJson": "Export as JSON (full backup)",
@@ -238,5 +238,41 @@
     "current": "current",
     "restore": "Restore this version",
     "lastEdited": "{author} · {time}"
+  },
+  "comments": {
+    "title": "Comments",
+    "toggle": "{count, plural, one {# open comment} other {# open comments}}",
+    "close": "Close comments",
+    "add": "Comment",
+    "addShort": "Comment",
+    "newThread": "New comment",
+    "placeholder": "Write a comment. Type @ to mention someone.",
+    "pagePlaceholder": "Comment on this page…",
+    "submit": "Comment",
+    "submitReply": "Reply",
+    "reply": "Reply…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "empty": "No open comments. Select text and choose Comment, or write one below.",
+    "showResolved": "{count, plural, one {Show # resolved} other {Show # resolved}}",
+    "resolve": "Resolve",
+    "reopen": "Reopen",
+    "detached": "The text this comment was on has changed or been removed.",
+    "threadOn": "Comment on “{text}”",
+    "pageThread": "Page comment",
+    "you": "You",
+    "localAuthor": "Local",
+    "edited": "edited",
+    "actions": "Comment actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "people": "People to mention"
+  },
+  "mentions": {
+    "title": "Mentions",
+    "description": "Open comments that mention you, on every page of this workspace.",
+    "empty": "Nobody has mentioned you in an open comment.",
+    "signedOut": "Sign in with GitHub to see comments that mention you.",
+    "count": "{count, plural, one {# mention} other {# mentions}}"
   }
 }

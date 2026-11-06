@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 /** Workspace-level dialogs, opened from the sidebar, shortcuts or the editor. */
-type DialogName = "search" | "templates" | "trash" | "pillars" | "github" | "share" | "moveFolder" | null;
+type DialogName = "search" | "templates" | "trash" | "pillars" | "github" | "share" | "moveFolder" | "mentions" | null;
 
 interface OpenOptions {
   /** Templates: parent for a new page (null = top level). */
@@ -19,6 +19,9 @@ interface UIStore {
   githubMode: "connect" | "open";
   /** Bumped when page content is replaced outside the editor, so the open editor reloads. */
   contentVersion: number;
+  /** A comment thread to open when its page shows (from the mentions inbox). */
+  threadToOpen: { pageId: string; threadId: string } | null;
+  focusThread: (target: { pageId: string; threadId: string } | null) => void;
   open: (dialog: Exclude<DialogName, null>, opts?: OpenOptions) => void;
   close: () => void;
   bumpContent: () => void;
@@ -30,6 +33,8 @@ export const useUI = create<UIStore>((set) => ({
   targetPageId: null,
   githubMode: "connect",
   contentVersion: 0,
+  threadToOpen: null,
+  focusThread: (target) => set({ threadToOpen: target }),
   open: (dialog, opts) =>
     set({
       dialog,

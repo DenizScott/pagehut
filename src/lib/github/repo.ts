@@ -235,3 +235,21 @@ export async function readFileAt(api: GitHubApi, repo: RepoRef, path: string, re
   if (res.status === 404 || !res.data.content) return null;
   return utf8.decode(base64ToBytes(res.data.content));
 }
+
+/**
+ * People who can be @mentioned: the repository's collaborators. Listing them needs push access;
+ * if GitHub refuses, recent committers are used instead.
+ */
+export async function listCollaborators(api: GitHubApi, repo: RepoRef): Promise<string[]> {
+  try {
+    const { data } = await api.get<{ login: string }[]>(`${repoPath(repo)}/collaborators?per_page=100`);
+    return data.map((u) => u.login);
+  } catch {
+    try {
+      const { data } = await api.get<{ author: { login: string } | null }[]>(`${repoPath(repo)}/commits?sha=${enc(repo.branch)}&per_page=100`);
+      return [...new Set(data.map((c) => c.author?.login).filter((x): x is string => !!x))];
+    } catch {
+      return [];
+    }
+  }
+}

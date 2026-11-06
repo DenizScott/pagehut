@@ -8,6 +8,9 @@ import { GripVertical } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef } from "react";
 import { schemaExtensions } from "@/lib/editor/extensions";
+import { COMMENT_FOUND_EVENT, COMMENT_OPEN_EVENT, CommentHighlights, type CommentAnchor } from "@/lib/editor/comment-highlights";
+import { anchorFor } from "@/lib/comments/anchor";
+import type { Anchor } from "@/lib/comments/types";
 import { useDebouncedSaver } from "@/lib/hooks/useDebouncedSaver";
 import { ASSET_WARN_BYTES, type PageRecord } from "@/lib/model/schemas";
 import { AssetTooLargeError, createPage, listPages, putAsset, savePageContent } from "@/lib/storage/local-repo";
@@ -27,6 +30,14 @@ interface EditorProps {
   onReady?: (focus: () => void) => void;
   /** Called with true/false whenever the document becomes empty or non-empty. */
   onEmptyChange?: (empty: boolean) => void;
+  /** Inline comments: highlights for open threads, and the toolbar's Comment button. */
+  comments?: {
+    anchors: CommentAnchor[];
+    active: string | null;
+    onOpen: (threadId: string) => void;
+    onResolved: (found: string[]) => void;
+    onNew: (anchor: Anchor) => void;
+  };
 }
 
 const PICK_IMAGE_EVENT = "lk:pick-image";
@@ -51,7 +62,7 @@ async function pageLinkItems(workspaceId: string, currentId: string, query: stri
 }
 const mb = (bytes: number) => (bytes / 1024 / 1024).toFixed(1);
 
-export function Editor({ page, onReady, onEmptyChange }: EditorProps) {
+export function Editor({ page, onReady, onEmptyChange, comments }: EditorProps) {
   const t = useTranslations("editor");
   const ts = useTranslations("slash");
   const locale = useLocale();
@@ -61,13 +72,23 @@ export function Editor({ page, onReady, onEmptyChange }: EditorProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const saver = useDebouncedSaver((doc: unknown) => savePageContent(page.id, doc));
   const wrapper = useRef<HTMLDivElement>(null);
+  const commentsRef = useRef(comments);
 
   // The slash menu asks for an image via a DOM event, so extensions never hold React refs.
   useEffect(() => {
     const el = wrapper.current;
     const open = () => fileInput.current?.click();
+    // Comment highlights report clicks and which anchors were found the same way.
+    const onOpen = (e: Event) => commentsRef.current?.onOpen((e as CustomEvent<string>).detail);
+    const onFound = (e: Event) => commentsRef.current?.onResolved((e as CustomEvent<string[]>).detail);
     el?.addEventListener(PICK_IMAGE_EVENT, open);
-    return () => el?.removeEventListener(PICK_IMAGE_EVENT, open);
+    el?.addEventListener(COMMENT_OPEN_EVENT, onOpen);
+    el?.addEventListener(COMMENT_FOUND_EVENT, onFound);
+    return () => {
+      el?.removeEventListener(PICK_IMAGE_EVENT, open);
+      el?.removeEventListener(COMMENT_OPEN_EVENT, onOpen);
+      el?.removeEventListener(COMMENT_FOUND_EVENT, onFound);
+    };
   }, []);
 
   const slashEntries = useMemo<SlashEntry[]>(
@@ -101,6 +122,7 @@ export function Editor({ page, onReady, onEmptyChange }: EditorProps) {
   useEffect(() => {
     uploadRef.current = uploadImage;
     onEmptyRef.current = onEmptyChange;
+    commentsRef.current = comments;
   });
 
   const extensions = useMemo(
@@ -109,6 +131,7 @@ export function Editor({ page, onReady, onEmptyChange }: EditorProps) {
         taskCheckbox: (node) => t("a11y.taskCheckbox", { text: node.textContent || t("a11y.emptyTask") }),
         toggle: (isOpen) => (isOpen ? t("a11y.collapse") : t("a11y.expand")),
       }).map((ext) => (ext.name === "image" ? AssetImage : ext.name === "pageLink" ? PageLinkWithView : ext)),
+      CommentHighlights,
       Placeholder.configure({
         placeholder: ({ node }) =>
           node.type.name === "heading" ? t("headingPlaceholder", { level: node.attrs.level as number }) : t("placeholder"),
@@ -170,6 +193,21 @@ export function Editor({ page, onReady, onEmptyChange }: EditorProps) {
     },
   });
 
+  // Keep comment highlights in step with the threads (anchors are found again on every change).
+  const anchors = comments?.anchors;
+  const active = comments?.active ?? null;
+  useEffect(() => {
+    if (editor && !editor.isDestroyed) editor.commands.setCommentAnchors(anchors ?? [], active);
+  }, [editor, anchors, active]);
+
+  function newComment() {
+    const e = editorRef.current;
+    if (!e) return;
+    const { from, to } = e.state.selection;
+    const anchor = anchorFor(e.state.doc, from, to);
+    if (anchor) commentsRef.current?.onNew(anchor);
+  }
+
   useEffect(() => {
     editorRef.current = editor;
     // view.focus() is synchronous; commands.focus() alone waits for an animation frame.
@@ -189,11 +227,20 @@ export function Editor({ page, onReady, onEmptyChange }: EditorProps) {
               <GripVertical className="size-4" aria-hidden="true" />
             </div>
           </DragHandle>
-          <BubbleToolbar editor={editor} />
+          <BubbleToolbar editor={editor} onComment={comments ? newComment : undefined} />
         </>
       )}
       {/* Real input only (not load-time normalization) marks the page as being edited. */}
-      <EditorContent editor={editor} onKeyDown={noteUserEdit} onInput={noteUserEdit} onPaste={noteUserEdit} onDrop={noteUserEdit} />
+      <EditorContent
+        editor={editor}
+        onKeyDown={(e) => {
+          if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === "KeyM" && comments) {
+            e.preventDefault();
+            newComment();
+            return;
+          }
+          noteUserEdit();
+        }} onInput={noteUserEdit} onPaste={noteUserEdit} onDrop={noteUserEdit} />
       <input
         ref={fileInput}
         type="file"

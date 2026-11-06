@@ -186,6 +186,10 @@ export class FakeGitHub {
       repo.refs.set(branch, body.sha);
       return json({ object: { sha: body.sha } });
     }
+    if (rest === "collaborators" && method === "GET") {
+      const logins = new Set([repo.owner, this.user.login, ...[...repo.commits.values()].map((c) => c.author)]);
+      return json([...logins].map((login) => ({ login })));
+    }
     if (rest === "commits" && method === "GET") {
       // Commits on the branch (first parent) that changed ?path=, newest first.
       const path = url.searchParams.get("path") ?? "";

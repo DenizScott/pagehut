@@ -1,7 +1,9 @@
 "use client";
 
 import { useLiveQuery } from "dexie-react-hooks";
-import { Download, LayoutTemplate, MoreHorizontal, Plus, Search, Table2, Trash2, Upload, X } from "lucide-react";
+import { AtSign, Download, LayoutTemplate, MoreHorizontal, Plus, Search, Table2, Trash2, Upload, X } from "lucide-react";
+import { useMentions } from "@/components/comments/MentionsDialog";
+import { useGitHub } from "@/lib/github/session";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -46,8 +48,11 @@ export function Sidebar() {
     router.push(`/p/${page.id}`);
   }
 
-  const quick = [
+  const mentionCount = useMentions()?.length ?? 0;
+  const showMentions = useGitHub((s) => s.status === "signedIn") && workspace?.mode === "github";
+  const quick: { key: string; icon: typeof Search; label: string; kbd?: string; badge?: number; run: () => void }[] = [
     { key: "search", icon: Search, label: t("shell.search"), kbd: isMac() ? "⌘K" : "Ctrl+K", run: () => openDialog("search") },
+    ...(showMentions ? [{ key: "mentions", icon: AtSign, label: t("mentions.title"), badge: mentionCount, run: () => openDialog("mentions") }] : []),
     { key: "templates", icon: LayoutTemplate, label: t("shell.templates"), run: () => openDialog("templates") },
     { key: "trash", icon: Trash2, label: t("shell.trash"), run: () => openDialog("trash") },
   ];
@@ -70,7 +75,7 @@ export function Sidebar() {
       <StorageBadge />
 
       <div className="space-y-px px-2">
-        {quick.map(({ key, icon: Icon, label, kbd, run }) => (
+        {quick.map(({ key, icon: Icon, label, kbd, badge, run }) => (
           <button
             key={key}
             type="button"
@@ -83,6 +88,11 @@ export function Sidebar() {
             <Icon className="size-4" aria-hidden="true" />
             <span className="flex-1 text-start">{label}</span>
             {kbd && <kbd className="font-sans text-xs text-fg-subtle">{kbd}</kbd>}
+            {!!badge && (
+              <span className="rounded-full bg-accent px-1.5 text-xs font-medium text-accent-fg tabular-nums" aria-label={t("mentions.count", { count: badge })}>
+                {badge}
+              </span>
+            )}
           </button>
         ))}
       </div>

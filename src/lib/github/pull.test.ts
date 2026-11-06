@@ -12,6 +12,7 @@ import { serializeDatabase } from "@/lib/database/file";
 import type { DatabaseData } from "@/lib/database/types";
 import { pageContentFromFile } from "@/lib/page-file";
 import { pageFile } from "@/lib/transfer/bundle";
+import { addReply, addThread, getThreads } from "@/lib/storage/comments";
 
 const welcome = { title: "Combat", markdown: "## Core loop\n\nExplore.\n\n## Bosses\n\nThree phases.\n", workspaceName: "Twin Coasters" };
 const repo = { owner: "team", name: "game", branch: "main", dir: "GDD" };
@@ -294,5 +295,50 @@ describe("databases", () => {
     const opened = (await listPages(id2)).find((p) => p.id === dbPage.id);
     expect(opened?.kind).toBe("database");
     expect(opened?.database?.rows).toHaveLength(3);
+  });
+});
+
+describe("comments", () => {
+  it("a comment survives a teammate's edit of the page and a sync, and comments merge both ways", async () => {
+    const { ws, page, teammateEdits } = await setup();
+    // I comment on "Three phases." in local mode-style storage, then sync.
+    await addThread(page.id, ws.id, { anchor: { exact: "Three phases.", prefix: "Bosses\n", suffix: "" }, author: "octo-designer", body: "Is this too long, @ada?" });
+    await syncWorkspace(api, ws.id);
+    const path = `GDD/comments/${page.id}.json`;
+    expect(JSON.parse(gh.files("team/game")[path]).threads[0].comments[0].body).toBe("Is this too long, @ada?");
+    expect(await pendingCount(ws.id)).toBe(0);
+
+    // A teammate edits the page text AND replies to the comment on GitHub; I reply here too.
+    teammateEdits((t) => t.replace("## Core loop", "## Core loop (v2)"));
+    const remote = JSON.parse(gh.files("team/game")[path]);
+    remote.threads[0].comments.push({ id: "01ZZZZZZZZZZZZZZZZZZZZZZZZ", author: "ada", body: "Cut phase 2.", createdAt: 2 });
+    gh.commit("team/game", { [path]: `${JSON.stringify(remote, null, 2)}\n` }, "Ada replies");
+    const [thread] = await getThreads(page.id);
+    await addReply(page.id, ws.id, thread.id, { author: "octo-designer", body: "Agreed." });
+
+    const r = await syncWorkspace(api, ws.id);
+    expect(r.pull.comments).toEqual([page.id]);
+    const [merged] = await getThreads(page.id);
+    expect(merged.comments.map((c) => c.body)).toEqual(["Is this too long, @ada?", "Agreed.", "Cut phase 2."]);
+    expect((await getPage(page.id))?.markdown).toContain("Core loop (v2)");
+    expect(JSON.parse(gh.files("team/game")[path]).threads[0].comments).toHaveLength(3);
+    expect(await pendingCount(ws.id)).toBe(0);
+
+    // A second device gets the comments with the workspace.
+    setDBForTests(new AppDB(`second-${Math.random()}`));
+    const id2 = await openRepoWorkspace(api, repo);
+    expect((await getThreads(page.id)).at(0)?.comments).toHaveLength(3);
+    expect((await listPages(id2)).some((p) => p.id === page.id)).toBe(true);
+  });
+
+  it("deleting a page deletes its comments file", async () => {
+    const { ws, page } = await setup();
+    await addThread(page.id, ws.id, { author: "", body: "Page note" });
+    await syncWorkspace(api, ws.id);
+    expect(gh.files("team/game")[`GDD/comments/${page.id}.json`]).toBeDefined();
+    await trashPage(page.id);
+    await syncWorkspace(api, ws.id);
+    expect(gh.files("team/game")[`GDD/comments/${page.id}.json`]).toBeUndefined();
+    expect(await pendingCount(ws.id)).toBe(0);
   });
 });

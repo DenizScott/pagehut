@@ -249,3 +249,18 @@ body {
   body { background: white; }
   .lk-no-print { display: none !important; }
 }
+
+/* ---------- Comments ---------- */
+
+.lk-editor .lk-comment {
+  background: var(--idea-soft);
+  border-bottom: 2px solid color-mix(in srgb, var(--idea) 55%, transparent);
+  cursor: pointer;
+  border-radius: 2px;
+}
+.lk-editor .lk-comment-active {
+  background: color-mix(in srgb, var(--idea) 28%, var(--idea-soft));
+}
+@media print {
+  .lk-editor .lk-comment { background: none; border: 0; }
+}

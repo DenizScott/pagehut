@@ -3,12 +3,13 @@
 import type { Editor } from "@tiptap/react";
 import { useEditorState } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
-import { Bold, Code, Italic, Link2, Strikethrough, Underline } from "lucide-react";
+import { Bold, Code, Italic, Link2, MessageSquarePlus, Strikethrough, Underline } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-export function BubbleToolbar({ editor }: { editor: Editor }) {
+export function BubbleToolbar({ editor, onComment }: { editor: Editor; onComment?: () => void }) {
   const t = useTranslations("editor.toolbar");
+  const tc = useTranslations("common.comments");
   const state = useEditorState({
     editor,
     selector: ({ editor: e }) => ({
@@ -68,6 +69,21 @@ export function BubbleToolbar({ editor }: { editor: Editor }) {
             <Icon className="size-4" aria-hidden="true" />
           </button>
         ))}
+        {onComment && (
+          <>
+            <span aria-hidden="true" className="mx-0.5 h-5 w-px bg-hairline" />
+            <button
+              type="button"
+              onClick={onComment}
+              aria-label={tc("add")}
+              title={`${tc("add")} (Ctrl+Alt+M)`}
+              className="flex h-7 items-center gap-1 rounded-md px-1.5 text-sm text-fg-muted hover:bg-surface-hover hover:text-fg"
+            >
+              <MessageSquarePlus className="size-4" aria-hidden="true" />
+              <span className="hidden sm:inline">{tc("addShort")}</span>
+            </button>
+          </>
+        )}
       </div>
     </BubbleMenu>
   );

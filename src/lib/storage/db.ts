@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from "dexie";
 import type { AssetRecord, PageRecord, WorkspaceRecord } from "@/lib/model/schemas";
+import type { CommentsRecord } from "@/lib/comments/types";
 import { BRAND } from "@/config/brand";
 
 export interface KvRecord {
@@ -12,6 +13,7 @@ export class AppDB extends Dexie {
   pages!: EntityTable<PageRecord, "id">;
   assets!: EntityTable<AssetRecord, "path">;
   kv!: EntityTable<KvRecord, "key">;
+  comments!: EntityTable<CommentsRecord, "pageId">;
 
   constructor(name: string = BRAND.slug) {
     super(name);
@@ -23,6 +25,8 @@ export class AppDB extends Dexie {
       assets: "path, workspaceId",
       kv: "key",
     });
+    // P5: comment threads, one record per page.
+    this.version(2).stores({ comments: "pageId, workspaceId" });
   }
 }
 

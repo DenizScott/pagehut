@@ -5,6 +5,8 @@ import { getDB } from "@/lib/storage/db";
 import { pageFile, workspaceFile } from "@/lib/transfer/bundle";
 import { pageContentFromFile } from "@/lib/page-file";
 import { gitBlobSha, GitHubError, RemoteChangedError, utf8, type GitHubApi } from "./api";
+import { commentChanges, commentFilesChanged, planComments, readAllComments, recordPushedComments, baseCommentSha, type CommentPlan } from "./comments-sync";
+import { commentsPath } from "@/lib/comments/types";
 import { commitChanges, getHead, inRepo, normalizeDir, readBlob, readTree, type FileChange, type RepoRef } from "./repo";
 
 /**
@@ -75,6 +77,7 @@ interface Plan {
   workspaceJson: string;
   workspaceJsonChanged: boolean;
   newAssets: AssetRecord[];
+  comments: CommentPlan;
 }
 
 async function plan(workspaceId: string, exclude: ReadonlySet<string> = new Set()): Promise<Plan> {
@@ -84,11 +87,13 @@ async function plan(workspaceId: string, exclude: ReadonlySet<string> = new Set(
   const all = await db.pages.where("workspaceId").equals(workspaceId).toArray();
   const live = all.filter((p) => !p.deletedAt);
   const workspaceJson = workspaceJsonText(ws, live);
+  const deletedPages = all.filter((p) => p.deletedAt && p.base && !p.conflict && !exclude.has(p.id));
   return {
     ws: ws as Plan["ws"],
     // Pages in conflict wait for the user's decision; everything else can still be pushed.
     changedPages: live.filter((p) => !p.conflict && !exclude.has(p.id) && p.base?.markdown !== pageFileText(p)),
-    deletedPages: all.filter((p) => p.deletedAt && p.base && !p.conflict && !exclude.has(p.id)),
+    deletedPages,
+    comments: await planComments(workspaceId, new Set(deletedPages.map((p) => p.id)), new Set(live.map((p) => p.id))),
     workspaceJson,
     workspaceJsonChanged: workspaceJson !== ws.workspaceFileBase,
     newAssets: (await db.assets.where("workspaceId").equals(workspaceId).toArray()).filter((a) => !a.sha),
@@ -100,7 +105,7 @@ export async function pendingCount(workspaceId: string): Promise<number> {
   const ws = await getDB().workspaces.get(workspaceId);
   if (!ws?.repo) return 0;
   const p = await plan(workspaceId);
-  return p.changedPages.length + p.deletedPages.length + (p.workspaceJsonChanged ? 1 : 0) + p.newAssets.length;
+  return p.changedPages.length + p.deletedPages.length + (p.workspaceJsonChanged ? 1 : 0) + p.newAssets.length + p.comments.changed.length + p.comments.deleted.length;
 }
 
 export interface PendingChanges {
@@ -110,6 +115,8 @@ export interface PendingChanges {
   pageTexts: Map<string, string>;
   deletedPageIds: string[];
   assetPaths: string[];
+  commentTexts: Map<string, string>;
+  deletedCommentIds: string[];
 }
 
 /** What a push would send right now (content-based: unchanged files are skipped). */
@@ -130,8 +137,12 @@ export async function pendingChanges(workspaceId: string, exclude?: ReadonlySet<
   for (const a of p.newAssets) {
     changes.push({ path: inRepo(repo, a.path), content: new Uint8Array(await a.blob.arrayBuffer()), expectedSha: null });
   }
+  const comments = await commentChanges(repo, p.comments);
+  changes.push(...comments.changes);
   return {
     changes,
+    commentTexts: comments.texts,
+    deletedCommentIds: p.comments.deleted.map((r) => r.pageId),
     titles: p.changedPages.map((pg) => pg.title || "Untitled"),
     workspaceJson: p.workspaceJson,
     pageTexts,
@@ -183,7 +194,8 @@ export async function pushWorkspace(
   });
 
   const now = Date.now();
-  await db.transaction("rw", [db.workspaces, db.pages, db.assets], async () => {
+  await db.transaction("rw", [db.workspaces, db.pages, db.assets, db.comments], async () => {
+    await recordPushedComments(repo, pending.commentTexts, pending.deletedCommentIds, blobShas, now);
     for (const [id, text] of pending.pageTexts) {
       const page = await db.pages.get(id);
       if (!page) continue;
@@ -216,7 +228,7 @@ async function workspaceFilesChanged(api: GitHubApi, ws: Plan["ws"], treeSha: st
   const prefix = inRepo(ws.repo, "pages/");
   const known = new Set(pages.filter((p) => p.base || p.conflict).map((p) => inRepo(ws.repo, pagePath(p.id))));
   for (const path of remote.keys()) if (path.startsWith(prefix) && !known.has(path)) return true; // page added remotely
-  return false;
+  return commentFilesChanged(ws.id, ws.repo, remote);
 }
 
 /**
@@ -232,7 +244,8 @@ export async function connectWorkspace(api: GitHubApi, workspaceId: string, targ
     if (tree.some((e) => e.path === inRepo(repo, WORKSPACE_FILE))) throw new RepoHasWorkspaceError();
   }
   const before = await db.workspaces.get(workspaceId);
-  await db.transaction("rw", [db.workspaces, db.pages, db.assets], async () => {
+  await db.transaction("rw", [db.workspaces, db.pages, db.assets, db.comments], async () => {
+    await db.comments.where("workspaceId").equals(workspaceId).modify({ base: undefined });
     await db.workspaces.update(workspaceId, {
       mode: "github",
       repo,
@@ -283,6 +296,8 @@ export async function moveWorkspaceDir(api: GitHubApi, workspaceId: string, newD
   for (const p of pages) move(pagePath(p.id), utf8.encode(p.base!.markdown), await basePageSha(p));
   if (ws.workspaceFileBase) move(WORKSPACE_FILE, utf8.encode(ws.workspaceFileBase), await baseWorkspaceSha(ws));
   for (const a of assets) move(a.path, new Uint8Array(await a.blob.arrayBuffer()), a.sha!);
+  const comments = (await db.comments.where("workspaceId").equals(workspaceId).toArray()).filter((c) => c.base);
+  for (const c of comments) move(commentsPath(c.pageId), utf8.encode(c.base!.text), await baseCommentSha(c));
 
   const { commit, blobShas } = await commitChanges(api, oldRepo, {
     expectedHead: ws.headSha ?? null,
@@ -291,10 +306,11 @@ export async function moveWorkspaceDir(api: GitHubApi, workspaceId: string, newD
     readmeForEmptyRepo: readme(ws.name),
   });
 
-  await db.transaction("rw", [db.workspaces, db.pages, db.assets], async () => {
+  await db.transaction("rw", [db.workspaces, db.pages, db.assets, db.comments], async () => {
     for (const p of pages) {
       await db.pages.update(p.id, { base: { ...p.base!, sha: blobShas.get(inRepo(newRepo, pagePath(p.id))) ?? p.base!.sha } });
     }
+    for (const c of comments) await db.comments.update(c.pageId, { base: { ...c.base!, sha: blobShas.get(inRepo(newRepo, commentsPath(c.pageId))) ?? c.base!.sha } });
     for (const a of assets) await db.assets.update(a.path, { sha: blobShas.get(inRepo(newRepo, a.path)) ?? a.sha });
     await db.workspaces.update(workspaceId, {
       repo: newRepo,
@@ -394,7 +410,10 @@ export async function openRepoWorkspace(api: GitHubApi, target: RepoRef): Promis
     assets.push({ path: localPath, workspaceId, blob: new Blob([data as BlobPart], { type: mime }), mime, size: data.length, createdAt: now, sha: e.sha });
   }
 
-  await db.transaction("rw", [db.workspaces, db.pages, db.assets], async () => {
+  const comments = await readAllComments(workspaceId, repo, new Map(tree.map((e) => [e.path, e.sha])), async (sha) => utf8.decode(await readBlob(api, repo, sha)), now);
+
+  await db.transaction("rw", [db.workspaces, db.pages, db.assets, db.comments], async () => {
+    await db.comments.bulkPut(comments);
     await db.workspaces.add({
       id: workspaceId,
       name: file.name,

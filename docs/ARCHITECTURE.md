@@ -1,6 +1,6 @@
 # Architecture
 
-Status: P4. Sections marked *(planned)* describe the approved design for later phases.
+Status: P5. Sections marked *(planned)* describe the approved design for later phases.
 
 ## Overview
 
@@ -53,6 +53,8 @@ Next.js 16 notes for contributors:
 | `src/lib/database/` | Database types, file format, queries (filter, sort, group), formulas, edits, structural merge |
 | `src/lib/page-file.ts` | Page file text <-> content for both kinds of page; picks the right merge |
 | `src/components/database/` | Database UI: views, cells, property menu, row dialog |
+| `src/lib/comments/`, `src/components/comments/` | Comment threads, text-quote anchors, merge; comments panel and mentions inbox |
+| `src/lib/structured-merge.ts` | Three-way merge of JSON data by id and field (databases, comments) |
 | `src/templates/` | GDD templates, one file per language (`en.ts`, `tr.ts`, `de.ts`), and database templates (`databases.ts`) |
 
 ## Data model
@@ -71,7 +73,7 @@ Repository layout:
 ```
 workspace.json        page tree, settings, pillars, templates (schemaVersion)
 pages/<id>.md         YAML front matter + Markdown body (documents and databases)
-comments/<id>.json    comment threads anchored by text quotes (P5, planned)
+comments/<id>.json    comment threads of page <id>, anchored by text quotes
 assets/<id>-<name>    images and files (warn above 1 MB, refuse above 25 MB)
 ```
 
@@ -101,6 +103,37 @@ conflicts and history work unchanged. The body has two parts:
 formulas that use it.
 
 Relations store row ids of another database page.
+
+## Comments
+
+Each page's threads are in `comments/<pageId>.json`, not in the page file. Commenting never changes
+a page's text, so it never conflicts with someone typing.
+
+- **Anchors.** An inline thread stores the quoted text plus up to 32 characters before and after it
+  (W3C TextQuoteSelector), not a position. `lib/comments/anchor.ts` finds the quote again after
+  every change, scoring each occurrence by how much of its context still matches. The editor shows
+  anchored threads as decorations (`lib/editor/comment-highlights.ts`). If the quoted text is gone,
+  the thread is kept and marked as detached.
+- **Sync.** Comment files sync like pages: `expectedSha` on push, then a merge on pull
+  (`lib/github/comments-sync.ts`). The merge (`mergeThreads`) works by thread and comment id and
+  never conflicts:
+  - a comment edited differently on both sides keeps both texts;
+  - a reply on one side reopens a thread that was resolved on the other.
+- **Mentions.** `@login` in a comment body is a mention. Suggestions come from the repository's
+  collaborators, or from recent committers if listing collaborators is not allowed. The Mentions
+  inbox lists open threads that mention the signed-in user.
+- **Known limit.** Comments are not part of ZIP or JSON exports yet. They travel through GitHub.
+
+## folder import
+
+`lib/transfer/folder-export.ts` reads a "Markdown & CSV" folder export, including ZIPs nested inside ZIPs:
+
+- Export ids are dropped from titles, and page folders become the page tree.
+- Relative links between exported pages become `[[page:…]]` links.
+- Images become assets, and `<aside>` callouts become callouts.
+- A CSV becomes a database. `_all.csv` is preferred, and property types are inferred: number,
+  checkbox, date, link, select or multi-select, otherwise text. Row pages become subpages of the
+  database.
 
 ## Markdown format
 
