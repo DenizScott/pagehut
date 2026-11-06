@@ -34,10 +34,12 @@ system asks once on first start:
 
 **Türkçe:** Yukarıdaki düğmeden işletim sistemine uygun dosyayı indir, kur ve aç. Komut
 çalıştırmana ya da siteye girmene gerek yok; uygulama tamamen bilgisayarında, internetsiz çalışır.
-Windows ilk açılışta uyarırsa **Ek bilgi → Yine de çalıştır**'ı seç.
+Windows ilk açılışta uyarırsa **Ek bilgi → Yine de çalıştır**'ı seç. Ekibinle çalışmak için
+uygulamada **GitHub ile giriş yap**'a bas, çıkan kısa kodu GitHub'da gir; 8 saat açık kalır.
 
-To work with your team in a GitHub repository, use the web version at
-<https://pagehut.vercel.app>; you can move pages between the two with Export as ZIP and Import.
+To work with your team, sign in with GitHub from the app: it shows a short code, you enter it on
+github.com, and the app syncs with your repository like the web version at
+<https://pagehut.vercel.app>. No password or key is stored in the app; a sign-in lasts 8 hours.
 
 ## What works today
 

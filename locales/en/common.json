@@ -183,7 +183,21 @@
     "folderLabel": "Folder in the repository:",
     "folderHint": "Recommended for game repos: PageHut only touches this folder, never your Unity/Unreal project. Leave empty to use the repository root.",
     "repoRoot": "repository root",
-    "autoMoved": "Your GDD in {repo} now lives in the GDD/ folder. Nothing else in the repository changed."
+    "autoMoved": "Your GDD in {repo} now lives in the GDD/ folder. Nothing else in the repository changed.",
+    "deviceHint": "GitHub has opened in your browser. Enter this code there and approve PageHut. This window carries on by itself.",
+    "deviceCodeLabel": "Code for GitHub",
+    "deviceCopy": "Copy code",
+    "deviceCopied": "Copied",
+    "deviceWaiting": "Waiting for GitHub…",
+    "deviceOpen": "Open GitHub again",
+    "deviceCancel": "Cancel",
+    "deviceSessionNote": "In the desktop app you stay signed in for 8 hours; then sign in again with a new code.",
+    "deviceErrors": {
+      "disabled": "Sign-in with a code isn't switched on for this app on GitHub yet. Try again a little later.",
+      "denied": "Sign-in was cancelled on GitHub.",
+      "expired": "The code expired before it was entered. Try again for a new one.",
+      "failed": "Couldn't sign in. Check your connection and try again."
+    }
   },
   "share": {
     "title": "Share with your team",

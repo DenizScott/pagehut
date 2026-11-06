@@ -8,8 +8,12 @@ internet connection is needed.
 - The page gets no Node.js access (`contextIsolation`, `sandbox`, no preload).
 - Only the app loads in the window; other links open in the default browser.
 - The server runs only while the app is open, and listens on 127.0.0.1 only.
-- GitHub sign-in isn't available in the desktop app (an installer can't hold the GitHub App's
-  secret); the GitHub dialog points to the web version instead.
+- GitHub sign-in uses GitHub's device flow (`github.js`): the app shows a code, the person enters it
+  on github.com, and the main process receives a user token. It needs only the GitHub App's public
+  client id and slug (`github.json`, written by `prepare-server`), never its secret. The token is
+  kept encrypted with the system's key store (`safeStorage`) and lasts 8 hours; without the secret
+  it can't be refreshed. The page reaches it only through `preload.js`, which accepts calls from
+  the app's own origin. The GitHub App must have **Enable Device Flow** switched on.
 - `PAGEHUT_URL=https://…` loads a hosted copy instead of the bundled server (for development).
 
 ```bash

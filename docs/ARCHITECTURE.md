@@ -260,8 +260,10 @@ desktop and mobile; performance 97–98 on desktop.
 `.env` file). On start, the app runs that server on `127.0.0.1:47821` and opens it in a sandboxed
 window, so everything works offline. The port is fixed because IndexedDB is per origin: a
 different port would look like an empty workspace. The server reports `desktop: true` from
-`/api/auth/status`, and the GitHub dialog then explains that team sync is done in the web
-version. Installers for all three systems are built by `.github/workflows/desktop.yml`.
+`/api/auth/status`. GitHub sign-in there uses the device flow in Electron's main process
+(`desktop/github.js`, no secret in the installer), and the page gets the token through
+`desktop/preload.js` instead of `/api/auth/token`; everything else (sync, merge, comments) is
+the same code as on the web. Installers for all three systems are built by `.github/workflows/desktop.yml`.
 
 ## Deployment
 

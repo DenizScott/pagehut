@@ -61,9 +61,19 @@ function redirectWithError(req: NextRequest, returnTo: string, code: string) {
   return NextResponse.redirect(url);
 }
 
-export async function handleStatus(config: GitHubAppConfig | null, desktop = false) {
+/**
+ * `desktop`: this server runs inside the desktop app. There the app itself signs in (device flow,
+ * no secret on the computer), so sign-in counts as configured when it knows the app slug.
+ */
+export async function handleStatus(config: GitHubAppConfig | null, desktop: false | { appSlug?: string } = false) {
   return NextResponse.json(
-    config ? { configured: true, appSlug: config.appSlug } : { configured: false, ...(desktop ? { desktop: true } : {}) },
+    desktop
+      ? desktop.appSlug
+        ? { configured: true, appSlug: desktop.appSlug, desktop: true }
+        : { configured: false, desktop: true }
+      : config
+        ? { configured: true, appSlug: config.appSlug }
+        : { configured: false },
     { headers: noStore },
   );
 }

@@ -183,7 +183,21 @@
     "folderLabel": "Depodaki klasör:",
     "folderHint": "Oyun depoları için önerilir: PageHut yalnızca bu klasöre dokunur, Unity/Unreal projene asla dokunmaz. Deponun köküne koymak için boş bırak.",
     "repoRoot": "deponun kökü",
-    "autoMoved": "{repo} deposundaki GDD artık GDD/ klasöründe. Depodaki başka hiçbir şey değişmedi."
+    "autoMoved": "{repo} deposundaki GDD artık GDD/ klasöründe. Depodaki başka hiçbir şey değişmedi.",
+    "deviceHint": "GitHub tarayıcında açıldı. Bu kodu orada gir ve PageHut'a izin ver. Bu pencere kendiliğinden devam eder.",
+    "deviceCodeLabel": "GitHub için kod",
+    "deviceCopy": "Kodu kopyala",
+    "deviceCopied": "Kopyalandı",
+    "deviceWaiting": "GitHub bekleniyor…",
+    "deviceOpen": "GitHub'ı yeniden aç",
+    "deviceCancel": "Vazgeç",
+    "deviceSessionNote": "Masaüstü uygulamasında 8 saat oturum açık kalır; sonra yeni bir kodla yeniden giriş yaparsın.",
+    "deviceErrors": {
+      "disabled": "Bu uygulama için GitHub'da kodla giriş henüz açılmamış. Biraz sonra yeniden dene.",
+      "denied": "Giriş GitHub'da iptal edildi.",
+      "expired": "Kod girilmeden süresi doldu. Yeni bir kod için yeniden dene.",
+      "failed": "Giriş yapılamadı. Bağlantını kontrol edip yeniden dene."
+    }
   },
   "share": {
     "title": "Ekibinle paylaş",

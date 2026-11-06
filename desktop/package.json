@@ -1,7 +1,7 @@
 {
   "name": "pagehut-desktop",
   "productName": "PageHut",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "PageHut desktop app: the game design workspace, running entirely on your computer.",
   "author": "DenizScott and PageHut contributors",
   "homepage": "https://pagehut.vercel.app",
@@ -31,6 +31,9 @@
     },
     "files": [
       "main.js",
+      "github.js",
+      "preload.js",
+      "github.json",
       "offline.html",
       "build/icon.png",
       "server/**/*",

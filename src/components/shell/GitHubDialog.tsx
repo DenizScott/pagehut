@@ -70,6 +70,7 @@ function Body({ mode }: { mode: "connect" | "open" }) {
         )}
       </div>
     );
+  if (github.status === "signedOut" && github.device) return <DeviceCode code={github.device.userCode} uri={github.device.verificationUri} onCancel={github.cancelSignIn} />;
   if (github.status === "signedOut")
     return (
       <div className="space-y-3 p-4 text-sm">
@@ -77,13 +78,63 @@ function Body({ mode }: { mode: "connect" | "open" }) {
         <ul className="list-disc space-y-1 ps-5 text-fg-muted">
           <li>{t("privacy1")}</li>
           <li>{t("privacy2")}</li>
+          {github.desktop && <li>{t("deviceSessionNote")}</li>}
         </ul>
+        {github.deviceError && (
+          <p role="alert" className="rounded-md bg-danger-soft px-3 py-2 text-danger">
+            {github.deviceError === "device_flow_disabled"
+              ? t("deviceErrors.disabled")
+              : github.deviceError === "access_denied"
+                ? t("deviceErrors.denied")
+                : github.deviceError === "expired_token"
+                  ? t("deviceErrors.expired")
+                  : t("deviceErrors.failed")}
+          </p>
+        )}
         <Button variant="primary" onClick={() => github.signIn(`${window.location.pathname}?github=${mode}`)}>
           <GitHubMark /> {t("signIn")}
         </Button>
       </div>
     );
   return <RepoPicker mode={mode} key={pathname} />;
+}
+
+/** Desktop sign-in: GitHub is open in the browser; the person types this code there. */
+function DeviceCode({ code, uri, onCancel }: { code: string; uri: string; onCancel: () => void }) {
+  const t = useTranslations("common.github");
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="space-y-4 p-4 text-sm">
+      <p>{t("deviceHint")}</p>
+      <p className="flex flex-wrap items-center gap-3">
+        <output aria-label={t("deviceCodeLabel")} className="rounded-lg border border-border-control bg-canvas px-4 py-2 font-mono text-2xl font-semibold tracking-[0.2em] select-all">
+          {code}
+        </output>
+        <Button
+          variant="subtle"
+          onClick={() =>
+            void navigator.clipboard
+              .writeText(code)
+              .then(() => setCopied(true))
+              .catch(() => {})
+          }
+        >
+          {copied ? t("deviceCopied") : t("deviceCopy")}
+        </Button>
+      </p>
+      <p role="status" className="text-fg-muted">
+        {t("deviceWaiting")}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <a href={uri} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-md bg-accent px-3 py-1.5 font-medium text-accent-fg">
+          <ExternalLink className="size-4" aria-hidden="true" /> {t("deviceOpen")}
+        </a>
+        <Button variant="subtle" onClick={onCancel}>
+          {t("deviceCancel")}
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 function RepoPicker({ mode }: { mode: "connect" | "open" }) {

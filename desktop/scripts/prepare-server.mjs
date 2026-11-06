@@ -62,5 +62,23 @@ if (findEnvFiles(out).length) {
   process.exit(1);
 }
 
+// GitHub sign-in for the desktop app (device flow) needs only the GitHub App's public client id and
+// slug, never its secret. CI passes them as repository variables; a local build reads just these two
+// keys from the root .env.local. Without them, the desktop app works in local mode only.
+const fromEnvFile = (key) => {
+  try {
+    const line = fs.readFileSync(path.join(root, ".env.local"), "utf8").split(/\r?\n/).find((l) => l.startsWith(`${key}=`));
+    return line?.slice(key.length + 1).trim().replace(/^"|"$/g, "") || undefined;
+  } catch {
+    return undefined;
+  }
+};
+const clientId = process.env.PAGEHUT_GITHUB_CLIENT_ID || fromEnvFile("GITHUB_APP_CLIENT_ID");
+const appSlug = process.env.PAGEHUT_GITHUB_APP_SLUG || fromEnvFile("GITHUB_APP_SLUG");
+const githubJson = path.join(desktop, "github.json");
+if (clientId && appSlug) fs.writeFileSync(githubJson, `${JSON.stringify({ clientId, appSlug }, null, 2)}\n`);
+else fs.rmSync(githubJson, { force: true });
+console.log(clientId && appSlug ? "GitHub sign-in: on (device flow)" : "GitHub sign-in: off (no client id)");
+
 const size = (dir) => fs.readdirSync(dir, { withFileTypes: true }).reduce((s, e) => s + (e.isDirectory() ? size(path.join(dir, e.name)) : fs.statSync(path.join(dir, e.name)).size), 0);
 console.log(`server ready in ${path.relative(root, out)} (${(size(out) / 1048576).toFixed(1)} MB${envFiles.length ? `, removed ${envFiles.length} env file(s)` : ""})`);

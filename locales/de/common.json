@@ -183,7 +183,21 @@
     "folderLabel": "Ordner im Repository:",
     "folderHint": "Empfohlen für Spiele-Repos: PageHut ändert nur diesen Ordner, nie dein Unity/Unreal-Projekt. Leer lassen für das Repository-Stammverzeichnis.",
     "repoRoot": "Stammverzeichnis",
-    "autoMoved": "Dein GDD in {repo} liegt jetzt im Ordner GDD/. Sonst hat sich im Repository nichts geändert."
+    "autoMoved": "Dein GDD in {repo} liegt jetzt im Ordner GDD/. Sonst hat sich im Repository nichts geändert.",
+    "deviceHint": "GitHub hat sich in deinem Browser geöffnet. Gib dort diesen Code ein und erlaube PageHut den Zugriff. Dieses Fenster macht von selbst weiter.",
+    "deviceCodeLabel": "Code für GitHub",
+    "deviceCopy": "Code kopieren",
+    "deviceCopied": "Kopiert",
+    "deviceWaiting": "Warte auf GitHub…",
+    "deviceOpen": "GitHub erneut öffnen",
+    "deviceCancel": "Abbrechen",
+    "deviceSessionNote": "In der Desktop-App bleibst du 8 Stunden angemeldet; danach meldest du dich mit einem neuen Code wieder an.",
+    "deviceErrors": {
+      "disabled": "Die Anmeldung per Code ist für diese App auf GitHub noch nicht eingeschaltet. Versuche es etwas später erneut.",
+      "denied": "Die Anmeldung wurde auf GitHub abgebrochen.",
+      "expired": "Der Code ist abgelaufen, bevor er eingegeben wurde. Versuche es erneut.",
+      "failed": "Anmeldung nicht möglich. Prüfe deine Verbindung und versuche es erneut."
+    }
   },
   "share": {
     "title": "Mit dem Team teilen",

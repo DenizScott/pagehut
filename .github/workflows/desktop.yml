@@ -46,8 +46,12 @@ jobs:
       # 2. The desktop shell with that server inside.
       - run: npm ci
         working-directory: desktop
+      # Public values only (no secret): they turn on GitHub sign-in by code in the desktop app.
       - run: node scripts/prepare-server.mjs
         working-directory: desktop
+        env:
+          PAGEHUT_GITHUB_CLIENT_ID: ${{ vars.PAGEHUT_GITHUB_CLIENT_ID }}
+          PAGEHUT_GITHUB_APP_SLUG: ${{ vars.PAGEHUT_GITHUB_APP_SLUG }}
       - name: Build installers (unsigned)
         working-directory: desktop
         shell: bash

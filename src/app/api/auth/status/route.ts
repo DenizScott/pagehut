@@ -6,5 +6,6 @@ import { readConfig } from "@/lib/server/config";
 export async function GET() {
   await connection();
   // The desktop app runs this server on the user's own computer, without GitHub keys.
-  return handleStatus(readConfig(), process.env.PAGEHUT_DESKTOP === "1");
+  const desktop = process.env.PAGEHUT_DESKTOP === "1" ? { appSlug: process.env.PAGEHUT_DESKTOP_APP_SLUG } : false;
+  return handleStatus(readConfig(), desktop);
 }

@@ -249,3 +249,64 @@ test("an older root connection in a Unity repo moves to GDD/ by itself on reload
   await expect(page.getByRole("link", { name: /team\/unity-game\/GDD/ })).toBeVisible();
   await ctx.close();
 });
+
+test("desktop app: sign in with a code (device flow), cancel, and see GitHub's errors", async ({ browser }) => {
+  const gh = new FakeGitHub();
+  gh.addRepo("team", "gdd");
+  const ctx = await browser.newContext();
+  await ctx.route("**/api/auth/status", (r) => r.fulfill({ json: { configured: true, appSlug: "pagehut-test", desktop: true } }));
+  await ctx.route("https://api.github.com/**", async (route) => {
+    const req = route.request();
+    const res = await gh.fetch(req.url(), { method: req.method(), headers: req.headers(), body: req.postData() ?? undefined });
+    await route.fulfill({ status: res.status, body: await res.text(), headers: { "content-type": "application/json", "access-control-allow-origin": "*" } });
+  });
+  // The desktop bridge (desktop/preload.js), faked: the first sign-in fails as if the app's device
+  // flow were off, the second is cancelled, the third is approved.
+  await ctx.addInitScript(() => {
+    let attempt = 0;
+    let approve: (() => void) | null = null;
+    let cancel: (() => void) | null = null;
+    let signedIn = false;
+    (window as unknown as { pagehutDesktop: unknown }).pagehutDesktop = {
+      startSignIn: async () => {
+        attempt++;
+        if (attempt === 1) throw new Error("Error invoking remote method 'github:start': Error: device_flow_disabled");
+        return { userCode: "WDJB-MJHT", verificationUri: "https://github.com/login/device", expiresIn: 900 };
+      },
+      finishSignIn: () =>
+        new Promise((resolve) => {
+          approve = () => {
+            signedIn = true;
+            resolve({ ok: true });
+          };
+          cancel = () => resolve({ ok: false, error: "cancelled" });
+        }),
+      cancelSignIn: async () => cancel?.(),
+      getToken: async () => (signedIn ? { accessToken: "ghu_desktop", expiresAt: Date.now() + 8 * 3600_000 } : null),
+      signOut: async () => {
+        signedIn = false;
+      },
+    };
+    (window as unknown as { __approve: () => void }).__approve = () => approve?.();
+  });
+  const page = await ctx.newPage();
+  await page.goto("/en");
+  await page.waitForURL(/\/p\//);
+  await page.getByRole("button", { name: /Local mode/ }).click();
+  const dialog = page.getByRole("dialog", { name: "Save this workspace to GitHub" });
+  await expect(dialog).toContainText("you stay signed in for 8 hours");
+
+  await dialog.getByRole("button", { name: "Sign in with GitHub" }).click();
+  await expect(dialog.getByRole("alert")).toContainText("isn't switched on for this app");
+
+  await dialog.getByRole("button", { name: "Sign in with GitHub" }).click();
+  await expect(dialog.getByRole("status", { name: "Code for GitHub" }).or(dialog.getByLabel("Code for GitHub"))).toHaveText("WDJB-MJHT");
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  await expect(dialog.getByRole("button", { name: "Sign in with GitHub" })).toBeVisible();
+
+  await dialog.getByRole("button", { name: "Sign in with GitHub" }).click();
+  await expect(dialog.getByText("Waiting for GitHub…")).toBeVisible();
+  await page.evaluate(() => (window as unknown as { __approve: () => void }).__approve());
+  await expect(dialog.getByRole("radio", { name: "team/gdd" })).toBeVisible();
+  await ctx.close();
+});

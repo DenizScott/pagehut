@@ -7,10 +7,11 @@
 // For development, PAGEHUT_URL=https://… loads a hosted copy instead of the bundled server.
 "use strict";
 
-const { app, BrowserWindow, Menu, dialog, nativeTheme, session, shell, utilityProcess } = require("electron");
+const { app, BrowserWindow, Menu, dialog, ipcMain, nativeTheme, session, shell, utilityProcess } = require("electron");
 const fs = require("node:fs");
 const http = require("node:http");
 const path = require("node:path");
+const github = require("./github");
 
 const PORT = 47821;
 const LOCAL_URL = new URL(`http://127.0.0.1:${PORT}`);
@@ -92,6 +93,8 @@ async function startServer() {
       NODE_ENV: "production",
       NEXT_TELEMETRY_DISABLED: "1",
       PAGEHUT_DESKTOP: "1",
+      // Public app slug only (for "install the app on a repository" links); sign-in runs here.
+      ...(github.config ? { PAGEHUT_DESKTOP_APP_SLUG: github.config.appSlug } : {}),
     },
   });
   server.stdout?.pipe(log);
@@ -152,6 +155,7 @@ function createWindow() {
       sandbox: true,
       nodeIntegration: false,
       spellcheck: true,
+      preload: path.join(__dirname, "preload.js"),
     },
   });
   if (state.maximized) win.maximize();
@@ -181,6 +185,29 @@ function createWindow() {
   mainWindow = win;
 }
 
+/* ---------- GitHub sign-in bridge (see github.js, preload.js) ---------- */
+
+/** Only the app's own page may use the bridge. */
+const fromApp = (event) => {
+  try {
+    return new URL(event.senderFrame?.url ?? "").origin === APP_URL.origin;
+  } catch {
+    return false;
+  }
+};
+function registerBridge() {
+  const handle = (channel, fn) =>
+    ipcMain.handle(channel, (event) => {
+      if (!fromApp(event)) throw new Error("forbidden");
+      return fn();
+    });
+  handle("github:start", () => github.startSignIn());
+  handle("github:finish", () => github.finishSignIn());
+  handle("github:cancel", () => github.cancelSignIn());
+  handle("github:token", () => github.getToken());
+  handle("github:signout", () => github.signOut());
+}
+
 /* ---------- app lifecycle ---------- */
 
 if (!app.requestSingleInstanceLock()) {
@@ -193,6 +220,8 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.whenReady().then(async () => {
+    github.loadToken();
+    registerBridge();
     session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) => callback(permission === "clipboard-sanitized-write"));
     Menu.setApplicationMenu(
       process.platform === "darwin"
