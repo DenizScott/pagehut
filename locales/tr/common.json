@@ -127,7 +127,7 @@
   },
   "workspace": {
     "title": "Çalışma alanları",
-    "switch": "Çalışma alanını değiştir (şu an: {name})",
+    "switch": "Çalışma alanını değiştir",
     "current": "Geçerli çalışma alanı"
   },
   "github": {
@@ -225,9 +225,12 @@
     "keepMine": "Benimkini tut",
     "keepTheirs": "Onunkini tut",
     "compareTitle": "Senin sürümün ve GitHub'daki sürüm",
-    "compareDescription": "Yalnızca senin sürümünde olan satırlar turuncu, yalnızca GitHub'daki sürümde olanlar mavi.",
+    "compareDescription": "Yalnızca senin sürümünde olan satırlar “Senin”, yalnızca GitHub'daki sürümde olanlar “GitHub'da” diye işaretli.",
     "mine": "Senin",
-    "theirs": "GitHub'da"
+    "theirs": "GitHub'da",
+    "confirmMine": "Kendi sürümün kalsın mı? GitHub'daki sürümün yerini alır; o sürüm sayfa geçmişinde kalır.",
+    "confirmTheirs": "GitHub'daki sürüm kalsın mı? Bu sayfada henüz gönderilmemiş metnin silinir.",
+    "cancel": "Vazgeç"
   },
   "history": {
     "title": "Sayfa geçmişi",

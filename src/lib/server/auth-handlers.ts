@@ -35,7 +35,9 @@ const noStore = { "Cache-Control": "no-store" };
 function cookieOpts(req: NextRequest, maxAgeSeconds: number) {
   return {
     httpOnly: true,
-    secure: new URL(req.url).protocol === "https:",
+    // Behind a TLS-terminating proxy the request reaches the app as http; trust the proxy's header
+    // here (it can only make the cookie stricter).
+    secure: new URL(req.url).protocol === "https:" || req.headers.get("x-forwarded-proto")?.split(",")[0].trim() === "https",
     sameSite: "lax" as const,
     path: PATH,
     maxAge: Math.max(0, Math.floor(maxAgeSeconds)),
@@ -140,7 +142,8 @@ export async function handleToken(req: NextRequest, config: GitHubAppConfig | nu
 
   const session = await unseal<Session>(req.cookies.get(COOKIE.session)?.value, config.sessionSecret, PURPOSE.session);
   if (!session || session.refreshExpiresAt < Date.now()) {
-    const res = NextResponse.json({ error: "signed_out" }, { status: 401, headers: noStore });
+    // Being signed out is a normal state, not an error: 200 with no token keeps consoles clean.
+    const res = NextResponse.json({ accessToken: null, error: "signed_out" }, { headers: noStore });
     clear(res, COOKIE.session, COOKIE.handoff);
     return res;
   }

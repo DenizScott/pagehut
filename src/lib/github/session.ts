@@ -22,7 +22,11 @@ export async function getAccessToken(): Promise<string | null> {
         token = null;
         return null;
       }
-      const json = (await res.json()) as { accessToken: string; expiresAt: number };
+      const json = (await res.json()) as { accessToken: string | null; expiresAt?: number };
+      if (!json.accessToken || !json.expiresAt) {
+        token = null;
+        return null;
+      }
       token = { value: json.accessToken, expiresAt: json.expiresAt };
       return token.value;
     } catch {

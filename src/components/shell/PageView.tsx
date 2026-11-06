@@ -2,16 +2,14 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronRight, FileDown, History, LayoutTemplate, Menu as MenuIcon, MessageSquare, MoreHorizontal, Printer, Trash2 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { CommentsPanel } from "@/components/comments/CommentsPanel";
 import type { Anchor } from "@/lib/comments/types";
 import { getThreads } from "@/lib/storage/comments";
 import { githubApi, useGitHub } from "@/lib/github/session";
 import { listCollaborators } from "@/lib/github/repo";
-import { Editor } from "@/components/editor/Editor";
-import { DatabaseView } from "@/components/database/DatabaseView";
 import { Button } from "@/components/ui/button";
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -30,6 +28,13 @@ import { ConflictBanner } from "./ConflictBanner";
 import { LastEditor, PageHistoryDialog } from "./PageHistory";
 import { useStatus } from "@/lib/stores/status";
 import { cn } from "@/lib/utils";
+
+// The editor (Tiptap/ProseMirror), databases and comments load in parallel with the page data,
+// so the title paints first. The placeholder keeps the layout from jumping.
+const editorFallback = () => <div className="min-h-[50vh]" aria-hidden="true" />;
+const Editor = dynamic(() => import("@/components/editor/Editor").then((m) => m.Editor), { ssr: false, loading: editorFallback });
+const DatabaseView = dynamic(() => import("@/components/database/DatabaseView").then((m) => m.DatabaseView), { ssr: false, loading: editorFallback });
+const CommentsPanel = dynamic(() => import("@/components/comments/CommentsPanel").then((m) => m.CommentsPanel), { ssr: false });
 
 type Load = { state: "loading" } | { state: "missing" } | { state: "ready"; page: PageRecord };
 

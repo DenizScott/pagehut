@@ -10,16 +10,9 @@ import { useWorkspace } from "@/lib/stores/workspace";
 import { githubApi, useGitHub } from "@/lib/github/session";
 import { migrateLegacyRootWorkspace } from "@/lib/github/sync";
 import { AutoSync } from "./AutoSync";
-import { GitHubDialog } from "./GitHubDialog";
-import { MoveFolderDialog } from "./MoveFolderDialog";
-import { PillarsDialog } from "./PillarsDialog";
-import { SearchDialog } from "./SearchDialog";
-import { ShareDialog } from "./ShareDialog";
+import { LazyDialogs } from "./LazyDialogs";
 import { Sidebar } from "./Sidebar";
-import { TemplatesDialog } from "./TemplatesDialog";
 import { Toasts } from "./Toasts";
-import { TrashDialog } from "./TrashDialog";
-import { MentionsDialog } from "@/components/comments/MentionsDialog";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const t = useTranslations("common");
@@ -123,7 +116,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="fixed inset-0 z-30 bg-black/30 md:hidden" aria-hidden="true" onClick={() => setSidebarOpen(false)} />
       )}
       {/* URL params are runtime-only; Suspense lets the static shell prerender. */}
-      <Suspense fallback={<div className="hidden w-64 md:block" aria-hidden="true" />}>
+      <Suspense fallback={<div className="hidden w-[264px] md:block" aria-hidden="true" />}>
         <Sidebar />
       </Suspense>
 
@@ -140,14 +133,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <Toasts />
       <AutoSync />
       <Suspense fallback={null}>
-        <SearchDialog />
-        <TemplatesDialog />
-        <TrashDialog />
-        <PillarsDialog />
-        <GitHubDialog />
-        <ShareDialog />
-        <MoveFolderDialog />
-        <MentionsDialog />
+        <LazyDialogs />
       </Suspense>
     </div>
   );

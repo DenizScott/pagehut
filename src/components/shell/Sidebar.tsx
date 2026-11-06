@@ -61,7 +61,7 @@ export function Sidebar() {
     <aside
       aria-label={t("a11y.mainNav")}
       className={cn(
-        "lk-no-print fixed inset-y-0 start-0 z-40 flex w-64 flex-col border-e border-hairline bg-surface-glass backdrop-blur-xl transition-transform md:static md:z-auto md:translate-x-0 md:border-0 md:bg-transparent md:backdrop-blur-none",
+        "lk-no-print fixed inset-y-0 start-0 z-40 flex w-[264px] flex-col border-e border-hairline bg-surface-glass backdrop-blur-xl transition-transform md:static md:z-auto md:translate-x-0 md:border-0 md:bg-transparent md:backdrop-blur-none",
         open ? "translate-x-0" : "-translate-x-full rtl:translate-x-full",
       )}
     >

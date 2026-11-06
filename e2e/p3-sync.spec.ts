@@ -70,16 +70,23 @@ test("same-line edits show a conflict that can be compared and resolved", async 
   // Sync leaves the page alone while I'm typing; after a short pause it notices the conflict.
   await page.waitForTimeout(9_000);
   await syncButton(page).click();
-  const banner = page.getByRole("alert").filter({ hasText: "also changed on GitHub" });
+  const banner = page.getByRole("alert").filter({ hasText: /also changed on GitHub|Keep your version\?/ });
   await expect(banner).toBeVisible();
   await expect(syncButton(page)).toHaveAttribute("data-sync-state", "conflict");
   await expect(editor(page)).toContainText("Try it (mine)"); // my text is untouched
   expect(gh.files("team/game")[path]).toContain("Try it (theirs)"); // theirs too
 
+  // Keeping one side without comparing asks first; Cancel changes nothing.
+  await banner.getByRole("button", { name: "Keep mine" }).click();
+  await expect(banner).toContainText("Keep your version?");
+  await banner.getByRole("button", { name: "Cancel" }).click();
+  await expect(banner).toContainText("also changed on GitHub");
+
   await banner.getByRole("button", { name: "Compare" }).click();
   const compare = page.getByRole("dialog", { name: "Your version and the GitHub version" });
   await expect(compare).toContainText("## Try it (mine)");
   await expect(compare).toContainText("## Try it (theirs)");
+  await expect(compare.getByText("## Try it (mine)").locator("xpath=preceding-sibling::span")).toHaveText(/^\d+$/);
   await compare.getByRole("button", { name: "Keep theirs" }).click();
 
   await expect(banner).toBeHidden();

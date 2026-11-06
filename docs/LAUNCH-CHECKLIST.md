@@ -32,3 +32,9 @@ account and decision. Tick items off here as they are done.
       with the production callback URL.
 - [ ] Choose the license (MIT proposed) and add `LICENSE`.
 - [ ] Privacy note: documents are stored only in the browser or in the user's GitHub repo.
+- [ ] First deployed preview: import the repo on Vercel (Hobby) with your own account, following
+      `docs/DEPLOY.md`. Then run Lighthouse on the preview URL and check that accessibility is
+      at least 95.
+- [ ] Optional: build the Docker image once (`docker build -t pagehut .`). Docker was not
+      available on the development machine, so the image itself is untested; the standalone
+      server it runs was tested.

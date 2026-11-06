@@ -148,7 +148,7 @@ function Toolbar({ api, onSelectView }: { api: Api; onSelectView: (id: string) =
 
   return (
     <div className="lk-no-print mb-2 flex flex-wrap items-center gap-1 border-b border-hairline pb-2">
-      <div role="tablist" aria-label={t("views.label")} className="flex min-w-0 flex-1 flex-wrap items-center gap-0.5">
+      <div role="tablist" aria-label={t("views.label")} className="flex min-w-0 flex-wrap items-center gap-0.5">
         {data.views.map((v) => {
           const Icon = viewIcon[v.type];
           const selected = v.id === view.id;
@@ -186,6 +186,8 @@ function Toolbar({ api, onSelectView }: { api: Api; onSelectView: (id: string) =
             </button>
           );
         })}
+      </div>
+      <div className="flex min-w-0 flex-1 items-center">
         <Menu>
           <MenuTrigger className="grid size-7 place-items-center rounded-md text-fg-muted hover:bg-surface-hover hover:text-fg" aria-label={t("views.add")}>
             <Plus className="size-4" />
@@ -385,9 +387,9 @@ function ViewSettings({ api, onRename, onDeleted }: { api: Api; onRename: () => 
 
   return (
     <Popover.Root>
-      <Popover.Trigger className="flex h-7 items-center gap-1.5 rounded-md px-2 text-sm text-fg-muted hover:bg-surface-hover" aria-label={t("views.settings")}>
+      <Popover.Trigger className="flex h-7 items-center gap-1.5 rounded-md px-2 text-sm text-fg-muted hover:bg-surface-hover">
         <Eye className="size-4" aria-hidden="true" />
-        <span className="hidden sm:inline">{t("views.properties")}</span>
+        <span className="sr-only sm:not-sr-only">{t("views.properties")}</span>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content align="end" sideOffset={4} collisionPadding={8} className="z-50 w-72 rounded-lg border border-hairline bg-surface-glass p-2 text-sm shadow-float backdrop-blur-xl">

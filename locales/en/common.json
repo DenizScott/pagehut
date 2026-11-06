@@ -127,7 +127,7 @@
   },
   "workspace": {
     "title": "Workspaces",
-    "switch": "Switch workspace (current: {name})",
+    "switch": "Switch workspace",
     "current": "Current workspace"
   },
   "github": {
@@ -225,9 +225,12 @@
     "keepMine": "Keep mine",
     "keepTheirs": "Keep theirs",
     "compareTitle": "Your version and the GitHub version",
-    "compareDescription": "Lines only in your version are orange; lines only in the GitHub version are blue.",
+    "compareDescription": "Lines only in your version are marked “Yours”; lines only in the GitHub version are marked “On GitHub”.",
     "mine": "Yours",
-    "theirs": "On GitHub"
+    "theirs": "On GitHub",
+    "confirmMine": "Keep your version? It replaces the GitHub version, which stays in the page history.",
+    "confirmTheirs": "Keep the GitHub version? Your unsent text on this page will be replaced.",
+    "cancel": "Cancel"
   },
   "history": {
     "title": "Page history",

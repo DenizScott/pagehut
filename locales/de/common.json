@@ -127,7 +127,7 @@
   },
   "workspace": {
     "title": "Arbeitsbereiche",
-    "switch": "Arbeitsbereich wechseln (aktuell: {name})",
+    "switch": "Arbeitsbereich wechseln",
     "current": "Aktueller Arbeitsbereich"
   },
   "github": {
@@ -225,9 +225,12 @@
     "keepMine": "Meine behalten",
     "keepTheirs": "Deren behalten",
     "compareTitle": "Deine Fassung und die Fassung auf GitHub",
-    "compareDescription": "Zeilen nur in deiner Fassung sind orange, Zeilen nur in der GitHub-Fassung blau.",
+    "compareDescription": "Zeilen nur in deiner Fassung sind mit „Deine“ markiert, Zeilen nur in der GitHub-Fassung mit „Auf GitHub“.",
     "mine": "Deine",
-    "theirs": "Auf GitHub"
+    "theirs": "Auf GitHub",
+    "confirmMine": "Deine Fassung behalten? Sie ersetzt die GitHub-Fassung, die im Seitenverlauf bleibt.",
+    "confirmTheirs": "Die GitHub-Fassung behalten? Dein noch nicht gesendeter Text auf dieser Seite wird ersetzt.",
+    "cancel": "Abbrechen"
   },
   "history": {
     "title": "Seitenverlauf",

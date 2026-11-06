@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 /** Workspace-level dialogs, opened from the sidebar, shortcuts or the editor. */
-type DialogName = "search" | "templates" | "trash" | "pillars" | "github" | "share" | "moveFolder" | "mentions" | null;
+export type DialogName = "search" | "templates" | "trash" | "pillars" | "github" | "share" | "moveFolder" | "mentions" | null;
 
 interface OpenOptions {
   /** Templates: parent for a new page (null = top level). */

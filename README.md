@@ -11,7 +11,8 @@ students, indie teams, small studios and university classes.
   beats, playtests and balancing ([docs/FEATURES.md](docs/FEATURES.md)).
 - **Localized.** Turkish, English and German at launch, with RTL support ready.
 
-> Status: **P5 (collaboration)**. Polish, accessibility and deployment guides come next (P6).
+> Status: **P6 (polish and release)**. Every planned feature is in; the first public release is
+> waiting on the items in [docs/LAUNCH-CHECKLIST.md](docs/LAUNCH-CHECKLIST.md).
 
 ## What works today
 
@@ -51,23 +52,32 @@ No environment variables are needed for local mode.
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | Generates route types, then runs `tsc --noEmit` |
 | `pnpm test` | Unit tests (Vitest) |
-| `pnpm e2e` | End-to-end tests (Playwright; run `pnpm exec playwright install chromium` once) |
+| `pnpm e2e` | End-to-end tests, including the axe accessibility checks (Playwright; run `pnpm exec playwright install chromium` once) |
 | `pnpm i18n:check` | Fails on missing, extra or mismatched translation keys |
 | `pnpm check` | lint + typecheck + i18n + unit tests |
 
 If a dev server is already running, point the e2e suite at it: `E2E_PORT=3000 pnpm e2e`.
 
+## Accessibility
+
+PageHut aims for WCAG 2.2 AA in Turkish, English and German, in light and dark themes. Every
+screen is checked with axe in the test suite, and Lighthouse scores accessibility at 100. If
+something doesn't work with your keyboard or screen reader, please open an issue.
+
 ## Deploy (free)
 
 - **Vercel (Hobby):** import the repo; no settings needed for local mode.
-- **Self-host:** `pnpm build && pnpm start` on any Node.js host.
+- **Docker:** `docker build -t pagehut .`, then `docker run -p 3000:3000 pagehut`.
+- **Any Node.js host:** `pnpm build && pnpm start`.
 
-Cloudflare Pages and Docker guides arrive in P6.
+Details, GitHub sign-in on your own domain, and a Cloudflare outline:
+[docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Project docs
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how the app is put together
 - [docs/SYNC.md](docs/SYNC.md): GitHub sync, merge and conflicts
+- [docs/DEPLOY.md](docs/DEPLOY.md): Vercel, Docker, Node.js and Cloudflare
 - [docs/FEATURES.md](docs/FEATURES.md): every feature
 - [docs/IDEAS.md](docs/IDEAS.md): feature ideas for game teams
 - [docs/LAUNCH-CHECKLIST.md](docs/LAUNCH-CHECKLIST.md): names and handles to register by hand

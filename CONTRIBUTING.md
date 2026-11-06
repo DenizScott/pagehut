@@ -29,7 +29,12 @@ pnpm e2e
   translation key.
 - UI text always goes through translations, including `aria-label`s.
 - Use logical CSS properties (`ms-*`, `pe-*`, `start-*`, `border-e`) so right-to-left languages work.
-- Keep every interactive element reachable by keyboard and labeled for screen readers.
+- Keep every interactive element reachable by keyboard and labeled for screen readers. When a
+  control shows text, its accessible name must start with that text; click targets are at least
+  24×24 px. `e2e/p6-a11y.spec.ts` (axe) fails on violations. If you add a screen or dialog, add it
+  to that test.
+- Load heavy, rarely used UI (dialogs, panels) with `next/dynamic`; see `LazyDialogs.tsx`.
+- Don't change colors without checking contrast in both themes (`docs/design/HANDOFF.md`).
 
 ## Translations
 
@@ -54,6 +59,11 @@ word by word. Examples for Turkish:
 
 The first time a term appears in a template, give the English term in parentheses. Many teams use
 both.
+
+## Project docs
+
+Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) first. Sync and merging are in
+[docs/SYNC.md](docs/SYNC.md), deployment in [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Commits
 

@@ -35,14 +35,13 @@ export function WorkspaceMenu() {
 
   return (
     <Menu>
-      <MenuTrigger
-        className="flex min-w-0 flex-1 items-center gap-2 rounded-md p-1 text-start hover:bg-surface-hover"
-        aria-label={t("workspace.switch", { name: workspace?.name ?? "" })}
-      >
+      <MenuTrigger className="flex min-w-0 flex-1 items-center gap-2 rounded-md p-1 text-start hover:bg-surface-hover">
         <Logo className="size-7 shrink-0" />
         <span className="min-w-0 flex-1 leading-tight">
           <span className="block truncate text-sm font-semibold">{t("app.name")}</span>
           <span className="block truncate text-xs text-fg-muted">{workspace?.name ?? t("app.tagline")}</span>
+          {/* The visible text starts the accessible name (WCAG 2.5.3), the action follows. */}
+          <span className="sr-only">: {t("workspace.switch")}</span>
         </span>
         <ChevronsUpDown className="size-4 shrink-0 text-fg-subtle" aria-hidden="true" />
       </MenuTrigger>

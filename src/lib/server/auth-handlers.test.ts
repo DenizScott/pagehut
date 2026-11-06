@@ -110,6 +110,13 @@ describe("GitHub sign-in flow", () => {
     expect(cookie).toMatch(/Max-Age=600/);
   });
 
+  it("marks cookies Secure behind an HTTPS proxy", async () => {
+    const plain = await handleLogin(req("/api/auth/login"), config);
+    const proxied = await handleLogin(req("/api/auth/login", { headers: { "x-forwarded-proto": "https" } }), config);
+    expect(ORIGIN.startsWith("http:") ? plain.headers.getSetCookie()[0] : "").not.toMatch(/Secure/i);
+    expect(proxied.headers.getSetCookie()[0]).toMatch(/Secure/i);
+  });
+
   it("callback sends the matching PKCE verifier and redirects back without tokens in the URL", async () => {
     const { authUrl, cb, jar } = await signIn();
     const location = cb.headers.get("location")!;
@@ -150,11 +157,14 @@ describe("GitHub sign-in flow", () => {
     expect((await handleToken(cross, config, fakeGitHub)).status).toBe(403);
   });
 
-  it("signed-out and tampered sessions get 401 and the cookies are cleared", async () => {
+  it("signed-out and tampered sessions get no token and the cookies are cleared", async () => {
     const headers = { [CSRF_HEADER]: "1" };
-    expect((await handleToken(req("/api/auth/token", { method: "POST", headers }), config, fakeGitHub)).status).toBe(401);
+    const signedOut = await handleToken(req("/api/auth/token", { method: "POST", headers }), config, fakeGitHub);
+    expect(signedOut.status).toBe(200);
+    expect(await signedOut.json()).toMatchObject({ accessToken: null });
     const tampered = await handleToken(req("/api/auth/token", { method: "POST", jar: { ph_session: "garbage" }, headers }), config, fakeGitHub);
-    expect(tampered.status).toBe(401);
+    expect(await tampered.json()).toMatchObject({ accessToken: null });
+    expect(tampered.headers.get("set-cookie")).toContain("ph_session=;");
   });
 
   it("logout clears the session cookies", async () => {

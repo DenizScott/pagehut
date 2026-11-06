@@ -1,6 +1,6 @@
 # Architecture
 
-Status: P5. Sections marked *(planned)* describe the approved design for later phases.
+Status: P6 (polish and release). Every planned phase is built; known limits are listed in each section.
 
 ## Overview
 
@@ -207,13 +207,51 @@ Checked contrast pairs (WCAG AA):
 Glass (blur plus translucent surface) is used only on chrome: the sidebar drawer, menus, dialogs
 and toasts. The document canvas is always opaque.
 
+## Accessibility
+
+Target: WCAG 2.2 AA. `e2e/p6-a11y.spec.ts` runs axe (WCAG 2.0–2.2 A/AA rules) over the page,
+search, templates, comments, all three database views and the GitHub and trash dialogs, in light
+and dark themes and on a phone layout. The suite fails on any violation.
+
+- Every control has a visible label or a translated `aria-label`. When a control shows text, its
+  accessible name starts with that text (WCAG 2.5.3).
+- Click targets are at least 24×24 px (WCAG 2.5.8). Task-list checkboxes draw a 16 px box inside
+  a 24 px target.
+- Focus is always visible (`--ring`), dialogs trap focus and return it, and a skip link leads to
+  the page.
+- State is never shown by color alone (sync status, conflicts, diff lines all have text).
+
+Lighthouse (production build, `/en`): accessibility 100, best practices 100 and SEO 100 on
+desktop and mobile; performance 97–98 on desktop.
+
+## Performance
+
+- Dialogs opened by a click (`LazyDialogs`), the editor, database views and the comments panel
+  are loaded with `next/dynamic`, so the first paint does not wait for them. Templates are
+  fetched when the browser is idle.
+- Search stays in the first bundle on purpose: it opens from Ctrl/Cmd+K and people type at once,
+  so a lazy dialog would let the first keystrokes land in the page (an e2e test guards this).
+- The monospace font is not preloaded; the two text fonts are.
+- **Known limit.** Lighthouse's throttled mobile profile scores 75–77, with LCP around 6 s.
+  The page title is drawn only after IndexedDB answers, and the Markdown converters (Tiptap
+  schema) are still in the first bundle, because the storage and sync layers import them. The
+  next step is to load `src/lib/markdown` lazily inside `local-repo.ts`, `page-file.ts` and the
+  importers.
+
+## Deployment
+
+See [DEPLOY.md](DEPLOY.md): Vercel, Docker (`Dockerfile`, Next.js standalone output enabled with
+`PAGEHUT_STANDALONE=1`), any Node.js host, and an untested Cloudflare (OpenNext) outline.
+
 ## Security
 
 GitHub App with `Contents: read/write` + `Metadata: read`, limited to repositories the app is
 installed on. Sign-in uses the web flow with `state` and PKCE (S256).
 
 - **Refresh token.** Sealed with AES-256-GCM in an `httpOnly`, `SameSite=Lax` cookie scoped to
-  `/api/auth`, and `Secure` on HTTPS.
+  `/api/auth`, and `Secure` on HTTPS (also behind a proxy that sends `X-Forwarded-Proto: https`).
+- **Signed out.** `/api/auth/token` answers 200 with `accessToken: null`, so a signed-out
+  visit logs no errors.
 - **Access token.** Lives about 8 hours. It is handed to the browser once and kept in module
   memory only (`src/lib/github/session.ts`).
 - **Token endpoint.** Requires the `x-pagehut-csrf` header and a same-origin `Origin`.

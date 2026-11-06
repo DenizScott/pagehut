@@ -93,7 +93,7 @@ test("build a weapons table with a select, numbers and a formula; filter and sor
 
   // Search finds rows by their text.
   await page.keyboard.press("ControlOrMeta+k");
-  await page.getByRole("combobox").fill("spear");
+  await page.getByRole("dialog").getByRole("combobox").fill("spear");
   await expect(page.getByRole("option", { name: /Weapons/ })).toBeVisible();
 });
 

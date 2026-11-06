@@ -10,7 +10,8 @@ import "../globals.css";
 
 const sans = Bricolage_Grotesque({ variable: "--font-sans-face", subsets: ["latin", "latin-ext"], axes: ["opsz", "wdth"] });
 const doc = Hanken_Grotesk({ variable: "--font-doc-face", subsets: ["latin", "latin-ext"] });
-const mono = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin", "latin-ext"] });
+// Code blocks are rare: load the mono font when needed instead of preloading it.
+const mono = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin", "latin-ext"], preload: false });
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
