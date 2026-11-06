@@ -232,11 +232,16 @@ desktop and mobile; performance 97–98 on desktop.
 - Search stays in the first bundle on purpose: it opens from Ctrl/Cmd+K and people type at once,
   so a lazy dialog would let the first keystrokes land in the page (an e2e test guards this).
 - The monospace font is not preloaded; the two text fonts are.
-- **Known limit.** Lighthouse's throttled mobile profile scores 75–77, with LCP around 6 s.
-  The page title is drawn only after IndexedDB answers, and the Markdown converters (Tiptap
-  schema) are still in the first bundle, because the storage and sync layers import them. The
-  next step is to load `src/lib/markdown` lazily inside `local-repo.ts`, `page-file.ts` and the
-  importers.
+- The Markdown converters (which bring the Tiptap/ProseMirror schema) load through
+  `src/lib/markdown/runtime.ts`. Entry points that convert (saving, creating pages, import,
+  pull, conflicts, history, opening a repo) call `await loadMarkdown()` before any IndexedDB
+  transaction, then use the synchronous `markdown()`. A returning visit opens the page without
+  them. Unit tests load them once in `src/test-setup.ts`.
+- **Measured** (Lighthouse, throttled mobile, production build): a returning visit scores 100. A
+  first visit scores 75–79 with LCP around 5.5–6.5 s. On the first visit the welcome page is
+  created in the browser, so the title waits for the app code, IndexedDB, the converters and a
+  client-side navigation over a slow 4G profile. Rendering the first-run welcome page on the
+  server would be the next step if this matters.
 
 ## Deployment
 

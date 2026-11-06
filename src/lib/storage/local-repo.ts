@@ -2,8 +2,7 @@ import { ulid } from "ulid";
 import { getDB } from "./db";
 import { migrateLegacyDatabases } from "./migrate";
 import { descendantIds } from "@/lib/tree";
-import { docToMarkdown } from "@/lib/markdown/serialize";
-import { markdownToDoc } from "@/lib/markdown/parse";
+import { loadMarkdown, type MarkdownConverters } from "@/lib/markdown/runtime";
 import { serializeDatabase } from "@/lib/database/file";
 import type { DatabaseData } from "@/lib/database/types";
 import { EMPTY_DOC } from "@/lib/page-file";
@@ -32,30 +31,47 @@ export async function ensureWorkspace(welcome: WelcomeContent): Promise<Workspac
   const db = getDB();
   // Bring over data saved under an earlier product name before deciding this is a first run.
   await migrateLegacyDatabases(db);
-  return db.transaction("rw", db.workspaces, db.pages, db.kv, async () => {
+  const findActive = async () => {
     const activeId = (await db.kv.get(ACTIVE_WS_KEY))?.value as string | undefined;
-    const existing = activeId ? await db.workspaces.get(activeId) : await db.workspaces.orderBy("updatedAt").last();
-    if (existing) return existing;
-
-    const now = Date.now();
-    const ws: WorkspaceRecord = { id: ulid(), name: welcome.workspaceName, mode: "local", createdAt: now, updatedAt: now };
-    await db.workspaces.add(ws);
-    await db.kv.put({ key: ACTIVE_WS_KEY, value: ws.id });
-    const doc = markdownToDoc(welcome.markdown);
-    await db.pages.add({
-      id: ulid(),
-      workspaceId: ws.id,
-      parentId: null,
-      order: 1,
-      title: welcome.title,
-      doc,
-      markdown: docToMarkdown(doc),
-      createdAt: now,
-      updatedAt: now,
-      dirty: true,
+    return activeId ? db.workspaces.get(activeId) : db.workspaces.orderBy("updatedAt").last();
+  };
+  // Returning visits never load the converters here, so the page can paint before the editor
+  // code arrives. They are loaded outside the transaction: awaiting a dynamic import inside an
+  // IndexedDB transaction would end it.
+  let md = (await findActive()) ? null : await loadMarkdown();
+  for (;;) {
+    const result = await db.transaction("rw", db.workspaces, db.pages, db.kv, async () => {
+      const existing = await findActive();
+      if (existing) return existing;
+      if (!md) return null; // gone since the check above: load the converters, then try again
+      return createWelcomeWorkspace(welcome, md);
     });
-    return ws;
+    if (result) return result;
+    md = await loadMarkdown();
+  }
+}
+
+/** First run: a local workspace with a welcome page. Runs inside ensureWorkspace's transaction. */
+async function createWelcomeWorkspace(welcome: WelcomeContent, { markdownToDoc, docToMarkdown }: MarkdownConverters): Promise<WorkspaceRecord> {
+  const db = getDB();
+  const now = Date.now();
+  const ws: WorkspaceRecord = { id: ulid(), name: welcome.workspaceName, mode: "local", createdAt: now, updatedAt: now };
+  await db.workspaces.add(ws);
+  await db.kv.put({ key: ACTIVE_WS_KEY, value: ws.id });
+  const doc = markdownToDoc(welcome.markdown);
+  await db.pages.add({
+    id: ulid(),
+    workspaceId: ws.id,
+    parentId: null,
+    order: 1,
+    title: welcome.title,
+    doc,
+    markdown: docToMarkdown(doc),
+    createdAt: now,
+    updatedAt: now,
+    dirty: true,
   });
+  return ws;
 }
 
 export async function listWorkspaces(): Promise<WorkspaceRecord[]> {
@@ -90,6 +106,7 @@ export async function createPage(
   const siblings = await listPages(workspaceId);
   const parentId = opts.parentId ?? null;
   const maxOrder = Math.max(0, ...siblings.filter((p) => p.parentId === parentId).map((p) => p.order));
+  const { markdownToDoc, docToMarkdown } = await loadMarkdown();
   const doc = markdownToDoc(opts.markdown ?? "");
   const now = Date.now();
   const page: PageRecord = {
@@ -116,6 +133,7 @@ export async function createPage(
  */
 export async function savePageContent(id: string, doc: unknown): Promise<PageRecord> {
   const db = getDB();
+  const { docToMarkdown } = await loadMarkdown();
   let markdown: string | undefined;
   try {
     markdown = docToMarkdown(doc);
@@ -136,6 +154,7 @@ export async function savePageContent(id: string, doc: unknown): Promise<PageRec
  */
 export async function fillEmptyPage(id: string, content: { title: string; markdown: string; icon?: string }): Promise<boolean> {
   const db = getDB();
+  const { markdownToDoc, docToMarkdown } = await loadMarkdown();
   return db.transaction("rw", db.pages, async () => {
     const page = await db.pages.get(id);
     if (!page || page.markdown.trim()) return false;

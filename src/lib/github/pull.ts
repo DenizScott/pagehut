@@ -1,3 +1,4 @@
+import { loadMarkdown } from "@/lib/markdown/runtime";
 import { mergePageFile, pageContentFromFile } from "@/lib/page-file";
 import { workspaceFileSchema, type AssetRecord, type PageRecord, type WorkspaceFile, type WorkspaceRecord } from "@/lib/model/schemas";
 import { getDB } from "@/lib/storage/db";
@@ -58,6 +59,7 @@ function parseWorkspaceFile(text: string | undefined): WorkspaceFile | null {
 }
 
 export async function pullWorkspace(api: GitHubApi, workspaceId: string, opts: PullOptions = {}): Promise<PullResult> {
+  await loadMarkdown(); // pageFromFile below runs inside a transaction
   const db = getDB();
   const canTouch = opts.canTouchPage ?? (() => true);
   const result = emptyResult();
@@ -242,6 +244,7 @@ export async function syncWorkspace(api: GitHubApi, workspaceId: string, opts: P
 
 /** The user's choice for a page in conflict. */
 export async function resolveConflict(pageId: string, choice: "mine" | "theirs"): Promise<void> {
+  await loadMarkdown();
   const db = getDB();
   const page = await db.pages.get(pageId);
   if (!page?.conflict) return;
@@ -262,6 +265,7 @@ export async function resolveConflict(pageId: string, choice: "mine" | "theirs")
 
 /** Puts an older version (from the page history) back as a normal local edit; the next sync commits it. */
 export async function restorePageVersion(pageId: string, fileText: string): Promise<void> {
+  await loadMarkdown();
   const db = getDB();
   const page = await db.pages.get(pageId);
   if (!page) return;

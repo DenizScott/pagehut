@@ -1,6 +1,5 @@
 import { ulid } from "ulid";
-import { docToMarkdown } from "@/lib/markdown/serialize";
-import { markdownToDoc } from "@/lib/markdown/parse";
+import { loadMarkdown } from "@/lib/markdown/runtime";
 import { ASSET_MAX_BYTES, type PageRecord } from "@/lib/model/schemas";
 import { getDB } from "@/lib/storage/db";
 import { isDatabaseBody, parseDatabase, serializeDatabase } from "@/lib/database/file";
@@ -20,6 +19,7 @@ export interface ImportResult {
  */
 export async function importBundle(workspaceId: string, source: WorkspaceBundle): Promise<ImportResult> {
   const db = getDB();
+  const { markdownToDoc, docToMarkdown } = await loadMarkdown();
   const bundle = remapIds(source, ulid);
   const existingRoots = (await db.pages.where("workspaceId").equals(workspaceId).toArray()).filter((p) => !p.parentId && !p.deletedAt);
   const offset = Math.max(0, ...existingRoots.map((p) => p.order));

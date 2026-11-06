@@ -1,0 +1,11 @@
+# Never upload local secrets or build output when deploying from this folder with the Vercel CLI.
+.env*
+!.env.example
+*.pem
+.next
+node_modules
+test-results
+playwright-report
+.claude
+.serena
+*.tsbuildinfo

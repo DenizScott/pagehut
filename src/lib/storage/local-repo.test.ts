@@ -33,6 +33,15 @@ describe("local repository", () => {
     expect(pages[0].markdown).toBe("# Hi\n\n- [ ] task\n");
   });
 
+  it("creates a fresh workspace when the active one was deleted", async () => {
+    const ws = await ensureWorkspace(welcome);
+    const { getDB } = await import("./db");
+    await getDB().workspaces.delete(ws.id); // the active id now points at nothing
+    const next = await ensureWorkspace(welcome);
+    expect(next.id).not.toBe(ws.id);
+    expect(await listPages(next.id)).toHaveLength(1);
+  });
+
   it("saves content as doc + regenerated markdown and marks dirty", async () => {
     const ws = await ensureWorkspace(welcome);
     const page = await createPage(ws.id, { title: "Combat" });

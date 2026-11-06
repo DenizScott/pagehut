@@ -15,7 +15,8 @@ FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1 PAGEHUT_STANDALONE=1
-RUN pnpm build
+# public/ may be empty, and Git doesn't keep empty folders; the run stage copies it.
+RUN mkdir -p public && pnpm build
 
 FROM node:22-alpine AS run
 WORKDIR /app

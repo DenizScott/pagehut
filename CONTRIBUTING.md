@@ -21,6 +21,9 @@ pnpm check
 pnpm e2e
 ```
 
+GitHub Actions (`.github/workflows/ci.yml`) runs the same checks, the production build and the
+end-to-end suite on every push to `main` and on every pull request.
+
 ## Code rules
 
 - TypeScript strict; no `any` unless it is unavoidable and commented.
@@ -34,6 +37,9 @@ pnpm e2e
   24×24 px. `e2e/p6-a11y.spec.ts` (axe) fails on violations. If you add a screen or dialog, add it
   to that test.
 - Load heavy, rarely used UI (dialogs, panels) with `next/dynamic`; see `LazyDialogs.tsx`.
+- Don't import `src/lib/markdown/parse` or `serialize` from app code: use
+  `loadMarkdown()` / `markdown()` from `src/lib/markdown/runtime.ts`, so the editor core stays
+  out of the first bundle.
 - Don't change colors without checking contrast in both themes (`docs/design/HANDOFF.md`).
 
 ## Translations

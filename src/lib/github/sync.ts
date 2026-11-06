@@ -3,6 +3,7 @@ import { BRAND } from "@/config/brand";
 import { workspaceFileSchema, type AssetRecord, type PageRecord, type WorkspaceRecord } from "@/lib/model/schemas";
 import { getDB } from "@/lib/storage/db";
 import { pageFile, workspaceFile } from "@/lib/transfer/bundle";
+import { loadMarkdown } from "@/lib/markdown/runtime";
 import { pageContentFromFile } from "@/lib/page-file";
 import { gitBlobSha, GitHubError, RemoteChangedError, utf8, type GitHubApi } from "./api";
 import { commentChanges, commentFilesChanged, planComments, readAllComments, recordPushedComments, baseCommentSha, type CommentPlan } from "./comments-sync";
@@ -332,6 +333,7 @@ function findWorkspaceDirs(paths: string[]): string[] {
 
 /** Opens a workspace stored in a repo as a new local working copy (or returns the existing one). */
 export async function openRepoWorkspace(api: GitHubApi, target: RepoRef): Promise<string> {
+  await loadMarkdown();
   const db = getDB();
   const head = await getHead(api, target);
   if (!head) throw new NotAWorkspaceError();

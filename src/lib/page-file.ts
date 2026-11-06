@@ -1,8 +1,7 @@
 import { isDatabaseBody, parseDatabase, serializeDatabase } from "@/lib/database/file";
 import { mergeDatabase } from "@/lib/database/merge";
 import type { DatabaseData } from "@/lib/database/types";
-import { docToMarkdown } from "@/lib/markdown/serialize";
-import { markdownToDoc } from "@/lib/markdown/parse";
+import { markdown } from "@/lib/markdown/runtime";
 import { mergeText, type MergeResult } from "@/lib/merge";
 import type { PageKind } from "@/lib/model/schemas";
 import { pageFile } from "@/lib/transfer/bundle";
@@ -28,7 +27,7 @@ export function isDatabaseFile(meta: Record<string, unknown>, body: string): boo
   return meta.type === "database" || isDatabaseBody(body);
 }
 
-/** Content of a page from its file text (front matter + body). */
+/** Content of a page from its file text (front matter + body). Needs `await loadMarkdown()` first. */
 export function pageContentFromFile(text: string, fallbackTitle: string): PageContent {
   const { meta, body } = parseFrontMatter(text);
   const title = typeof meta.title === "string" ? meta.title : fallbackTitle;
@@ -37,6 +36,7 @@ export function pageContentFromFile(text: string, fallbackTitle: string): PageCo
     const { data } = parseDatabase(body);
     return { title, icon, kind: "database", doc: EMPTY_DOC, markdown: serializeDatabase(data), database: data };
   }
+  const { markdownToDoc, docToMarkdown } = markdown();
   const doc = markdownToDoc(body);
   return { title, icon, kind: undefined, doc, markdown: docToMarkdown(doc), database: undefined };
 }
