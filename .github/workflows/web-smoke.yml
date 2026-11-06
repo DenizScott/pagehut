@@ -1,0 +1,42 @@
+name: Web smoke test
+
+# Opens the deployed site in Chromium, Firefox and WebKit (desktop and phone viewports, three
+# languages) and runs scripts/web-smoke.mjs: pages, templates, databases, search, console errors.
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Site to test
+        default: https://pagehut.vercel.app
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox, webkit]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps ${{ matrix.engine }}
+      - run: node scripts/web-smoke.mjs "${{ inputs.url || 'https://pagehut.vercel.app' }}"
+        env:
+          ENGINES: ${{ matrix.engine }}
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-smoke-${{ matrix.engine }}
+          path: test-results/web-smoke-*.png
+          retention-days: 7
