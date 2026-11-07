@@ -1,7 +1,7 @@
 {
   "name": "pagehut-desktop",
   "productName": "PageHut",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "PageHut desktop app: a free writing and planning workspace, running entirely on your computer.",
   "author": "DenizScott and PageHut contributors",
   "homepage": "https://pagehut.vercel.app",
