@@ -48,8 +48,23 @@ function ImageView({ node, selected }: ReactNodeViewProps) {
   );
 }
 
-/** Same schema as the base Image extension (see lib/editor/extensions.ts); only the view differs. */
+/**
+ * Same schema as the base Image extension (see lib/editor/extensions.ts); only the view differs.
+ * In HTML the editor makes itself (drag, copy, node selection) an asset path goes into
+ * data-asset-src rather than src: a detached <img src="assets/…"> would make the browser fetch
+ * that path relative to the page URL and log a 404. The view above loads assets from IndexedDB.
+ */
 export const AssetImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      src: {
+        default: null,
+        parseHTML: (el: HTMLElement) => el.getAttribute("data-asset-src") ?? el.getAttribute("src"),
+        renderHTML: (attrs: { src?: string | null }) => (attrs.src?.startsWith("assets/") ? { "data-asset-src": attrs.src } : { src: attrs.src }),
+      },
+    };
+  },
   addNodeView() {
     return ReactNodeViewRenderer(ImageView);
   },

@@ -228,7 +228,11 @@ function OptionPicker({
 
   return (
     <Popover.Root open={open} onOpenChange={(o) => (setOpen(o), setQuery(""))}>
-      <Popover.Trigger aria-label={label} className={cn(className, "flex flex-wrap items-center gap-1")}>
+      {/* The name ends with the visible value, like text cells ("Status: Doing"; WCAG 2.5.3). */}
+      <Popover.Trigger
+        aria-label={`${label}: ${selected.map((id) => optionById(prop, id)?.name).filter(Boolean).join(", ") || t("cell.empty")}`}
+        className={cn(className, "flex flex-wrap items-center gap-1")}
+      >
         {selected.map((id) => optionById(prop, id)).filter(Boolean).map((o) => <OptionChip key={o!.id} option={o!} />)}
       </Popover.Trigger>
       <Popover.Portal>
@@ -315,7 +319,10 @@ function RelationPicker({
 
   return (
     <Popover.Root onOpenChange={() => setQuery("")}>
-      <Popover.Trigger aria-label={label} className={cn(className, "flex flex-wrap items-center gap-1")}>
+      <Popover.Trigger
+        aria-label={`${label}: ${selected.filter((id) => target?.data.rows.some((r) => r.id === id)).map(titleOf).join(", ") || t("cell.empty")}`}
+        className={cn(className, "flex flex-wrap items-center gap-1")}
+      >
         {selected.filter((id) => target?.data.rows.some((r) => r.id === id)).map((id) => (
           <span key={id} className="max-w-full truncate rounded bg-surface-active px-1.5 text-xs leading-5 underline decoration-hairline underline-offset-2">
             {titleOf(id)}

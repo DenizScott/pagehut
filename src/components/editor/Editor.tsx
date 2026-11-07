@@ -23,6 +23,7 @@ import type { PageLinkItem } from "./PageLinkMenu";
 import { PageLinkWithView } from "./PageLinkView";
 import { SlashCommand } from "./slash-command";
 import { filterSlash, searchKey, slashItems, type SlashEntry } from "./slash-items";
+import { pendingKey } from "@/lib/storage/pending-edits";
 
 interface EditorProps {
   page: PageRecord;
@@ -70,7 +71,7 @@ export function Editor({ page, onReady, onEmptyChange, comments }: EditorProps) 
   const noteUserEdit = useStatus((s) => s.noteUserEdit);
   const editorRef = useRef<TiptapEditor | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
-  const saver = useDebouncedSaver((doc: unknown) => savePageContent(page.id, doc));
+  const saver = useDebouncedSaver((doc: unknown) => savePageContent(page.id, doc), 300, pendingKey("content", page.id));
   const wrapper = useRef<HTMLDivElement>(null);
   const commentsRef = useRef(comments);
 
@@ -223,6 +224,17 @@ export function Editor({ page, onReady, onEmptyChange, comments }: EditorProps) 
         }
         current.commands.setTextSelection(1);
         current.view.focus();
+        // Focus can drop right after: React's development checks mount the editor's DOM twice. If
+        // it fell to the page body (nobody else took it) within a few frames, put it back.
+        let frames = 10;
+        const keep = () => {
+          const e = editorRef.current;
+          if (!e || e.isDestroyed) return;
+          const active = document.activeElement;
+          if ((!active || active === document.body) && e.view.dom.isConnected) e.view.focus();
+          if (--frames > 0) requestAnimationFrame(keep);
+        };
+        requestAnimationFrame(keep);
       };
       onReady?.(() => focus());
     }

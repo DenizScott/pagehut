@@ -35,6 +35,8 @@ interface SyncStore {
 }
 
 let running: Promise<SyncState> | null = null;
+/** A sync asked for while one runs: it starts once that one ends (one follow-up for all such calls). */
+let again: Promise<SyncState> | null = null;
 
 export const useSync = create<SyncStore>((set, get) => ({
   state: "idle",
@@ -43,8 +45,22 @@ export const useSync = create<SyncStore>((set, get) => ({
   reset: () => set({ state: "idle", retryAt: null, lastSyncAt: null }),
   push: (workspaceId) => get().sync(workspaceId),
   sync: (workspaceId) => {
-    // Never two syncs at once (timer + button + focus can coincide).
-    if (running) return running;
+    // Never two syncs at once (timer + button + focus can coincide). A call during a sync still gets
+    // a sync of its own afterwards: the running one may have started before the latest edit, or
+    // left the open page alone because it was being edited at that moment.
+    if (running) {
+      again ??= running.then(
+        () => {
+          again = null;
+          return get().sync(workspaceId);
+        },
+        () => {
+          again = null;
+          return get().sync(workspaceId);
+        },
+      );
+      return again;
+    }
     running = (async (): Promise<SyncState> => {
       set({ state: "syncing" });
       try {

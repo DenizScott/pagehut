@@ -91,6 +91,18 @@ export function AppShell({ children }: { children: ReactNode }) {
       });
   }, [workspace, setWorkspace, t]);
 
+  const bumpRecovered = useUI((s) => s.bumpContent);
+  // Edits that were still waiting to be saved when the app was last closed (see pending-edits.ts).
+  useEffect(() => {
+    import("@/lib/storage/pending-edits")
+      .then(({ recoverPendingEdits }) => recoverPendingEdits())
+      .then((ids) => {
+        if (ids.length) bumpRecovered();
+      })
+      .catch((err: unknown) => console.error("[autosave] recovery failed", err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per app start
+  }, []);
+
   // The welcome page and default workspace name follow the language while they're untouched.
   // Plain strings as dependencies: the effect runs once per workspace and language, not per render.
   const workspaceId = workspace?.id;

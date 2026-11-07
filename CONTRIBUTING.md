@@ -21,9 +21,8 @@ pnpm check
 pnpm e2e
 ```
 
-Known flaky check: locally, under a full parallel e2e run in dev mode, the assertion that the
-editor has focus right after Enter in a new page's title fails now and then (about one run in
-three or four, never in isolation, also before the latest changes). Re-run before digging in.
+The end-to-end suite fails a test on any console error, uncaught exception or local server error
+(`e2e/deep-guard.ts`), so a passing run also means a quiet console.
 
 GitHub Actions (`.github/workflows/ci.yml`) runs the same checks, the production build and the
 end-to-end suite on every push to `main` and on every pull request.

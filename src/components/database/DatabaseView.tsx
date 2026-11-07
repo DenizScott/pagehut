@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { useDebouncedSaver } from "@/lib/hooks/useDebouncedSaver";
+import { pendingKey } from "@/lib/storage/pending-edits";
 import * as ops from "@/lib/database/ops";
 import { runAutomations } from "@/lib/database/automations";
 import { todayIso } from "@/lib/database/dates";
@@ -72,7 +73,7 @@ export function DatabaseView({ page }: { page: PageRecord }) {
   const [data, setData] = useState<DatabaseData>(() => page.database ?? { properties: [], views: [], rows: [] });
   const [viewId, setViewId] = useState(() => data.views[0]?.id ?? "");
   const [openRowId, setOpenRowId] = useState<string | null>(null);
-  const saver = useDebouncedSaver((next: DatabaseData) => saveDatabase(page.id, next));
+  const saver = useDebouncedSaver((next: DatabaseData) => saveDatabase(page.id, next), 300, pendingKey("database", page.id));
   const me = useGitHub((s) => s.user?.login);
   /** Runs the database's automations for one edited (or new, `before` undefined) row. */
   const automate = (next: DatabaseData, rowId: string, before: Row | undefined) => runAutomations(next, rowId, before, { today: todayIso(), me }).data;

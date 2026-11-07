@@ -36,7 +36,7 @@ export function useImporter() {
         type="file"
         multiple
         hidden
-        accept=".md,.markdown,.txt,.zip,.json,text/markdown,application/zip,application/json"
+        accept=".md,.markdown,.txt,.csv,.zip,.json,text/markdown,text/csv,application/zip,application/json"
         data-testid="import-input"
         onChange={(e) => {
           const files = Array.from(e.target.files ?? []);

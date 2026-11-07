@@ -5,6 +5,7 @@ import { getDB } from "@/lib/storage/db";
 import { isDatabaseBody, parseDatabase, serializeDatabase } from "@/lib/database/file";
 import { EMPTY_DOC } from "@/lib/page-file";
 import { bundleFromJson, bundleFromZip, remapIds, titleFromMarkdown, type WorkspaceBundle } from "./bundle";
+import { databaseFromCsv } from "./folder-export";
 import { parseFrontMatter } from "./frontmatter";
 
 export interface ImportResult {
@@ -77,7 +78,7 @@ export async function importBundle(workspaceId: string, source: WorkspaceBundle)
   return { pages: records.length, firstPageId: firstRoot?.id ?? null, skipped };
 }
 
-/** Accepts .md/.markdown files, a .zip (export or folder of Markdown) or a .json workspace export. */
+/** Accepts .md/.markdown/.txt files, .csv tables, a .zip (export or folder of Markdown) or a .json workspace export. */
 export async function importFiles(workspaceId: string, files: File[]): Promise<ImportResult> {
   const total: ImportResult = { pages: 0, firstPageId: null, skipped: [] };
   const loose: WorkspaceBundle = { name: "", pillars: [], pages: [], assets: [] };
@@ -88,6 +89,10 @@ export async function importFiles(workspaceId: string, files: File[]): Promise<I
       merge(total, await importBundle(workspaceId, bundleFromZip(new Uint8Array(await file.arrayBuffer()), file.name)));
     } else if (name.endsWith(".json")) {
       merge(total, await importBundle(workspaceId, bundleFromJson(await file.text())));
+    } else if (name.endsWith(".csv")) {
+      // A spreadsheet export becomes a database: first column = row titles, column types inferred.
+      const data = databaseFromCsv(await file.text());
+      loose.pages.push({ id: ulid(), parentId: null, order: loose.pages.length + 1, title: file.name.replace(/\.csv$/i, ""), kind: "database", markdown: serializeDatabase(data) });
     } else if (/\.(md|markdown|txt)$/.test(name)) {
       const { meta, body } = parseFrontMatter(await file.text());
       const derived = typeof meta.title === "string" ? { title: meta.title, markdown: body } : titleFromMarkdown(body, file.name);

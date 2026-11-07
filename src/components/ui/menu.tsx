@@ -4,7 +4,14 @@ import { DropdownMenu as M } from "radix-ui";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
-export const Menu = M.Root;
+/**
+ * Non-modal: a modal menu marks the rest of the page aria-hidden while its links and buttons stay
+ * focusable, which screen readers handle badly (axe: aria-hidden-focus). The menu still closes on
+ * Escape, on outside clicks and when focus leaves it.
+ */
+export function Menu(props: ComponentProps<typeof M.Root>) {
+  return <M.Root modal={false} {...props} />;
+}
 export const MenuTrigger = M.Trigger;
 export const MenuSub = M.Sub;
 

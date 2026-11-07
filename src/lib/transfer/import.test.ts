@@ -36,6 +36,16 @@ describe("import", () => {
     expect(titles).toEqual(["Welcome", "Pitch", "Core loop"]);
   });
 
+  it("imports a CSV file as a database with inferred column types", async () => {
+    const ws = await ensureWorkspace(welcome);
+    const r = await importFiles(ws.id, [new File(["Video,Views,Published\nIntro,1200,2026-10-01\nTips,800,2026-10-15\n"], "Channel stats.csv")]);
+    expect(r.pages).toBe(1);
+    const page = (await listPages(ws.id)).find((p) => p.title === "Channel stats")!;
+    expect(page.kind).toBe("database");
+    expect(page.database!.rows).toHaveLength(2);
+    expect(page.database!.properties.map((p) => [p.name, p.type])).toEqual([["Video", "title"], ["Views", "number"], ["Published", "date"]]);
+  });
+
   it("imports a ZIP export twice without id collisions and keeps links working", async () => {
     const ws = await ensureWorkspace(welcome);
     const zip = new File([bundleToZip(bundle) as BlobPart], "export.zip");

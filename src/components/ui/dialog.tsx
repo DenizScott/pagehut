@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import { Dialog as D } from "radix-ui";
-import type { ComponentProps, ReactNode } from "react";
+import { useEffect, useState, type ComponentProps, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,19 @@ export function DialogContent({
   ...props
 }: ComponentProps<typeof D.Content> & { title: string; description?: string; hideTitle?: boolean; children: ReactNode }) {
   const t = useTranslations("common.a11y");
+  // Most dialogs here open from app state, not a Radix Trigger, so Radix can't return focus on
+  // close. Remember what had focus when the dialog opened and give it back afterwards, unless
+  // closing moved focus somewhere on purpose (e.g. into a page that a template just created).
+  const [returnTo] = useState(() => (typeof document === "undefined" ? null : (document.activeElement as HTMLElement | null)));
+  useEffect(
+    () => () => {
+      setTimeout(() => {
+        const lost = !document.activeElement || document.activeElement === document.body;
+        if (lost && returnTo?.isConnected) returnTo.focus();
+      }, 0);
+    },
+    [returnTo],
+  );
   return (
     <D.Portal>
       <D.Overlay className="fixed inset-0 z-50 bg-(--backdrop)" />

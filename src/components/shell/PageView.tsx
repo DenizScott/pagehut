@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { Link, useRouter } from "@/i18n/navigation";
 import { useDebouncedSaver } from "@/lib/hooks/useDebouncedSaver";
+import { pendingKey } from "@/lib/storage/pending-edits";
 import type { PageRecord } from "@/lib/model/schemas";
 import { getPage, listPages, savePageTitle, trashPage } from "@/lib/storage/local-repo";
 import { useUI } from "@/lib/stores/ui";
@@ -47,6 +48,8 @@ export function PageView() {
   // Live view of the record, only to notice that the page was moved to trash elsewhere.
   const live = useLiveQuery(() => getPage(pageId), [pageId]);
   const want = `${pageId}:${contentVersion}`;
+  // Restored from the trash while open: load it again (it may have changed since it was loaded).
+  const trashed = !!live?.deletedAt;
 
   useEffect(() => {
     let cancelled = false;
@@ -56,12 +59,17 @@ export function PageView() {
     });
     return () => {
       cancelled = true;
+      // Next keeps visited pages mounted but hidden (Activity), and runs this cleanup when it hides
+      // one. What is loaded now may be stale by the time the view shows again (the page was edited
+      // in another view since), so it loads again then instead of showing an old title and text that
+      // the next keystroke would save over the newer version.
+      setLoad({ state: "loading" });
     };
-  }, [pageId, contentVersion]);
+  }, [pageId, contentVersion, trashed]);
 
   // Never show the previous page while the next one loads: typing there would edit the wrong page.
   if (load.state === "loading" || load.for !== want) return null;
-  if (load.state === "missing" || live?.deletedAt)
+  if (load.state === "missing" || trashed)
     return (
       <div className="m-auto max-w-sm p-6 text-center">
         <p className="mb-3 text-fg-muted">{t("shell.notFound")}</p>
@@ -93,7 +101,7 @@ function PageEditor({ page }: { page: PageRecord }) {
   const focusEditor = useRef<(() => void) | null>(null);
   // Enter in the title before the editor is ready (a new page, a slow device): focus it on ready.
   const focusPending = useRef(false);
-  const titleSaver = useDebouncedSaver((value: string) => savePageTitle(page.id, value));
+  const titleSaver = useDebouncedSaver((value: string) => savePageTitle(page.id, value), 300, pendingKey("title", page.id));
   const pages = useLiveQuery(() => listPages(page.workspaceId), [page.workspaceId]);
   const ancestors = pages ? ancestorsOf(pages, page.id) : [];
   const workspace = useWorkspace((s) => s.workspace);
