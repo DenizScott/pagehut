@@ -39,6 +39,7 @@ import { Cell, OptionChip, type RelationSource } from "./Cell";
 import { AutomationsButton } from "./Automations";
 import { CalendarView, TimelineView } from "./DateViews";
 import { ChartView, FormView } from "./ExtraViews";
+import { viewDisplayName } from "./view-name";
 import { PropertyMenu, typeIcon } from "./PropertyMenu";
 
 const viewIcon: Record<ViewType, typeof Table2> = {
@@ -210,7 +211,7 @@ function Toolbar({ api, onSelectView }: { api: Api; onSelectView: (id: string) =
               )}
             >
               <Icon className="size-4" aria-hidden="true" />
-              {v.name}
+              {viewDisplayName(v, t)}
             </button>
           );
         })}

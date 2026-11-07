@@ -211,17 +211,18 @@ export function Editor({ page, onReady, onEmptyChange, comments }: EditorProps) 
   useEffect(() => {
     editorRef.current = editor;
     // view.focus() is synchronous (commands.focus() waits for an animation frame), so keys typed
-    // right after Enter in the title land here. Right after creation the view may not be in the
-    // page yet; then try again on the next frames.
+    // right after Enter in the title land here. It always targets the editor that exists *now*:
+    // an editor can be replaced right after creation (React may mount effects twice), and its view
+    // may not be in the page yet. In those cases it tries again on the next frames.
     if (editor) {
       const focus = (tries = 120) => {
-        if (editor.isDestroyed) return;
-        if (!editor.view.dom.isConnected) {
+        const current = editorRef.current;
+        if (!current || current.isDestroyed || !current.view.dom.isConnected) {
           if (tries > 0) requestAnimationFrame(() => focus(tries - 1));
           return;
         }
-        editor.commands.setTextSelection(1);
-        editor.view.focus();
+        current.commands.setTextSelection(1);
+        current.view.focus();
       };
       onReady?.(() => focus());
     }

@@ -91,6 +91,34 @@ export function AppShell({ children }: { children: ReactNode }) {
       });
   }, [workspace, setWorkspace, t]);
 
+  // The welcome page and default workspace name follow the language while they're untouched.
+  // Plain strings as dependencies: the effect runs once per workspace and language, not per render.
+  const workspaceId = workspace?.id;
+  const bumpContent = useUI((s) => s.bumpContent);
+  const welcomeTitle = t("welcome.title", { appName: t("app.name") });
+  const welcomeBody = t("welcome.body", { appName: t("app.name") });
+  const defaultName = t("shell.workspaceName");
+  useEffect(() => {
+    if (!workspaceId) return;
+    let cancelled = false;
+    import("@/lib/storage/localize-defaults")
+      .then(({ localizeDefaults }) => localizeDefaults(workspaceId, { title: welcomeTitle, markdown: welcomeBody, workspaceName: defaultName }))
+      .then(async ({ renamed, welcomePageIds }) => {
+        // Reload the editor only if the welcome page is the one on screen (even when this run was
+        // superseded: its changes are saved, and a later run finds nothing left to change).
+        if (welcomePageIds.includes(useStatus.getState().activePageId ?? "")) bumpContent();
+        if (cancelled) return;
+        if (renamed) {
+          const updated = await getWorkspace(workspaceId);
+          if (updated) setWorkspace(updated);
+        }
+      })
+      .catch((err: unknown) => console.error("[workspace] localizing defaults failed", err));
+    return () => {
+      cancelled = true;
+    };
+  }, [workspaceId, welcomeTitle, welcomeBody, defaultName, setWorkspace, bumpContent]);
+
   useEffect(() => {
     const update = () => setOnline(navigator.onLine);
     update();

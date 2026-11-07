@@ -9,6 +9,7 @@ import { rowTitle } from "@/lib/database/query";
 import type { DatabaseData } from "@/lib/database/types";
 import { cn } from "@/lib/utils";
 import type { Api } from "./DatabaseView";
+import { viewDisplayName } from "./view-name";
 
 const DAY_MS = 86_400_000;
 const utc = (iso: string) => new Date(`${iso}T00:00:00Z`);
@@ -166,7 +167,7 @@ export function TimelineView({ api }: { api: Api }) {
               </div>
             ))}
           </div>
-          <ul aria-label={t("timeline.label", { name: view.name })}>
+          <ul aria-label={t("timeline.label", { name: viewDisplayName(view, t) })}>
             {tl.items.map(({ row, start: s, end: e }) => {
               const title = rowTitle(data, row) || t("cell.untitledRow");
               const range = s === e ? fmt(s) : t("timeline.range", { start: fmt(s), end: fmt(e) });

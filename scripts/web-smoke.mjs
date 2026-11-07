@@ -32,7 +32,10 @@ for (const [engineName, engine] of Object.entries(engines)) {
     const ctx = await browser.newContext(opts);
     const page = await ctx.newPage();
     const errors = [];
-    page.on("console", (m) => m.type() === "error" && errors.push(m.text().slice(0, 160)));
+    // Firefox logs a font load that a navigation cancelled (NS_BINDING_ABORTED = 2152398850) as an
+    // error; the test navigates fast on purpose, so that one is not a fault of the page.
+    const aborted = (t) => /downloadable font: download failed/.test(t) && /status=2152398850/.test(t);
+    page.on("console", (m) => m.type() === "error" && !aborted(m.text()) && errors.push(m.text().slice(0, 160)));
     page.on("pageerror", (e) => errors.push(String(e).slice(0, 160)));
     const where = `${engineName}/${formName}`;
     try {

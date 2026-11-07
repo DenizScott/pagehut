@@ -8,6 +8,7 @@ import type { OptionColor, Row } from "@/lib/database/types";
 import { cn } from "@/lib/utils";
 import { Cell } from "./Cell";
 import type { Api } from "./DatabaseView";
+import { viewDisplayName } from "./view-name";
 
 /** Solid bar colors with at least 3:1 contrast against the track in both themes. */
 const barClass: Record<OptionColor, string> = {
@@ -86,7 +87,7 @@ export function FormView({ api }: { api: Api }) {
 
   return (
     <form
-      aria-label={t("form.label", { name: view.name })}
+      aria-label={t("form.label", { name: viewDisplayName(view, t) })}
       className="max-w-xl rounded-lg border border-hairline bg-canvas p-4"
       onSubmit={(e) => {
         e.preventDefault();
